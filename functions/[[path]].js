@@ -17,7 +17,7 @@ export class StateManager {
     async handleHttpRequest(request) {
         const url = new URL(request.url);
         if (url.pathname === "/api/initial-data") {
-            // APIを呼び出す代わりに、インポートしたJSONデータを直接返す
+            // インポートしたJSONデータを直接返す
             return new Response(JSON.stringify({ teamsData, scriptData }), {
                 headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
             });
@@ -83,10 +83,10 @@ export class StateManager {
 }
 
 // エントリーポイント
-export default {
-    async fetch(request, env) {
-        let id = env.STATE_MANAGER.idFromName("v1");
-        let durableObject = env.STATE_MANAGER.get(id);
-        return durableObject.handleHttpRequest(request, env);
-    }
-}
+export const onRequest = async (context) => {
+    const { request, env } = context;
+    const id = env.STATE_MANAGER.idFromName("v1");
+    const durableObject = env.STATE_MANAGER.get(id);
+
+    return durableObject.handleHttpRequest(request);
+};
