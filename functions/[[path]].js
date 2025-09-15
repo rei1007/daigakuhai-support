@@ -1,5 +1,4 @@
 // --- データ定義 ---
-// JSONファイルをインポートする代わりに、データを直接コードに埋め込む
 const teamsData = [
     {
         "id": "team_a", "university": "イカ大学", "teamName": "インクリングス",
@@ -31,7 +30,6 @@ const scriptData = [
     { "speaker": "解説", "line": "特にプレイヤーF選手は、長射程ブキを使いこなし、相手チームに大きなプレッシャーを与え続けることができますからね。" }
 ];
 
-
 // --- Durable Objectの本体クラス ---
 export class StateManager {
     constructor(state, env) {
@@ -49,7 +47,7 @@ export class StateManager {
         const url = new URL(request.url);
         if (url.pathname === "/api/initial-data") {
             return new Response(JSON.stringify({ teamsData, scriptData }), {
-                headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+                headers: { "Content-Type": "application/json" },
             });
         }
         if (url.pathname === "/api/websocket") {
@@ -61,6 +59,7 @@ export class StateManager {
             await this.handleSession(server);
             return new Response(null, { status: 101, webSocket: client });
         }
+        // API以外のリクエストはPagesが静的ファイルを返すので、ここでは何もしない
         return new Response("Not found", { status: 404 });
     }
 
@@ -112,11 +111,19 @@ export class StateManager {
     }
 }
 
-// --- エントリーポイント ---
-export default {
-    async fetch(request, env) {
-        let id = env.STATE_MANAGER.idFromName("v1");
-        let durableObject = env.STATE_MANAGER.get(id);
-        return durableObject.handleHttpRequest(request);
+// ▼▼▼ エントリーポイントを Pages Functions が認識できる形式に修正 ▼▼▼
+export const onRequest = async (context) => {
+    const { request, env } = context;
+    // `[[path]].js` なので、API以外のリクエストもここに来る。
+    // そのため、静的ファイルへのリクエストはPagesに任せる。
+    const url = new URL(request.url);
+    if (!url.pathname.startsWith('/api/')) {
+        return env.ASSETS.fetch(request);
     }
+
+    // `/api/` へのリクエストだけをDurable Objectに転送する
+    const id = env.STATE_MANAGER.idFromName("v1");
+    const durableObject = env.STATE_MANAGER.get(id);
+
+    return durableObject.handleHttpRequest(request);
 };
