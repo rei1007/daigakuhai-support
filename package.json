@@ -1,9 +1,7 @@
 {
     "name": "daigakuhai-support",
     "private": true,
-    "scripts": {
-        "deploy": "wrangler pages deploy ./public"
-    },
+    "scripts": {},
     "devDependencies": {
         "wrangler": "^3.0.0"
     }

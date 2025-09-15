@@ -24,106 +24,56 @@ const teamsData = [
     }
 ];
 const scriptData = [
-    { "speaker": "実況", "line": "さあ、始まりました大学杯決勝トーナメント！全国の強豪を勝ち抜いてきた2チームによる、頂上決戦です！" },
-    { "speaker": "解説", "line": "今日の注目はやはり、イカ大学のエース、プレイヤーA選手ですね。彼のパフォーマンスが試合の鍵を握るでしょう。" },
-    { "speaker": "実況", "line": "XP3200超え、まさに今大会のスタープレイヤーです！対するオクト大学も、チーム全体の練度が非常に高く、一筋縄ではいきません。" },
-    { "speaker": "解説", "line": "特にプレイヤーF選手は、長射程ブキを使いこなし、相手チームに大きなプレッシャーを与え続けることができますからね。" }
+    { "speaker": "実況", "line": "さあ、始まりました大学杯決勝トーナメント！" },
+    { "speaker": "解説", "line": "今日の注目はやはり、イカ大学のエース、プレイヤーA選手ですね。" }
 ];
 
 // --- Durable Objectの本体クラス ---
 export class StateManager {
-    constructor(state, env) {
-        this.state = state;
-        this.env = env;
-        this.sessions = [];
-        this.state.storage.get(["matchup", "scriptIndex", "comments"]).then(stored => {
-            this.matchup = stored.get("matchup") || { alphaTeamId: null, bravoTeamId: null };
-            this.scriptIndex = stored.get("scriptIndex") || 0;
-            this.comments = stored.get("comments") || [];
-        });
-    }
-
+    constructor(state, env) { this.state = state; this.env = env; this.sessions = []; this.state.storage.get(["matchup", "scriptIndex", "comments"]).then(stored => { this.matchup = stored.get("matchup") || {}; this.scriptIndex = stored.get("scriptIndex") || 0; this.comments = stored.get("comments") || []; }); }
     async handleHttpRequest(request) {
         const url = new URL(request.url);
-        if (url.pathname === "/api/initial-data") {
-            return new Response(JSON.stringify({ teamsData, scriptData }), {
-                headers: { "Content-Type": "application/json" },
-            });
-        }
-        if (url.pathname === "/api/websocket") {
-            const upgradeHeader = request.headers.get("Upgrade");
-            if (upgradeHeader !== "websocket") {
-                return new Response("Expected WebSocket upgrade", { status: 426 });
-            }
-            const [client, server] = Object.values(new WebSocketPair());
-            await this.handleSession(server);
-            return new Response(null, { status: 101, webSocket: client });
-        }
-        // API以外のリクエストはPagesが静的ファイルを返すので、ここでは何もしない
+        if (url.pathname === "/api/initial-data") { return new Response(JSON.stringify({ teamsData, scriptData }), { headers: { "Content-Type": "application/json" } }); }
+        if (url.pathname === "/api/websocket") { const [client, server] = Object.values(new WebSocketPair()); await this.handleSession(server); return new Response(null, { status: 101, webSocket: client }); }
         return new Response("Not found", { status: 404 });
     }
-
     async handleSession(webSocket) {
         webSocket.accept();
         const session = { webSocket, id: crypto.randomUUID() };
         this.sessions.push(session);
-        webSocket.send(JSON.stringify({
-            type: "initialState",
-            payload: { matchup: this.matchup, scriptIndex: this.scriptIndex, comments: this.comments, sessionId: session.id },
-        }));
-        webSocket.addEventListener("message", async msg => {
-            const message = JSON.parse(msg.data);
-            await this.handleMessage(message, session);
-        });
+        webSocket.send(JSON.stringify({ type: "initialState", payload: { matchup: this.matchup, scriptIndex: this.scriptIndex, comments: this.comments, sessionId: session.id } }));
+        webSocket.addEventListener("message", async msg => { await this.handleMessage(JSON.parse(msg.data), session); });
         const closeOrErrorHandler = () => { this.sessions = this.sessions.filter(s => s !== session); };
         webSocket.addEventListener("close", closeOrErrorHandler);
         webSocket.addEventListener("error", closeOrErrorHandler);
     }
-
     async handleMessage(message, session) {
         switch (message.type) {
-            case "setMatchup":
-                this.matchup = message.payload;
-                this.broadcast({ type: "matchupUpdated", payload: this.matchup });
-                await this.state.storage.put("matchup", this.matchup);
-                break;
-            case "advanceScript":
-                this.scriptIndex++;
-                this.broadcast({ type: "scriptUpdated", payload: { newIndex: this.scriptIndex } });
-                await this.state.storage.put("scriptIndex", this.scriptIndex);
-                break;
-            case "postComment":
-                const newComment = { senderId: session.id, text: message.payload.text };
-                this.comments.push(newComment);
-                if (this.comments.length > 2) this.comments.shift();
-                this.broadcast({ type: "commentAdded", payload: this.comments });
-                await this.state.storage.put("comments", this.comments);
-                break;
+            case "setMatchup": this.matchup = message.payload; await this.state.storage.put("matchup", this.matchup); break;
+            case "advanceScript": this.scriptIndex++; await this.state.storage.put("scriptIndex", this.scriptIndex); break;
+            case "postComment": const newComment = { senderId: session.id, text: message.payload.text }; this.comments.push(newComment); if (this.comments.length > 2) this.comments.shift(); await this.state.storage.put("comments", this.comments); break;
         }
+        this.broadcastState();
     }
-
-    broadcast(message) {
-        const serializedMessage = JSON.stringify(message);
-        this.sessions = this.sessions.filter(session => {
-            try { session.webSocket.send(serializedMessage); return true; }
-            catch (err) { return false; }
-        });
+    broadcastState() {
+        const state = {
+            matchup: this.matchup,
+            scriptIndex: this.scriptIndex,
+            comments: this.comments
+        };
+        const message = JSON.stringify({ type: "stateUpdate", payload: state });
+        this.sessions = this.sessions.filter(session => { try { session.webSocket.send(message); return true; } catch (err) { return false; } });
     }
 }
 
-// ▼▼▼ エントリーポイントを Pages Functions が認識できる形式に修正 ▼▼▼
+// --- エントリーポイント ---
 export const onRequest = async (context) => {
     const { request, env } = context;
-    // `[[path]].js` なので、API以外のリクエストもここに来る。
-    // そのため、静的ファイルへのリクエストはPagesに任せる。
     const url = new URL(request.url);
     if (!url.pathname.startsWith('/api/')) {
         return env.ASSETS.fetch(request);
     }
-
-    // `/api/` へのリクエストだけをDurable Objectに転送する
     const id = env.STATE_MANAGER.idFromName("v1");
     const durableObject = env.STATE_MANAGER.get(id);
-
     return durableObject.handleHttpRequest(request);
 };
