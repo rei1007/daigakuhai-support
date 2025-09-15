@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学杯 配信サポート (実況解説ページ)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #202124;
+            --surface-container-color: #F1F3F4;
+            --surface-color: #FFFFFF;
+            --on-surface-color: #202124;
+            --on-surface-variant-color: #5F6368;
+            --outline-color: #BDC1C6;
+            --primary-container-color: #E8EAED;
+            --on-primary-container-color: #202124;
+            --font-family: 'Noto Sans JP', sans-serif;
+            --border-radius-large: 12px;
+            --border-radius-medium: 8px;
+            --greyed-out-color: #9AA0A6;
+            --xp-highlight-color: #E53935;
+            --xp-highlight-bg: #FFEBEE;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--surface-container-color);
+            color: var(--on-surface-color);
+            margin: 0;
+            padding: 16px;
+            font-size: 16px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--surface-color);
+            padding: 12px 20px;
+            border-radius: var(--border-radius-large);
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .connection-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--border-radius-medium);
+            background-color: var(--primary-container-color);
+            color: var(--on-primary-container-color);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .connection-indicator .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #34A853;
+            border-radius: 50%;
+        }
+
+        .script-card {
+            margin-top: 16px;
+            background-color: var(--surface-color);
+            padding: 16px;
+            border-radius: var(--border-radius-large);
+        }
+
+        .script-card h2 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .script-card .script-paragraph {
+            margin: 0 0 8px 0;
+            padding: 4px;
+            font-size: 15px;
+        }
+
+        .script-card .script-paragraph.is-done {
+            color: var(--greyed-out-color);
+        }
+
+        .script-card .script-paragraph b {
+            font-weight: 700;
+        }
+
+        .script-card .card-footer {
+            text-align: right;
+        }
+
+        .script-card .card-footer .outline-button {
+            font-size: 12px;
+            color: var(--on-surface-variant-color);
+            background: none;
+            border: 1px solid var(--outline-color);
+            border-radius: var(--border-radius-medium);
+            cursor: pointer;
+            padding: 6px 12px;
+            font-weight: 500;
+            width: fit-content;
+        }
+
+        .script-card .card-footer .outline-button:hover {
+            background-color: var(--primary-container-color);
+        }
+
+        .control-panel {
+            margin-top: 16px;
+            background-color: var(--surface-color);
+            padding: 16px;
+            border-radius: var(--border-radius-large);
+        }
+
+        .control-panel h2 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .team-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-selector select,
+        .team-selector .static-team-name {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--outline-color);
+            border-radius: var(--border-radius-medium);
+            font-size: 15px;
+            background-color: var(--surface-container-color);
+        }
+
+        .team-selector .vs-text {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .team-selector button {
+            background-color: var(--primary-container-color);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-display-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .team-card {
+            background-color: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--border-radius-large);
+        }
+
+        .team-card .university-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .team-card .team-name {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 2px 0 0 0;
+        }
+
+        .team-card .sub-info {
+            font-size: 14px;
+            color: var(--on-surface-variant-color);
+            margin: 4px 0 16px 0;
+        }
+
+        .team-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--primary-container-color);
+            padding-bottom: 6px;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .team-card p {
+            line-height: 1.7;
+            white-space: pre-wrap;
+            margin: 12px 0;
+        }
+
+        .player-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .player-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--surface-container-color);
+        }
+
+        .player-item:last-child {
+            border-bottom: none;
+        }
+
+        .player-main-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .player-main-info .xp-badge {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+            background-color: var(--primary-container-color);
+            color: var(--on-primary-container-color);
+        }
+
+        .player-main-info .xp-badge.is-highlight {
+            background-color: var(--xp-highlight-bg);
+            color: var(--xp-highlight-color);
+        }
+
+        .player-weapons {
+            margin-top: 6px;
+            font-size: 15px;
+            color: var(--on-surface-variant-color);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.is-active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            padding: 24px;
+            border-radius: var(--border-radius-large);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: sticky;
+            top: -24px;
+            float: right;
+            margin-right: -12px;
+            background: var(--surface-container-color);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .modal-script-list .script-paragraph {
+            padding: 12px 8px;
+            border-radius: var(--border-radius-medium);
+        }
+
+        .modal-script-list .script-paragraph.is-done {
+            color: var(--greyed-out-color);
+        }
+
+        .modal-comment-content {
+            padding: 16px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .modal-comment-content h2 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+        }
+
+        .test-button-area {
+            margin-top: 24px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .test-button-area button {
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1>大学杯 配信サポート (実況解説ページ)</h1>
+        <div class="connection-indicator">
+            <div class="status-dot"></div><span>接続状況: <span id="connection-status">接続中...</span></span>
+        </div>
+    </header>
+    <main>
+        <section class="script-card">
+            <h2>台本</h2>
+            <div id="script-card-content"></div>
+            <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button></div>
+        </section>
+        <section class="control-panel">
+            <div class="control-group">
+                <h2>▼ 現在の対戦チーム</h2>
+                <div class="team-selector">
+                    <div id="matchup-alpha-display" class="static-team-name">（情報待機中）</div><span
+                        class="vs-text">VS</span>
+                    <div id="matchup-bravo-display" class="static-team-name">（情報待機中）</div>
+                </div>
+            </div>
+            <div class="control-group">
+                <h2>▼ 表示チーム切り替え (ローカル)</h2>
+                <div class="team-selector"><select id="view-alpha-select"></select><span
+                        class="vs-text">VS</span><select id="view-bravo-select"></select><button id="sync-view-button"
+                        title="対戦チームの表示に切り替え"><span class="material-icons-outlined">sync_alt</span></button></div>
+            </div>
+        </section>
+        <div class="team-display-area">
+            <div id="team-alpha-card" class="team-card"></div>
+            <div id="team-bravo-card" class="team-card"></div>
+        </div>
+        <div class="test-button-area"><button id="comment-test-button">コメント受信テスト</button></div>
+    </main>
+    <div id="script-modal" class="modal">
+        <div class="modal-content"><button class="modal-close" id="script-modal-close"><span
+                    class="material-icons-outlined">close</span></button>
+            <h2>台本全体</h2>
+            <div class="modal-script-list" id="modal-script-list"></div>
+        </div>
+    </div>
+    <div id="comment-modal" class="modal">
+        <div class="modal-content"><button class="modal-close" id="comment-modal-close"><span
+                    class="material-icons-outlined">close</span></button>
+            <div class="modal-comment-content">
+                <h2>運営からのコメント</h2>
+                <p id="comment-modal-text"></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        let teamsData = [], scriptData = [], scriptState = { currentIndex: 0 }, mySessionId = null, webSocket;
+        const getEl = e => document.getElementById(e), DOMElements = { openScriptModalButton: getEl("open-script-modal-button"), scriptCardContent: getEl("script-card-content"), scriptModal: getEl("script-modal"), modalScriptList: getEl("modal-script-list"), scriptModalClose: getEl("script-modal-close"), commentModal: getEl("comment-modal"), commentModalText: getEl("comment-modal-text"), commentModalClose: getEl("comment-modal-close"), commentTestButton: getEl("comment-test-button"), matchupAlphaDisplay: getEl("matchup-alpha-display"), matchupBravoDisplay: getEl("matchup-bravo-display"), viewAlphaSelect: getEl("view-alpha-select"), viewBravoSelect: getEl("view-bravo-select"), syncViewButton: getEl("sync-view-button"), teamAlphaCard: getEl("team-alpha-card"), teamBravoCard: getEl("team-bravo-card"), connectionStatus: getEl("connection-status") };
+        const renderScript = () => { let e = scriptData.slice(scriptState.currentIndex, scriptState.currentIndex + 2).map(e => `<p class="script-paragraph"><b>${e.speaker}:</b> ${e.line}</p>`).join(""); DOMElements.scriptCardContent.innerHTML = e || '<p class="script-paragraph is-done">台本は終了しました。</p>', DOMElements.modalScriptList.innerHTML = scriptData.map((e, t) => `<div class="script-paragraph ${t < scriptState.currentIndex ? "is-done" : ""}" data-index="${t}"><b>${e.speaker}:</b> ${e.line}</div>`).join("") }, createTeamCardHTML = e => {
+            const t = teamsData.find(t => t.id === e); if (!t) return "<h3>チームを選択してください</h3>"; const n = [{ name: t.p1_name, xp: t.p1_xp, weapons: t.p1_weapons }, { name: t.p2_name, xp: t.p2_xp, weapons: t.p2_weapons }, { name: t.p3_name, xp: t.p3_xp, weapons: t.p3_weapons }, { name: t.p4_name, xp: t.p4_xp, weapons: t.p4_weapons }].filter(e => e.name).map(e => `<li class="player-item">
+                    <div class="player-main-info">
+                        <span class="name">${e.name}</span>
+                        <span class="xp-badge ${e.xp >= 3200 ? "is-highlight" : ""}">XP: ${e.xp}</span>
+                    </div>
+                    <div class="player-weapons">${(e.weapons || "").replace(/\//g, " / ")}</div>
+                </li>`).join(""); return `<p class="university-name">${t.university}</p><h2 class="team-name">${t.teamName}</h2>
+                <p class="sub-info">${t.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${n}</ul>
+                <h3>コメント</h3><p>${t.comment}</p><h3>チーム補足情報</h3><p>${t.teamInfo}</p>
+                <h3>プレイヤー補足情報</h3><p>${t.playerInfo}</p><h3>サークル情報</h3><p>${t.circleInfo}</p>`
+        }, updateTeamDisplay = () => { DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value), DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value) }, showCommentModal = e => { DOMElements.commentModalText.textContent = e, DOMElements.commentModal.classList.add("is-active") };
+        const connectWebSocket = () => { const e = `${"https:" === window.location.protocol ? "wss:" : "ws:"}//${window.location.host}/api/websocket`; (webSocket = new WebSocket(e)).onopen = () => DOMElements.connectionStatus.textContent = "正常", webSocket.onmessage = e => { const t = JSON.parse(e.data); switch (t.type) { case "initialState": { mySessionId = t.payload.sessionId, scriptState.currentIndex = t.payload.scriptIndex; const e = teamsData.find(e => e.id === t.payload.matchup.alphaTeamId), n = teamsData.find(e => e.id === t.payload.matchup.bravoTeamId); e && (DOMElements.matchupAlphaDisplay.textContent = e.teamName), n && (DOMElements.matchupBravoDisplay.textContent = n.teamName), renderScript(); break } case "scriptUpdated": scriptState.currentIndex = t.payload.newIndex, renderScript(); break; case "commentAdded": const e = t.payload[t.payload.length - 1]; e && showCommentModal(e.text); break; case "matchupUpdated": { const e = teamsData.find(e => e.id === t.payload.alphaTeamId), n = teamsData.find(e => e.id === t.payload.bravoTeamId); e && (DOMElements.matchupAlphaDisplay.textContent = e.teamName), n && (DOMElements.matchupBravoDisplay.textContent = n.teamName) } } }, webSocket.onclose = () => { DOMElements.connectionStatus.textContent = "切断", setTimeout(connectWebSocket, 5e3) }, webSocket.onerror = () => DOMElements.connectionStatus.textContent = "エラー" };
+        const initializePage = async () => { try { const e = await fetch("/api/initial-data"), t = await e.json(); teamsData = t.teamsData, scriptData = t.scriptData } catch (e) { return void alert("初期データの読み込みに失敗しました。") } document.querySelectorAll("select").forEach(e => { e.innerHTML = "", teamsData.forEach(t => { const n = document.createElement("option"); n.value = t.id, n.textContent = t.teamName, e.appendChild(n) }) }), DOMElements.viewAlphaSelect.onchange = updateTeamDisplay, DOMElements.viewBravoSelect.onchange = updateTeamDisplay, DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add("is-active"), DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove("is-active"), DOMElements.scriptModal.onclick = e => { e.target === DOMElements.scriptModal && DOMElements.scriptModal.classList.remove("is-active") }, DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove("is-active"), DOMElements.commentModal.onclick = e => { e.target === DOMElements.commentModal && DOMElements.commentModal.classList.remove("is-active") }, DOMElements.commentTestButton.onclick = () => showCommentModal("まもなく試合が再開します。準備をお願いします。"), DOMElements.syncViewButton.onclick = () => { const e = teamsData.find(e => e.teamName === DOMElements.matchupAlphaDisplay.textContent), t = teamsData.find(e => e.teamName === DOMElements.matchupBravoDisplay.textContent); e && (DOMElements.viewAlphaSelect.value = e.id), t && (DOMElements.viewBravoSelect.value = t.id), updateTeamDisplay() }, updateTeamDisplay(), connectWebSocket() };
+        document.addEventListener("DOMContentLoaded", initializePage);
+    </script>
+</body>
+
+</html>
