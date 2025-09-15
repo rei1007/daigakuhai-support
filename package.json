@@ -1,8 +1,4 @@
 {
     "name": "daigakuhai-support",
-    "private": true,
-    "scripts": {},
-    "devDependencies": {
-        "wrangler": "^3.0.0"
-    }
+    "private": true
 }

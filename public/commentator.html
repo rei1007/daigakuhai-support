@@ -9,6 +9,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <script src="https://achex.ca/achex.js"></script>
+
+    <script>
+        const teamsData = [
+            { "id": "team_a", "university": "イカ大学", "teamName": "インクリングス", "comment": "優勝目指して頑張ります！", "teamInfo": "連携力を武器にするチーム。", "playerInfo": "プレイヤーAはXP3200を超えるエース。", "circleName": "インク研究会", "circleInfo": "学内最大規模のサークル。", "p1_name": "プレイヤーA", "p1_xp": "3250", "p1_weapons": "スプラシューター/N-ZAP85/シャープマーカー", "p2_name": "プレイヤーB", "p2_xp": "2750", "p2_weapons": "プライムシューター", "p3_name": "プレイヤーC", "p3_xp": "2600", "p3_weapons": "リッター4K/スプラスコープ", "p4_name": "プレイヤーD", "p4_xp": "2650", "p4_weapons": "スクリュースロッシャー" },
+            { "id": "team_b", "university": "オクト大学", "teamName": "オクトエキスパンションズ", "comment": "楽しんで勝ちにいきます。", "teamInfo": "個々の対面能力が非常に高い。", "playerInfo": "プレイヤーFは大会屈指のXPを持つ司令塔。", "circleName": "タコゲーミング", "circleInfo": "プロ選手を輩出した強豪。", "p1_name": "プレイヤーE", "p1_xp": "2900", "p1_weapons": "デュアルスイーパーカスタム", "p2_name": "プレイヤーF", "p2_xp": "3300", "p2_weapons": "スプラチャージャー/ジェットスイーパー", "p3_name": "プレイヤーG", "p3_xp": "2720", "p3_weapons": "ジムワイパー", "p4_name": "プレイヤーH", "p4_xp": "2680", "p4_weapons": "LACT-450/プロモデラーRG" }
+        ];
+        const scriptData = [
+            { "speaker": "実況", "line": "さあ、始まりました大学杯決勝トーナメント！" }, { "speaker": "解説", "line": "今日の注目はやはり、イカ大学のエース、プレイヤーA選手ですね。" },
+            { "speaker": "実況", "line": "XP3200超え、まさに今大会のスタープレイヤーです！" }, { "speaker": "解説", "line": "対するオクト大学も、チーム全体の練度が非常に高い。" }
+        ];
+    </script>
+
     <style>
         :root {
             --primary-color: #202124;
@@ -228,10 +242,6 @@
             border-bottom: 1px solid var(--surface-container-color);
         }
 
-        .player-item:last-child {
-            border-bottom: none;
-        }
-
         .player-main-info {
             display: flex;
             justify-content: space-between;
@@ -391,23 +401,93 @@
         </div>
     </div>
     <script>
-        let teamsData = [], scriptData = [], scriptState = { currentIndex: 0 }, mySessionId = null, webSocket;
-        const getEl = e => document.getElementById(e), DOMElements = { openScriptModalButton: getEl("open-script-modal-button"), scriptCardContent: getEl("script-card-content"), scriptModal: getEl("script-modal"), modalScriptList: getEl("modal-script-list"), scriptModalClose: getEl("script-modal-close"), commentModal: getEl("comment-modal"), commentModalText: getEl("comment-modal-text"), commentModalClose: getEl("comment-modal-close"), commentTestButton: getEl("comment-test-button"), matchupAlphaDisplay: getEl("matchup-alpha-display"), matchupBravoDisplay: getEl("matchup-bravo-display"), viewAlphaSelect: getEl("view-alpha-select"), viewBravoSelect: getEl("view-bravo-select"), syncViewButton: getEl("sync-view-button"), teamAlphaCard: getEl("team-alpha-card"), teamBravoCard: getEl("team-bravo-card"), connectionStatus: getEl("connection-status") };
-        const renderScript = () => { let e = scriptData.slice(scriptState.currentIndex, scriptState.currentIndex + 2).map(e => `<p class="script-paragraph"><b>${e.speaker}:</b> ${e.line}</p>`).join(""); DOMElements.scriptCardContent.innerHTML = e || '<p class="script-paragraph is-done">台本は終了しました。</p>', DOMElements.modalScriptList.innerHTML = scriptData.map((e, t) => `<div class="script-paragraph ${t < scriptState.currentIndex ? "is-done" : ""}" data-index="${t}"><b>${e.speaker}:</b> ${e.line}</div>`).join("") }, createTeamCardHTML = e => {
-            const t = teamsData.find(t => t.id === e); if (!t) return "<h3>チームを選択してください</h3>"; const n = [{ name: t.p1_name, xp: t.p1_xp, weapons: t.p1_weapons }, { name: t.p2_name, xp: t.p2_xp, weapons: t.p2_weapons }, { name: t.p3_name, xp: t.p3_xp, weapons: t.p3_weapons }, { name: t.p4_name, xp: t.p4_xp, weapons: t.p4_weapons }].filter(e => e.name).map(e => `<li class="player-item">
-                    <div class="player-main-info">
-                        <span class="name">${e.name}</span>
-                        <span class="xp-badge ${e.xp >= 3200 ? "is-highlight" : ""}">XP: ${e.xp}</span>
-                    </div>
-                    <div class="player-weapons">${(e.weapons || "").replace(/\//g, " / ")}</div>
-                </li>`).join(""); return `<p class="university-name">${t.university}</p><h2 class="team-name">${t.teamName}</h2>
-                <p class="sub-info">${t.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${n}</ul>
-                <h3>コメント</h3><p>${t.comment}</p><h3>チーム補足情報</h3><p>${t.teamInfo}</p>
-                <h3>プレイヤー補足情報</h3><p>${t.playerInfo}</p><h3>サークル情報</h3><p>${t.circleInfo}</p>`
-        }, updateTeamDisplay = () => { DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value), DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value) }, showCommentModal = e => { DOMElements.commentModalText.textContent = e, DOMElements.commentModal.classList.add("is-active") };
-        const connectWebSocket = () => { const e = `${"https:" === window.location.protocol ? "wss:" : "ws:"}//${window.location.host}/api/websocket`; (webSocket = new WebSocket(e)).onopen = () => DOMElements.connectionStatus.textContent = "正常", webSocket.onmessage = e => { const t = JSON.parse(e.data); switch (t.type) { case "initialState": { mySessionId = t.payload.sessionId, scriptState.currentIndex = t.payload.scriptIndex; const e = teamsData.find(e => e.id === t.payload.matchup.alphaTeamId), n = teamsData.find(e => e.id === t.payload.matchup.bravoTeamId); e && (DOMElements.matchupAlphaDisplay.textContent = e.teamName), n && (DOMElements.matchupBravoDisplay.textContent = n.teamName), renderScript(); break } case "scriptUpdated": scriptState.currentIndex = t.payload.newIndex, renderScript(); break; case "commentAdded": const e = t.payload[t.payload.length - 1]; e && showCommentModal(e.text); break; case "matchupUpdated": { const e = teamsData.find(e => e.id === t.payload.alphaTeamId), n = teamsData.find(e => e.id === t.payload.bravoTeamId); e && (DOMElements.matchupAlphaDisplay.textContent = e.teamName), n && (DOMElements.matchupBravoDisplay.textContent = n.teamName) } } }, webSocket.onclose = () => { DOMElements.connectionStatus.textContent = "切断", setTimeout(connectWebSocket, 5e3) }, webSocket.onerror = () => DOMElements.connectionStatus.textContent = "エラー" };
-        const initializePage = async () => { try { const e = await fetch("/api/initial-data"), t = await e.json(); teamsData = t.teamsData, scriptData = t.scriptData } catch (e) { return void alert("初期データの読み込みに失敗しました。") } document.querySelectorAll("select").forEach(e => { e.innerHTML = "", teamsData.forEach(t => { const n = document.createElement("option"); n.value = t.id, n.textContent = t.teamName, e.appendChild(n) }) }), DOMElements.viewAlphaSelect.onchange = updateTeamDisplay, DOMElements.viewBravoSelect.onchange = updateTeamDisplay, DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add("is-active"), DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove("is-active"), DOMElements.scriptModal.onclick = e => { e.target === DOMElements.scriptModal && DOMElements.scriptModal.classList.remove("is-active") }, DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove("is-active"), DOMElements.commentModal.onclick = e => { e.target === DOMElements.commentModal && DOMElements.commentModal.classList.remove("is-active") }, DOMElements.commentTestButton.onclick = () => showCommentModal("まもなく試合が再開します。準備をお願いします。"), DOMElements.syncViewButton.onclick = () => { const e = teamsData.find(e => e.teamName === DOMElements.matchupAlphaDisplay.textContent), t = teamsData.find(e => e.teamName === DOMElements.matchupBravoDisplay.textContent); e && (DOMElements.viewAlphaSelect.value = e.id), t && (DOMElements.viewBravoSelect.value = t.id), updateTeamDisplay() }, updateTeamDisplay(), connectWebSocket() };
-        document.addEventListener("DOMContentLoaded", initializePage);
+        // --- DOM要素 ---
+        const getEl = (id) => document.getElementById(id);
+        const DOMElements = {
+            connectionStatus: getEl('connection-status'),
+            openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'),
+            scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
+            commentModal: getEl('comment-modal'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
+            commentTestButton: getEl('comment-test-button'),
+            matchupAlphaDisplay: getEl('matchup-alpha-display'), matchupBravoDisplay: getEl('matchup-bravo-display'),
+            viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
+            syncViewButton: getEl('sync-view-button'), teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card')
+        };
+
+        // --- Achexセットアップ ---
+        const achex = new Achex("daigakuhai-support@00001625"); // ★★★ Achexで取得したPublic Keyに書き換えてください ★★★
+        const channel = achex.channel("daigakuhai-support-1");
+
+        channel.on("connect", () => { DOMElements.connectionStatus.textContent = "正常"; });
+        channel.on("disconnect", () => { DOMElements.connectionStatus.textContent = "切断"; });
+
+        channel.on("stateUpdate", (state) => {
+            renderScript(state.scriptIndex);
+            const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
+            const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
+            if (alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
+            if (bravo) DOMElements.matchupBravoDisplay.textContent = bravo.teamName;
+        });
+
+        channel.on("comment", (text) => { showCommentModal(text); });
+
+        // --- レンダリング関数 ---
+        const renderScript = (currentIndex) => {
+            const cardContent = scriptData.slice(currentIndex, currentIndex + 2).map(p => `<p class="script-paragraph"><b>${p.speaker}:</b> ${p.line}</p>`).join('') || '<p class="script-paragraph is-done">台本は終了しました。</p>';
+            DOMElements.scriptCardContent.innerHTML = cardContent;
+            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
+        };
+        const createTeamCardHTML = (teamId) => {
+            const team = teamsData.find(t => t.id === teamId);
+            if (!team) return '<h3>チームを選択してください</h3>';
+            const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
+            const playerListHTML = players.filter(p => p.name).map(p => `
+                <li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
+            return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
+        };
+        const updateTeamDisplay = () => {
+            DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
+            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
+        };
+        const showCommentModal = (text) => {
+            DOMElements.commentModalText.textContent = text;
+            DOMElements.commentModal.classList.add('is-active');
+        };
+
+        // --- 初期化 & イベントリスナー ---
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('select').forEach(select => {
+                teamsData.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team.id;
+                    option.textContent = team.teamName;
+                    select.appendChild(option);
+                });
+            });
+
+            DOMElements.viewAlphaSelect.value = teamsData[0].id;
+            DOMElements.viewBravoSelect.value = teamsData[1].id;
+            updateTeamDisplay();
+            renderScript(0);
+
+            DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
+            DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
+
+            DOMElements.syncViewButton.onclick = () => {
+                const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
+                const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
+                if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
+                if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
+                updateTeamDisplay();
+            };
+
+            DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
+            DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
+            DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
+            DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+            DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
+            DOMElements.commentTestButton.onclick = () => showCommentModal('まもなく試合が再開します。準備をお願いします。');
+        });
     </script>
 </body>
 

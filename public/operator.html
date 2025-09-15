@@ -9,6 +9,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <script src="https://achex.ca/achex.js"></script>
+
+    <script>
+        const teamsData = [
+            { "id": "team_a", "university": "イカ大学", "teamName": "インクリングス", "comment": "優勝目指して頑張ります！", "teamInfo": "連携力を武器にするチーム。", "playerInfo": "プレイヤーAはXP3200を超えるエース。", "circleName": "インク研究会", "circleInfo": "学内最大規模のサークル。", "p1_name": "プレイヤーA", "p1_xp": "3250", "p1_weapons": "スプラシューター/N-ZAP85/シャープマーカー", "p2_name": "プレイヤーB", "p2_xp": "2750", "p2_weapons": "プライムシューター", "p3_name": "プレイヤーC", "p3_xp": "2600", "p3_weapons": "リッター4K/スプラスコープ", "p4_name": "プレイヤーD", "p4_xp": "2650", "p4_weapons": "スクリュースロッシャー" },
+            { "id": "team_b", "university": "オクト大学", "teamName": "オクトエキスパンションズ", "comment": "楽しんで勝ちにいきます。", "teamInfo": "個々の対面能力が非常に高い。", "playerInfo": "プレイヤーFは大会屈指のXPを持つ司令塔。", "circleName": "タコゲーミング", "circleInfo": "プロ選手を輩出した強豪。", "p1_name": "プレイヤーE", "p1_xp": "2900", "p1_weapons": "デュアルスイーパーカスタム", "p2_name": "プレイヤーF", "p2_xp": "3300", "p2_weapons": "スプラチャージャー/ジェットスイーパー", "p3_name": "プレイヤーG", "p3_xp": "2720", "p3_weapons": "ジムワイパー", "p4_name": "プレイヤーH", "p4_xp": "2680", "p4_weapons": "LACT-450/プロモデラーRG" }
+        ];
+        const scriptData = [
+            { "speaker": "実況", "line": "さあ、始まりました大学杯決勝トーナメント！" }, { "speaker": "解説", "line": "今日の注目はやはり、イカ大学のエース、プレイヤーA選手ですね。" },
+            { "speaker": "実況", "line": "XP3200超え、まさに今大会のスタープレイヤーです！" }, { "speaker": "解説", "line": "対するオクト大学も、チーム全体の練度が非常に高い。" }
+        ];
+    </script>
+
     <style>
         :root {
             --primary-color: #202124;
@@ -132,11 +146,6 @@
         .comment-history .badge.is-self {
             background-color: var(--primary-container-color);
             color: var(--on-primary-container-color);
-        }
-
-        .comment-history .badge.is-other {
-            background-color: var(--on-surface-variant-color);
-            color: white;
         }
 
         .script-card {
@@ -303,10 +312,6 @@
             border-bottom: 1px solid var(--surface-container-color);
         }
 
-        .player-item:last-child {
-            border-bottom: none;
-        }
-
         .player-main-info {
             display: flex;
             justify-content: space-between;
@@ -443,28 +448,127 @@
         </div>
     </div>
     <script>
-        let teamsData = [], scriptData = [], scriptState = { currentIndex: 0 }, commentHistory = [], mySessionId = null, webSocket;
-        const getEl = e => document.getElementById(e), DOMElements = { commentInput: getEl("comment-input"), sendCommentButton: getEl("send-comment-button"), commentHistory: getEl("comment-history"), openScriptModalButton: getEl("open-script-modal-button"), scriptCardContent: getEl("script-card-content"), nextScriptButton: getEl("next-script-button"), scriptModal: getEl("script-modal"), modalScriptList: getEl("modal-script-list"), scriptModalClose: getEl("script-modal-close"), matchupAlphaSelect: getEl("matchup-alpha-select"), matchupBravoSelect: getEl("matchup-bravo-select"), viewAlphaSelect: getEl("view-alpha-select"), viewBravoSelect: getEl("view-bravo-select"), syncViewButton: getEl("sync-view-button"), teamAlphaCard: getEl("team-alpha-card"), teamBravoCard: getEl("team-bravo-card"), connectionStatus: getEl("connection-status") };
-        const renderComments = () => {
-            DOMElements.commentHistory.innerHTML = commentHistory.map(e => `<div class="comment-item">
-                    <span class="badge ${e.senderId === mySessionId ? "is-self" : "is-other"}">${e.senderId === mySessionId ? "Me" : "Others"}</span>
-                    <span class="text">${e.text}</span>
-                </div>`).join("")
-        }, renderScript = () => { let e = scriptData.slice(scriptState.currentIndex, scriptState.currentIndex + 2).map((e, t) => `<p class="script-paragraph ${0 === t && scriptState.currentIndex < scriptData.length ? "is-current" : ""}"><b>${e.speaker}:</b> ${e.line}</p>`).join(""); DOMElements.scriptCardContent.innerHTML = e || '<p class="script-paragraph is-done">台本は終了しました。</p>', DOMElements.modalScriptList.innerHTML = scriptData.map((e, t) => { let n = ""; return t < scriptState.currentIndex && (n = "is-done"), t === scriptState.currentIndex && (n = "is-current"), `<div class="script-paragraph ${n}" data-index="${t}"><b>${e.speaker}:</b> ${e.line}</div>` }).join("") }, createTeamCardHTML = e => {
-            const t = teamsData.find(t => t.id === e); if (!t) return "<h3>チームを選択してください</h3>"; const n = [{ name: t.p1_name, xp: t.p1_xp, weapons: t.p1_weapons }, { name: t.p2_name, xp: t.p2_xp, weapons: t.p2_weapons }, { name: t.p3_name, xp: t.p3_xp, weapons: t.p3_weapons }, { name: t.p4_name, xp: t.p4_xp, weapons: t.p4_weapons }].filter(e => e.name).map(e => `<li class="player-item">
-                    <div class="player-main-info">
-                        <span class="name">${e.name}</span>
-                        <span class="xp-badge ${e.xp >= 3200 ? "is-highlight" : ""}">XP: ${e.xp}</span>
-                    </div>
-                    <div class="player-weapons">${(e.weapons || "").replace(/\//g, " / ")}</div>
-                </li>`).join(""); return `<p class="university-name">${t.university}</p><h2 class="team-name">${t.teamName}</h2>
-                <p class="sub-info">${t.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${n}</ul>
-                <h3>コメント</h3><p>${t.comment}</p><h3>チーム補足情報</h3><p>${t.teamInfo}</p>
-                <h3>プレイヤー補足情報</h3><p>${t.playerInfo}</p><h3>サークル情報</h3><p>${t.circleInfo}</p>`
-        }, updateTeamDisplay = () => { DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value), DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value) };
-        const connectWebSocket = () => { const e = `${"https:" === window.location.protocol ? "wss:" : "ws:"}//${window.location.host}/api/websocket`; (webSocket = new WebSocket(e)).onopen = () => { DOMElements.connectionStatus.textContent = "正常" }, webSocket.onmessage = e => { const t = JSON.parse(e.data); switch (t.type) { case "initialState": mySessionId = t.payload.sessionId, scriptState.currentIndex = t.payload.scriptIndex, commentHistory = t.payload.comments || [], t.payload.matchup.alphaTeamId && (DOMElements.matchupAlphaSelect.value = t.payload.matchup.alphaTeamId, DOMElements.matchupBravoSelect.value = t.payload.matchup.bravoTeamId), renderComments(), renderScript(); break; case "scriptUpdated": scriptState.currentIndex = t.payload.newIndex, renderScript(); break; case "commentAdded": commentHistory = t.payload, renderComments(); break; case "matchupUpdated": DOMElements.matchupAlphaSelect.value = t.payload.alphaTeamId, DOMElements.matchupBravoSelect.value = t.payload.bravoTeamId } }, webSocket.onclose = () => { DOMElements.connectionStatus.textContent = "切断", setTimeout(connectWebSocket, 5e3) }, webSocket.onerror = () => { DOMElements.connectionStatus.textContent = "エラー" } }, sendMessage = (e, t) => { webSocket && webSocket.readyState === WebSocket.OPEN && webSocket.send(JSON.stringify({ type: e, payload: t })) };
-        const initializePage = async () => { try { const e = await fetch("/api/initial-data"), t = await e.json(); teamsData = t.teamsData, scriptData = t.scriptData } catch (e) { return void alert("初期データの読み込みに失敗しました。バックエンドサーバーが起動しているか確認してください。") } document.querySelectorAll("select").forEach(e => { e.innerHTML = "", teamsData.forEach(t => { const n = document.createElement("option"); n.value = t.id, n.textContent = t.teamName, e.appendChild(n) }) }), DOMElements.viewAlphaSelect.onchange = updateTeamDisplay, DOMElements.viewBravoSelect.onchange = updateTeamDisplay, DOMElements.matchupAlphaSelect.onchange = () => sendMessage("setMatchup", { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value }), DOMElements.matchupBravoSelect.onchange = () => sendMessage("setMatchup", { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value }), DOMElements.sendCommentButton.onclick = () => { const e = DOMElements.commentInput.value.trim(); e && (sendMessage("postComment", { text: e }), DOMElements.commentInput.value = "") }, DOMElements.nextScriptButton.onclick = () => sendMessage("advanceScript"), DOMElements.modalScriptList.onclick = e => { const t = e.target.closest(".script-paragraph"); t && t.classList.contains("is-current") && sendMessage("advanceScript") }, DOMElements.syncViewButton.onclick = () => { DOMElements.viewAlphaSelect.value = DOMElements.matchupAlphaSelect.value, DOMElements.viewBravoSelect.value = DOMElements.matchupBravoSelect.value, updateTeamDisplay() }, DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add("is-active"), DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove("is-active"), DOMElements.scriptModal.onclick = e => { e.target === DOMElements.scriptModal && DOMElements.scriptModal.classList.remove("is-active") }, updateTeamDisplay(), connectWebSocket() };
-        document.addEventListener("DOMContentLoaded", initializePage);
+        // --- 状態管理 ---
+        const appState = {
+            matchup: { alphaTeamId: 'team_a', bravoTeamId: 'team_b' },
+            scriptIndex: 0
+        };
+
+        // --- DOM要素 ---
+        const getEl = (id) => document.getElementById(id);
+        const DOMElements = {
+            connectionStatus: getEl('connection-status'),
+            commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
+            openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'), nextScriptButton: getEl('next-script-button'),
+            scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
+            matchupAlphaSelect: getEl('matchup-alpha-select'), matchupBravoSelect: getEl('matchup-bravo-select'),
+            viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
+            syncViewButton: getEl('sync-view-button'), teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card')
+        };
+
+        // --- Achexセットアップ ---
+        const achex = new Achex("daigakuhai-support@00001625"); // ★★★ Achexで取得したPublic Keyに書き換えてください ★★★
+        const channel = achex.channel("daigakuhai-support-1");
+
+        channel.on("connect", () => {
+            DOMElements.connectionStatus.textContent = "正常";
+            broadcastState();
+        });
+        channel.on("disconnect", () => { DOMElements.connectionStatus.textContent = "切断"; });
+
+        const broadcastState = () => { channel.emit("stateUpdate", appState); };
+        const broadcastComment = (text) => { channel.emit("comment", text); };
+
+        // --- レンダリング関数 ---
+        const renderComments = (text, sender) => {
+            const historyEl = DOMElements.commentHistory;
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `<span class="badge ${sender === 'self' ? 'is-self' : 'is-other'}">${sender === 'self' ? 'Me' : 'Others'}</span> <span class="text">${text}</span>`;
+            historyEl.appendChild(item);
+            while (historyEl.children.length > 2) {
+                historyEl.removeChild(historyEl.firstChild);
+            }
+        };
+
+        const renderScript = () => {
+            const cardContent = scriptData.slice(appState.scriptIndex, appState.scriptIndex + 2).map((p, i) =>
+                `<p class="script-paragraph ${i === 0 && appState.scriptIndex < scriptData.length ? 'is-current' : ''}"><b>${p.speaker}:</b> ${p.line}</p>`
+            ).join('');
+            DOMElements.scriptCardContent.innerHTML = cardContent || '<p class="script-paragraph is-done">台本は終了しました。</p>';
+            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => {
+                let statusClass = (i < appState.scriptIndex) ? 'is-done' : (i === appState.scriptIndex) ? 'is-current' : '';
+                return `<div class="script-paragraph ${statusClass}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`;
+            }).join('');
+        };
+        const createTeamCardHTML = (teamId) => {
+            const team = teamsData.find(t => t.id === teamId);
+            if (!team) return '<h3>チームを選択してください</h3>';
+            const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
+            const playerListHTML = players.filter(p => p.name).map(p => `
+                <li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
+            return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
+        };
+        const updateTeamDisplay = () => {
+            DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
+            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
+        };
+
+        // --- 初期化 & イベントリスナー ---
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('select').forEach(select => {
+                teamsData.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team.id;
+                    option.textContent = team.teamName;
+                    select.appendChild(option);
+                });
+            });
+
+            DOMElements.matchupAlphaSelect.value = appState.matchup.alphaTeamId;
+            DOMElements.matchupBravoSelect.value = appState.matchup.bravoTeamId;
+            DOMElements.viewAlphaSelect.value = appState.matchup.alphaTeamId;
+            DOMElements.viewBravoSelect.value = appState.matchup.bravoTeamId;
+            updateTeamDisplay();
+            renderScript();
+
+            const matchupChangeHandler = () => {
+                appState.matchup = { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value };
+                broadcastState();
+            };
+            DOMElements.matchupAlphaSelect.onchange = matchupChangeHandler;
+            DOMElements.matchupBravoSelect.onchange = matchupChangeHandler;
+            DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
+            DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
+
+            const advanceScript = () => {
+                if (appState.scriptIndex < scriptData.length) {
+                    appState.scriptIndex++;
+                    renderScript();
+                    broadcastState();
+                }
+            };
+            DOMElements.nextScriptButton.onclick = advanceScript;
+            DOMElements.modalScriptList.onclick = (e) => { if (e.target.closest('.script-paragraph.is-current')) advanceScript(); };
+
+            DOMElements.sendCommentButton.onclick = () => {
+                const text = DOMElements.commentInput.value.trim();
+                if (text) {
+                    broadcastComment(text);
+                    renderComments(text, 'self');
+                    DOMElements.commentInput.value = '';
+                }
+            };
+
+            DOMElements.syncViewButton.onclick = () => {
+                DOMElements.viewAlphaSelect.value = appState.matchup.alphaTeamId;
+                DOMElements.viewBravoSelect.value = appState.matchup.bravoTeamId;
+                updateTeamDisplay();
+            };
+            DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
+            DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
+            DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
+        });
     </script>
 </body>
 
