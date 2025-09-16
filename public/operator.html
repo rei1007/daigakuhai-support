@@ -1,24 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
-<script>
-    // 下のfirebaseConfigオブジェクトを、あなたがFirebaseコンソールからコピーしたものに置き換えてください
-    const firebaseConfig = {
-        apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
-        authDomain: "daigakuhai-support-fb.firebaseapp.com",
-        projectId: "daigakuhai-support-fb",
-        storageBucket: "daigakuhai-support-fb.firebasestorage.app",
-        messagingSenderId: "939931798179",
-        appId: "1:939931798179:web:8320fba89104e81f47cd16"
-    };
-    // Firebaseを初期化
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-</script>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +9,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 
     <style>
         :root {
@@ -153,6 +151,11 @@
             color: var(--on-primary-container-color);
         }
 
+        .comment-history .badge.is-other {
+            background-color: var(--on-surface-variant-color);
+            color: white;
+        }
+
         .script-card {
             background-color: var(--surface-color);
             padding: 16px;
@@ -194,6 +197,11 @@
 
         .script-card .card-footer .outline-button:hover {
             background-color: var(--primary-container-color);
+        }
+
+        .script-card .card-footer .nav-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         .script-card .card-footer button {
@@ -393,15 +401,18 @@
         .modal-script-list .script-paragraph {
             padding: 12px 8px;
             border-radius: var(--border-radius-medium);
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
         .modal-script-list .script-paragraph.is-done {
             color: var(--greyed-out-color);
         }
 
-        .modal-script-list .script-paragraph.is-current {
+        .modal-script-list .script-paragraph:hover {
+            /* ホバーエフェクトを改善 */
+            outline: 2px solid var(--primary-color);
             background-color: var(--primary-container-color);
-            cursor: pointer;
         }
     </style>
 </head>
@@ -423,9 +434,11 @@
         <section class="script-card">
             <h2>台本</h2>
             <div id="script-card-content"></div>
-            <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button><button
-                    id="next-script-button" title="次の段落へ"><span
-                        class="material-icons-outlined">skip_next</span></button></div>
+            <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button>
+                <div class="nav-buttons"><button id="prev-script-button" title="前の段落へ"><span
+                            class="material-icons-outlined">skip_previous</span></button><button id="next-script-button"
+                        title="次の段落へ"><span class="material-icons-outlined">skip_next</span></button></div>
+            </div>
         </section>
         <section class="control-panel">
             <div class="control-group">
@@ -456,7 +469,7 @@
         // --- グローバル変数 ---
         let teamsData = [];
         let scriptData = [];
-        // Firestore上のドキュメントへの参照
+        let mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`; // 簡易的な自分ID
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
 
         // --- DOM要素 ---
@@ -464,48 +477,39 @@
         const DOMElements = {
             connectionStatus: getEl('connection-status'),
             commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
-            openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'), nextScriptButton: getEl('next-script-button'),
+            openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'), nextScriptButton: getEl('next-script-button'), prevScriptButton: getEl('prev-script-button'),
             scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
             matchupAlphaSelect: getEl('matchup-alpha-select'), matchupBravoSelect: getEl('matchup-bravo-select'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButton: getEl('sync-view-button'), teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card')
         };
 
-        // --- Firestoreリスナー (司令塔からの指示を待つ) ---
+        // --- Firestoreリスナー ---
         sessionDocRef.onSnapshot((doc) => {
-            if (!doc.exists) {
-                console.error("Firestoreドキュメントが見つかりません。");
-                DOMElements.connectionStatus.textContent = "DBエラー";
-                return;
-            }
+            if (!doc.exists) { DOMElements.connectionStatus.textContent = "DBエラー"; return; }
             const state = doc.data();
             DOMElements.connectionStatus.textContent = "正常";
 
-            // 状態を画面に反映
-            DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
-            DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
-            renderScript(state.scriptIndex);
-
-            // コメント履歴を更新 (最新1件を表示)
-            if (state.latestComment && state.latestComment.text) {
-                renderComments(state.latestComment.text, state.latestComment.senderId);
+            if (state.matchup) {
+                DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
+                DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
             }
+            renderScript(state.scriptIndex || 0);
+            renderComments(state.comments || []);
         });
 
         // --- レンダリング関数 ---
-        const renderComments = (text, senderId) => {
-            const historyEl = DOMElements.commentHistory;
-            historyEl.innerHTML = ''; // 履歴をクリア
-            const item = document.createElement('div');
-            item.className = 'comment-item';
-            // 今回はシンプルに「運営」と表示
-            item.innerHTML = `<span class="badge is-other">運営</span> <span class="text">${text}</span>`;
-            historyEl.appendChild(item);
+        const renderComments = (comments = []) => {
+            DOMElements.commentHistory.innerHTML = comments.map(c => `
+                <div class="comment-item">
+                    <span class="badge ${c.senderId === mySessionId ? 'is-self' : 'is-other'}">${c.senderId === mySessionId ? 'Me' : 'Others'}</span>
+                    <span class="text">${c.text}</span>
+                </div>`).join('');
         };
         const renderScript = (currentIndex = 0) => {
             const cardContent = scriptData.slice(currentIndex, currentIndex + 2).map((p, i) => `<p class="script-paragraph ${i === 0 && currentIndex < scriptData.length ? 'is-current' : ''}"><b>${p.speaker}:</b> ${p.line}</p>`).join('');
             DOMElements.scriptCardContent.innerHTML = cardContent || '<p class="script-paragraph is-done">台本は終了しました。</p>';
-            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : (i === currentIndex ? 'is-current' : '')}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
+            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
         };
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
@@ -536,11 +540,13 @@
                 });
             });
 
+            DOMElements.viewAlphaSelect.value = teamsData[0]?.id || null;
+            DOMElements.viewBravoSelect.value = teamsData[1]?.id || null;
             updateTeamDisplay();
             renderScript();
         };
 
-        // --- イベントリスナー (司令塔への指示) ---
+        // --- イベントリスナー ---
         const matchupChangeHandler = () => {
             const newMatchup = { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value };
             sessionDocRef.update({ matchup: newMatchup });
@@ -550,20 +556,44 @@
         DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
         DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
 
-        const advanceScript = async () => {
-            const doc = await sessionDocRef.get();
-            const currentIndex = doc.data().scriptIndex || 0;
-            if (currentIndex < scriptData.length) {
-                sessionDocRef.update({ scriptIndex: currentIndex + 1 });
+        const updateScriptIndex = (newIndex) => {
+            if (newIndex >= 0 && newIndex <= scriptData.length) {
+                sessionDocRef.update({ scriptIndex: newIndex });
             }
         };
-        DOMElements.nextScriptButton.onclick = advanceScript;
-        DOMElements.modalScriptList.onclick = (e) => { if (e.target.closest('.script-paragraph.is-current')) advanceScript(); };
+        DOMElements.nextScriptButton.onclick = async () => {
+            const doc = await sessionDocRef.get();
+            updateScriptIndex((doc.data().scriptIndex || 0) + 1);
+        };
+        DOMElements.prevScriptButton.onclick = async () => {
+            const doc = await sessionDocRef.get();
+            updateScriptIndex((doc.data().scriptIndex || 0) - 1);
+        };
+        DOMElements.modalScriptList.onclick = async (e) => {
+            const target = e.target.closest('.script-paragraph');
+            if (!target) return;
+
+            const clickedIndex = parseInt(target.dataset.index, 10);
+            const doc = await sessionDocRef.get();
+            const currentIndex = doc.data().scriptIndex || 0;
+
+            if (clickedIndex < currentIndex) { // 既読をクリックした場合
+                updateScriptIndex(clickedIndex);
+            } else { // 未読をクリックした場合
+                updateScriptIndex(clickedIndex + 1);
+            }
+        };
 
         DOMElements.sendCommentButton.onclick = () => {
             const text = DOMElements.commentInput.value.trim();
             if (text) {
-                sessionDocRef.update({ latestComment: { text: text, senderId: "operator", timestamp: new Date() } });
+                db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(sessionDocRef);
+                    const currentComments = doc.data().comments || [];
+                    const newComment = { text: text, senderId: mySessionId, timestamp: new Date() };
+                    const updatedComments = [...currentComments, newComment].slice(-3); // 末尾3件を保持
+                    transaction.update(sessionDocRef, { comments: updatedComments });
+                });
                 DOMElements.commentInput.value = '';
             }
         };

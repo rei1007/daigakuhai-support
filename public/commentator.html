@@ -1,24 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
-<script>
-    // 下のfirebaseConfigオブジェクトを、あなたがFirebaseコンソールからコピーしたものに置き換えてください
-    const firebaseConfig = {
-        apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
-        authDomain: "daigakuhai-support-fb.firebaseapp.com",
-        projectId: "daigakuhai-support-fb",
-        storageBucket: "daigakuhai-support-fb.firebasestorage.app",
-        messagingSenderId: "939931798179",
-        appId: "1:939931798179:web:8320fba89104e81f47cd16"
-    };
-    // Firebaseを初期化
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-</script>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +9,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 
     <style>
         :root {
@@ -426,25 +424,25 @@
 
         // --- Firestoreリスナー ---
         sessionDocRef.onSnapshot((doc) => {
-            if (!doc.exists) {
-                console.error("Firestoreドキュメントが見つかりません。");
-                DOMElements.connectionStatus.textContent = "DBエラー";
-                return;
-            }
+            if (!doc.exists) { DOMElements.connectionStatus.textContent = "DBエラー"; return; }
             const state = doc.data();
             DOMElements.connectionStatus.textContent = "正常";
 
-            renderScript(state.scriptIndex);
-            const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
-            const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
-            if (alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
-            if (bravo) DOMElements.matchupBravoDisplay.textContent = bravo.teamName;
+            renderScript(state.scriptIndex || 0);
 
-            // 前回のコメントとタイムスタンプが違う場合のみモーダル表示
+            if (state.matchup) {
+                const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
+                const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
+                if (alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
+                if (bravo) DOMElements.matchupBravoDisplay.textContent = bravo.teamName;
+            }
+
+            const comments = state.comments || [];
+            const latestComment = comments[comments.length - 1];
             const lastCommentTime = DOMElements.commentModal.dataset.lastCommentTime || 0;
-            if (state.latestComment && state.latestComment.timestamp && state.latestComment.timestamp.toMillis() > lastCommentTime) {
-                showCommentModal(state.latestComment.text);
-                DOMElements.commentModal.dataset.lastCommentTime = state.latestComment.timestamp.toMillis();
+            if (latestComment && latestComment.timestamp && latestComment.timestamp.toMillis() > lastCommentTime) {
+                showCommentModal(latestComment.text);
+                DOMElements.commentModal.dataset.lastCommentTime = latestComment.timestamp.toMillis();
             }
         });
 
@@ -510,7 +508,7 @@
         DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
         DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
         DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
-        DOMElements.commentTestButton.onclick = () => showCommentModal('これはテストコメントです。');
+        DOMElements.commentTestButton.onclick = () => showCommentModal('まもなく試合が再開します。準備をお願いします。');
 
         document.addEventListener("DOMContentLoaded", initializePage);
     </script>
