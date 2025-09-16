@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja">
 
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+    // 下のfirebaseConfigオブジェクトを、あなたがFirebaseコンソールからコピーしたものに置き換えてください
+    const firebaseConfig = {
+        apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+        authDomain: "daigakuhai-support-fb.firebaseapp.com",
+        projectId: "daigakuhai-support-fb",
+        storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+        messagingSenderId: "939931798179",
+        appId: "1:939931798179:web:8320fba89104e81f47cd16"
+    };
+    // Firebaseを初期化
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+</script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +27,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-
-    <script src="https://achex.ca/achex.js"></script>
 
     <script>
         const teamsData = [
@@ -401,6 +417,11 @@
         </div>
     </div>
     <script>
+        // --- グローバル変数 ---
+        let teamsData = [];
+        let scriptData = [];
+        const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
+
         // --- DOM要素 ---
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -414,25 +435,32 @@
             syncViewButton: getEl('sync-view-button'), teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card')
         };
 
-        // --- Achexセットアップ ---
-        const achex = new Achex("daigakuhai-support@00001625"); // ★★★ Achexで取得したPublic Keyに書き換えてください ★★★
-        const channel = achex.channel("daigakuhai-support-1");
+        // --- Firestoreリスナー ---
+        sessionDocRef.onSnapshot((doc) => {
+            if (!doc.exists) {
+                console.error("Firestoreドキュメントが見つかりません。");
+                DOMElements.connectionStatus.textContent = "DBエラー";
+                return;
+            }
+            const state = doc.data();
+            DOMElements.connectionStatus.textContent = "正常";
 
-        channel.on("connect", () => { DOMElements.connectionStatus.textContent = "正常"; });
-        channel.on("disconnect", () => { DOMElements.connectionStatus.textContent = "切断"; });
-
-        channel.on("stateUpdate", (state) => {
             renderScript(state.scriptIndex);
             const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
             const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
             if (alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
             if (bravo) DOMElements.matchupBravoDisplay.textContent = bravo.teamName;
+
+            // 前回のコメントとタイムスタンプが違う場合のみモーダル表示
+            const lastCommentTime = DOMElements.commentModal.dataset.lastCommentTime || 0;
+            if (state.latestComment && state.latestComment.timestamp && state.latestComment.timestamp.toMillis() > lastCommentTime) {
+                showCommentModal(state.latestComment.text);
+                DOMElements.commentModal.dataset.lastCommentTime = state.latestComment.timestamp.toMillis();
+            }
         });
 
-        channel.on("comment", (text) => { showCommentModal(text); });
-
         // --- レンダリング関数 ---
-        const renderScript = (currentIndex) => {
+        const renderScript = (currentIndex = 0) => {
             const cardContent = scriptData.slice(currentIndex, currentIndex + 2).map(p => `<p class="script-paragraph"><b>${p.speaker}:</b> ${p.line}</p>`).join('') || '<p class="script-paragraph is-done">台本は終了しました。</p>';
             DOMElements.scriptCardContent.innerHTML = cardContent;
             DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
@@ -441,8 +469,7 @@
             const team = teamsData.find(t => t.id === teamId);
             if (!team) return '<h3>チームを選択してください</h3>';
             const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
-            const playerListHTML = players.filter(p => p.name).map(p => `
-                <li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
+            const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
             return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
         };
         const updateTeamDisplay = () => {
@@ -454,8 +481,14 @@
             DOMElements.commentModal.classList.add('is-active');
         };
 
-        // --- 初期化 & イベントリスナー ---
-        document.addEventListener("DOMContentLoaded", () => {
+        // --- 初期化 ---
+        const initializePage = async () => {
+            try {
+                const [teamsRes, scriptRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json')]);
+                teamsData = await teamsRes.json();
+                scriptData = await scriptRes.json();
+            } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
+
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
@@ -465,29 +498,32 @@
                 });
             });
 
-            DOMElements.viewAlphaSelect.value = teamsData[0].id;
-            DOMElements.viewBravoSelect.value = teamsData[1].id;
+            DOMElements.viewAlphaSelect.value = teamsData[0]?.id || null;
+            DOMElements.viewBravoSelect.value = teamsData[1]?.id || null;
             updateTeamDisplay();
-            renderScript(0);
+            renderScript();
+        };
 
-            DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
-            DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
+        // --- イベントリスナー ---
+        DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
+        DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
 
-            DOMElements.syncViewButton.onclick = () => {
-                const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
-                const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
-                if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
-                if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
-                updateTeamDisplay();
-            };
+        DOMElements.syncViewButton.onclick = () => {
+            const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
+            const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
+            if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
+            if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
+            updateTeamDisplay();
+        };
 
-            DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
-            DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
-            DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
-            DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
-            DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
-            DOMElements.commentTestButton.onclick = () => showCommentModal('まもなく試合が再開します。準備をお願いします。');
-        });
+        DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
+        DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
+        DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
+        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+        DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
+        DOMElements.commentTestButton.onclick = () => showCommentModal('これはテストコメントです。');
+
+        document.addEventListener("DOMContentLoaded", initializePage);
     </script>
 </body>
 
