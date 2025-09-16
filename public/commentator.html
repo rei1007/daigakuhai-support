@@ -289,6 +289,26 @@
             flex-shrink: 0;
         }
 
+        .sync-button.is-desynced {
+            background-color: var(--badge-me-bg);
+            color: var(--badge-me-text);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
         .team-display-area {
             display: grid;
             grid-template-columns: 1fr;
@@ -674,6 +694,7 @@
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
+        let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -697,11 +718,20 @@
             DOMElements.connectionStatus.textContent = statusText[status];
         };
 
+        const checkSyncStatus = () => {
+            if (!officialMatchup.alphaTeamId) return;
+            const isSynced = DOMElements.viewAlphaSelect.value === officialMatchup.alphaTeamId && DOMElements.viewBravoSelect.value === officialMatchup.bravoTeamId;
+            DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', !isSynced);
+            DOMElements.syncViewButtonPC.classList.toggle('is-desynced', !isSynced);
+        };
+
         sessionDocRef.onSnapshot((doc) => {
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
+
             if (state.matchup && state.matchup.alphaTeamId) {
+                officialMatchup = state.matchup;
                 const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
                 const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
                 if (alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
@@ -709,6 +739,8 @@
             }
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
+            checkSyncStatus();
+
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
@@ -767,6 +799,7 @@
                 DOMElements.teamAlphaCardWrapper.style.display = 'block';
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
+            checkSyncStatus();
         };
 
         const initializePage = async () => {
@@ -815,11 +848,11 @@
         DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
         DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
         const syncViewToMatchup = () => {
-            const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
-            const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
-            if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
-            if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
-            updateTeamDisplay();
+            if (officialMatchup.alphaTeamId) {
+                DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+                DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
+                updateTeamDisplay();
+            }
         };
         DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
         DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
