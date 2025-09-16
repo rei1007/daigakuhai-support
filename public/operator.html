@@ -509,21 +509,19 @@
         // --- レンダリング関数 ---
         const renderComments = (comments = []) => {
             DOMElements.commentHistory.innerHTML = comments.map(c => `
-                <div class="comment-item">
-                    <span class="badge ${c.senderId === mySessionId ? 'is-self' : 'is-other'}">${c.senderId === mySessionId ? 'Me' : 'Others'}</span>
-                    <span class="text">${c.text}</span>
-                </div>`).join('');
+        <div class="comment-item">
+            <span class="badge ${c.senderId === mySessionId ? 'is-self' : 'is-other'}">${c.senderId === mySessionId ? 'Me' : 'Others'}</span>
+            <span class="text">${c.text}</span>
+        </div>`).join('');
         };
         const renderScript = (currentIndex = 0) => {
             let cardContentHTML = '';
-            // 現在の段落を表示
             if (currentIndex < scriptData.length) {
                 const currentP = scriptData[currentIndex];
                 cardContentHTML += `<p class="script-paragraph is-current"><b>${currentP.speaker}:</b> ${currentP.line}</p>`;
             } else {
                 cardContentHTML += '<p class="script-paragraph is-done">台本は終了しました。</p>';
             }
-            // 次の段落を表示
             if (currentIndex < scriptData.length - 1) {
                 const nextP = scriptData[currentIndex + 1];
                 cardContentHTML += `<p class="script-paragraph"><b>${nextP.speaker}:</b> ${nextP.line}</p>`;
@@ -531,8 +529,6 @@
                 cardContentHTML += '<p class="script-paragraph is-done">- 次で終了です -</p>';
             }
             DOMElements.scriptCardContent.innerHTML = cardContentHTML;
-
-            // モーダルの中身を生成
             DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
         };
         const createTeamCardHTML = (teamId) => {
@@ -608,7 +604,8 @@
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
-                    const newComment = { text: text, senderId: mySessionId, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+                    // ▼▼▼ この行を修正 ▼▼▼
+                    const newComment = { text: text, senderId: mySessionId, timestamp: new Date() }; // serverTimestamp() の代わりに new Date() を使用
                     const updatedComments = [...currentComments, newComment].slice(-3);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
