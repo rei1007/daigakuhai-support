@@ -410,14 +410,14 @@
             color: var(--greyed-out-color);
         }
 
-        .modal-comment-content #comment-modal-heading {
+        .modal-content #comment-modal-heading {
             margin: 0 0 16px 0;
             font-size: 16px;
             font-weight: 700;
             color: var(--on-surface-variant-color);
         }
 
-        .modal-comment-content #comment-modal-text {
+        .modal-content #comment-modal-text {
             font-size: 24px;
             line-height: 1.6;
             margin: 0;
@@ -439,9 +439,37 @@
 
         .segmented-control {
             display: flex;
-            background-color: var(--primary-container-color);
-            padding: 4px;
             border-radius: var(--border-radius-medium);
+            gap: 8px;
+            /* ボタン間の隙間を設定 */
+        }
+
+        .segmented-control button {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--outline-color);
+            /* 枠線を追加 */
+            background-color: var(--surface-color);
+            /* 背景色を白に */
+            color: var(--on-surface-variant-color);
+            /* 文字色をグレーに */
+            border-radius: var(--border-radius-medium);
+            font-size: 14px;
+            font-weight: 500;
+            /* 太さを通常に */
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .segmented-control button.active {
+            background-color: var(--primary-color);
+            /* アクティブな背景色をテーマカラーに */
+            color: white;
+            /* 文字色を白に */
+            border-color: var(--primary-color);
+            /* 枠線の色も合わせる */
+            font-weight: 700;
+            /* 太字にする */
         }
 
         .team-card-wrapper {
