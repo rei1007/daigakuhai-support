@@ -225,39 +225,22 @@
             background-color: var(--surface-color);
             padding: 16px;
             border-radius: var(--border-radius-large);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
         }
 
         .control-panel h2 {
             font-size: 15px;
             font-weight: 700;
-            margin: 0 0 10px 0;
-            width: 100%;
+            margin-bottom: 10px;
         }
 
         .control-group {
             margin-bottom: 16px;
         }
 
-        .control-group.matchup-group {
-            width: 100%;
-        }
-
-        .control-group.local-view-group {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 0;
-        }
-
         .team-selector {
             display: flex;
             align-items: center;
             gap: 10px;
-            flex-grow: 1;
         }
 
         .team-selector select,
@@ -276,7 +259,7 @@
             font-size: 14px;
         }
 
-        .sync-view-button-wrapper button {
+        .sync-button {
             background-color: var(--primary-container-color);
             border: none;
             width: 40px;
@@ -293,7 +276,6 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
-            margin-top: 16px;
         }
 
         .team-card {
@@ -460,23 +442,6 @@
             background-color: var(--primary-container-color);
             padding: 4px;
             border-radius: var(--border-radius-medium);
-            margin-bottom: 16px;
-        }
-
-        .segmented-control button {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            background-color: transparent;
-            border-radius: var(--border-radius-medium);
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .segmented-control button.active {
-            background-color: var(--surface-color);
-            color: var(--primary-color);
         }
 
         .team-card-wrapper {
@@ -487,38 +452,51 @@
             display: block;
         }
 
+        .content-wrapper {
+            margin-top: 16px;
+        }
+
         @media (min-width: 769px) {
             .team-display-area {
                 grid-template-columns: 1fr 1fr;
             }
 
-            .segmented-control {
-                display: none;
-            }
-
             .team-card-wrapper {
                 display: block !important;
+            }
+
+            .segmented-control {
+                display: none;
             }
         }
 
         @media (max-width: 768px) {
             .control-panel {
+                display: flex;
                 flex-direction: column;
-                align-items: stretch;
             }
 
-            .control-group.matchup-group {
-                order: 1;
-            }
-
-            .sync-view-button-wrapper {
-                order: 2;
+            .control-group {
+                width: 100%;
                 text-align: center;
-                margin: -8px 0 8px 0;
             }
 
-            .control-group.local-view-group {
-                order: 3;
+            .sync-button-wrapper {
+                margin: 8px 0;
+            }
+
+            .content-wrapper {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .segmented-control {
+                order: 1;
+                margin-bottom: 16px;
+            }
+
+            .team-display-area {
+                order: 2;
             }
         }
     </style>
@@ -544,7 +522,7 @@
             <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button></div>
         </section>
         <section class="control-panel">
-            <div class="control-group matchup-group">
+            <div class="control-group">
                 <h2>▼ 現在の対戦チーム</h2>
                 <div class="team-selector">
                     <div id="matchup-alpha-display" class="static-team-name">（情報待機中）</div><span
@@ -552,22 +530,24 @@
                     <div id="matchup-bravo-display" class="static-team-name">（情報待機中）</div>
                 </div>
             </div>
-            <div class="sync-view-button-wrapper"><button id="sync-view-button" title="表示チームを対戦チームに同期"><span
-                        class="material-icons-outlined">arrow_downward</span></button></div>
-            <div class="control-group local-view-group">
-                <h2>▼ 表示チーム切り替え (ローカル)</h2>
+            <div class="sync-button-wrapper"><button id="sync-view-button" class="sync-button"
+                    title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button></div>
+            <div class="control-group">
+                <h2>▼ 表示チーム切り替え</h2>
                 <div class="team-selector"><select id="view-alpha-select"></select><span
                         class="vs-text">VS</span><select id="view-bravo-select"></select></div>
             </div>
         </section>
-        <div class="segmented-control"><button id="display-alpha-btn" class="active">アルファ</button><button
-                id="display-bravo-btn">ブラボー</button></div>
-        <div class="team-display-area">
-            <div id="team-alpha-card-wrapper" class="team-card-wrapper active">
-                <div id="team-alpha-card" class="team-card"></div>
-            </div>
-            <div id="team-bravo-card-wrapper" class="team-card-wrapper">
-                <div id="team-bravo-card" class="team-card"></div>
+        <div class="content-wrapper">
+            <div class="segmented-control"><button id="display-alpha-btn" class="active">アルファ</button><button
+                    id="display-bravo-btn">ブラボー</button></div>
+            <div class="team-display-area">
+                <div id="team-alpha-card-wrapper" class="team-card-wrapper active">
+                    <div id="team-alpha-card" class="team-card"></div>
+                </div>
+                <div id="team-bravo-card-wrapper" class="team-card-wrapper">
+                    <div id="team-bravo-card" class="team-card"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -639,7 +619,6 @@
                 const isLatestClass = c.id === latestCommentId ? 'is-latest' : '';
                 return `<div class="comment-item ${isLatestClass}" id="comment-${c.id}"><span class="badge ${badgeClass}">${badgeText}</span><span class="text">${c.text}</span></div>`;
             }).join('');
-
             if (latestCommentId) {
                 const latestEl = getEl(`comment-${latestCommentId}`);
                 if (latestEl && !latestEl.classList.contains('highlighted')) {
@@ -662,6 +641,11 @@
             const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
             return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
         };
+        const showCommentModal = (text, role = '不明') => {
+            DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
+            DOMElements.commentModalText.textContent = text;
+            DOMElements.commentModal.classList.add('is-active');
+        };
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
             DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
@@ -672,11 +656,6 @@
                 DOMElements.teamAlphaCardWrapper.style.display = 'block';
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
-        };
-        const showCommentModal = (text, role = '運営') => {
-            DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
-            DOMElements.commentModalText.textContent = text;
-            DOMElements.commentModal.classList.add('is-active');
         };
 
         const initializePage = async () => {
