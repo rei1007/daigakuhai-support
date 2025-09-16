@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学杯 配信サポート</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #202124; --surface-container-color: #F1F3F4; --surface-color: #FFFFFF;
+            --on-surface-color: #202124; --on-surface-variant-color: #5F6368; --outline-color: #BDC1C6;
+            --primary-container-color: #E8EAED; --on-primary-container-color: #202124;
+            --font-family: 'Noto Sans JP', sans-serif; --border-radius-large: 12px; --border-radius-medium: 8px;
+        }
+        body { font-family: var(--font-family); background-color: var(--surface-container-color); color: var(--on-surface-color); margin: 0; padding: 16px; font-size: 16px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 { font-size: 32px; font-weight: 700; margin: 0; }
+        .header p { color: var(--on-surface-variant-color); margin-top: 8px; }
+        
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .info-card {
+            background-color: var(--surface-color);
+            padding: 24px 32px;
+            border-radius: var(--border-radius-large);
+            display: flex;
+            flex-direction: column;
+        }
+        .info-card h2 {
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0 0 16px 0;
+            text-align: center;
+        }
+
+        .info-card .description {
+            font-size: 15px;
+            color: var(--on-surface-variant-color);
+            line-height: 1.7;
+            border-left: 3px solid var(--primary-container-color);
+            padding-left: 16px;
+            margin: 0 0 24px 0;
+        }
+
+        .info-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 24px 0 12px 0;
+            border-bottom: 1px solid var(--primary-container-color);
+            padding-bottom: 8px;
+        }
+        
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        .info-card ul li {
+            padding-left: 24px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .info-card ul li .material-icons-outlined {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+        
+        .link-area {
+            margin-top: auto; /* カードの下部にボタンを配置 */
+            padding-top: 24px;
+            text-align: center;
+        }
+        .page-link-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius-medium);
+            font-weight: 700;
+            transition: opacity 0.2s;
+        }
+        .page-link-button:hover {
+            opacity: 0.8;
+        }
+
+        /* スマートフォン用のスタイル */
+        @media (max-width: 768px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="header">
+            <h1>大学杯 配信サポート</h1>
+            <p>大会配信の運営・実況解説を円滑にするためのサポートツールです。</p>
+        </header>
+
+        <main class="layout-grid">
+            <section class="info-card">
+                <h2>運営ページ</h2>
+                <p class="description">
+                    配信に表示する情報を管理・操作するためのページです。複数人での同時操作に対応しています。
+                </p>
+                
+                <h3>主な機能</h3>
+                <ul>
+                    <li><span class="material-icons-outlined">send</span><strong>コメント送信:</strong> 実況解説者へ、指示や情報をリアルタイムで送信できます。</li>
+                    <li><span class="material-icons-outlined">skip_next</span><strong>台本進行:</strong> 台本の進行状況を管理し、全部のページで同期させます。</li>
+                    <li><span class="material-icons-outlined">people</span><strong>対戦カード設定:</strong> 現在の公式な対戦カードを設定し、全ページに反映させます。</li>
+                    <li><span class="material-icons-outlined">search</span><strong>ローカル表示切替:</strong> 次の試合のチーム情報などを、他の人に影響を与えずに自分だけで閲覧できます。</li>
+                </ul>
+
+                <div class="link-area">
+                    <a href="./operator.html" class="page-link-button">運営ページを開く</a>
+                </div>
+            </section>
+
+            <section class="info-card">
+                <h2>実況解説ページ</h2>
+                <p class="description">
+                    実況・解説者が、配信に必要な情報をリアルタイムで確認するためのページです。
+                </p>
+                
+                <h3>主な機能</h3>
+                <ul>
+                    <li><span class="material-icons-outlined">chat</span><strong>コメント受信:</strong> 運営からの指示や情報が、画面中央にポップアップで表示されます。</li>
+                    <li><span class="material-icons-outlined">auto_stories</span><strong>台本閲覧:</strong> 運営が管理する台本の進行状況が、自動で画面に反映されます。</li>
+                    <li><span class="material-icons-outlined">people</span><strong>対戦カード確認:</strong> 現在の公式な対戦カードが常に表示されます。</li>
+                    <li><span class="material-icons-outlined">search</span><strong>ローカル表示切替:</strong> 話題に上がったチームの情報などを、自由に閲覧できます。</li>
+                </ul>
+                
+                <div class="link-area">
+                    <a href="./commentator.html" class="page-link-button">実況解説ページを開く</a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
