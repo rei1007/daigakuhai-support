@@ -598,6 +598,7 @@
         let teamsData = [], scriptData = [], mySessionId = `com-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
+        const pageLoadTime = Date.now(); // ▼▼▼ ページ読み込み時刻を記録 ▼▼▼
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -608,7 +609,7 @@
             commentModal: getEl('comment-modal'), commentModalHeading: getEl('comment-modal-heading'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
             matchupAlphaDisplay: getEl('matchup-alpha-display'), matchupBravoDisplay: getEl('matchup-bravo-display'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
-            syncViewButton: getEl('sync-view-button'),
+            syncViewButtonMobile: getEl('sync-view-button-mobile'), syncViewButtonPC: getEl('sync-view-button-pc'),
             teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'),
             teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
@@ -628,10 +629,11 @@
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
 
+            // ▼▼▼ モーダル表示ロジックを修正 ▼▼▼
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
-                if (lastComment.timestamp && lastComment.timestamp.toMillis() > lastShownTime) {
+                if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role);
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
@@ -730,13 +732,15 @@
 
         DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
         DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
-        DOMElements.syncViewButton.onclick = () => {
+        const syncViewToMatchup = () => {
             const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
             const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
             if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
             if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
             updateTeamDisplay();
         };
+        DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
+        DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
 
         DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
         DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');

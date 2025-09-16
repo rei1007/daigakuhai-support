@@ -641,6 +641,7 @@
         let teamsData = [], scriptData = [], mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
+        const pageLoadTime = Date.now(); // ▼▼▼ ページ読み込み時刻を記録 ▼▼▼
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -665,10 +666,12 @@
             }
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
+
+            // ▼▼▼ モーダル表示ロジックを修正 ▼▼▼
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
-                if (lastComment.timestamp && lastComment.timestamp.toMillis() > lastShownTime) {
+                if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role);
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
@@ -706,7 +709,7 @@
             const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
             return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
         };
-        const showCommentModal = (text, role = '不明') => {
+        const showCommentModal = (text, role = '運営') => {
             DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
             DOMElements.commentModalText.textContent = text;
             DOMElements.commentModal.classList.add('is-active');
