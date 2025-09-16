@@ -9,8 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
@@ -23,8 +25,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
+
     <style>
-        /* CSSの内容はoperator.htmlと共通 */
         :root {
             --primary-color: #202124;
             --surface-container-color: #F1F3F4;
@@ -441,7 +443,6 @@
             display: flex;
             border-radius: var(--border-radius-medium);
             gap: 8px;
-            /* ボタン間の隙間を設定 */
         }
 
         .segmented-control button {
@@ -496,21 +497,40 @@
             .segmented-control {
                 display: none;
             }
+
+            .sync-button-mobile {
+                display: none;
+            }
+
+            .control-panel .local-view-group {
+                display: flex;
+                align-items: center;
+            }
+
+            .control-panel .local-view-group .team-selector {
+                flex-grow: 1;
+            }
+
+            .control-panel .local-view-group .sync-button-pc {
+                margin-left: 10px;
+            }
         }
 
         @media (max-width: 768px) {
             .control-panel {
                 display: flex;
                 flex-direction: column;
+                align-items: stretch;
             }
 
-            .control-group {
-                width: 100%;
+            .sync-button-pc {
+                display: none;
+            }
+
+            .sync-button-mobile {
+                display: block;
                 text-align: center;
-            }
-
-            .sync-button-wrapper {
-                margin: 8px 0;
+                margin-bottom: 16px;
             }
 
             .content-wrapper {
@@ -558,12 +578,17 @@
                     <div id="matchup-bravo-display" class="static-team-name">（情報待機中）</div>
                 </div>
             </div>
-            <div class="sync-button-wrapper"><button id="sync-view-button" class="sync-button"
+            <div class="sync-button-mobile"><button id="sync-view-button-mobile" class="sync-button"
                     title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button></div>
             <div class="control-group">
                 <h2>▼ 表示チーム切り替え</h2>
-                <div class="team-selector"><select id="view-alpha-select"></select><span
-                        class="vs-text">VS</span><select id="view-bravo-select"></select></div>
+                <div class="local-view-group">
+                    <div class="team-selector"><select id="view-alpha-select"></select><span
+                            class="vs-text">VS</span><select id="view-bravo-select"></select></div>
+                    <div class="sync-button-pc"><button id="sync-view-button-pc" class="sync-button"
+                            title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button>
+                    </div>
+                </div>
             </div>
         </section>
         <div class="content-wrapper">
@@ -598,7 +623,7 @@
         let teamsData = [], scriptData = [], mySessionId = `com-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
-        const pageLoadTime = Date.now(); // ▼▼▼ ページ読み込み時刻を記録 ▼▼▼
+        const pageLoadTime = Date.now();
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -629,7 +654,6 @@
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
 
-            // ▼▼▼ モーダル表示ロジックを修正 ▼▼▼
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
