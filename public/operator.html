@@ -14,11 +14,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
+        // ▼▼▼ ご提供いただいたFirebase設定情報に更新 ▼▼▼
         const firebaseConfig = {
             apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
             authDomain: "daigakuhai-support-fb.firebaseapp.com",
             projectId: "daigakuhai-support-fb",
-            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            storageBucket: "daigakuhai-support-fb.appspot.com",
             messagingSenderId: "939931798179",
             appId: "1:939931798179:web:8320fba89104e81f47cd16"
         };
@@ -48,6 +49,9 @@
             --badge-commentator-text: #1B5E20;
             --badge-me-bg: #FFF3E0;
             --badge-me-text: #E65100;
+            --status-connected: #34A853;
+            --status-connecting: #FBBC05;
+            --status-disconnected: #EA4335;
         }
 
         body {
@@ -90,8 +94,20 @@
         .connection-indicator .status-dot {
             width: 10px;
             height: 10px;
-            background-color: #34A853;
             border-radius: 50%;
+        }
+
+        /* --- ▼▼▼ 接続状況ランプの色のスタイルを追加 ▼▼▼ --- */
+        .connection-indicator.is-connecting .status-dot {
+            background-color: var(--status-connecting);
+        }
+
+        .connection-indicator.is-connected .status-dot {
+            background-color: var(--status-connected);
+        }
+
+        .connection-indicator.is-disconnected .status-dot {
+            background-color: var(--status-disconnected);
         }
 
         .comment-area {
@@ -437,14 +453,14 @@
             background-color: var(--primary-container-color);
         }
 
-        .modal-comment-content #comment-modal-heading {
+        .modal-content #comment-modal-heading {
             margin: 0 0 16px 0;
             font-size: 16px;
             font-weight: 700;
             color: var(--on-surface-variant-color);
         }
 
-        .modal-comment-content #comment-modal-text {
+        .modal-content #comment-modal-text {
             font-size: 24px;
             line-height: 1.6;
             margin: 0;
@@ -510,7 +526,6 @@
             display: none;
         }
 
-        /* PC表示 (769px以上) */
         @media (min-width: 769px) {
             .team-display-area {
                 grid-template-columns: 1fr 1fr;
@@ -538,7 +553,6 @@
             }
         }
 
-        /* タブレット表示 (651px - 768px) */
         @media (max-width: 768px) {
             .control-panel {
                 display: flex;
@@ -574,7 +588,6 @@
             }
         }
 
-        /* --- ▼▼▼ スマホ表示用の新しいブレイクポイント (650px以下) ▼▼▼ --- */
         @media (max-width: 650px) {
             .header h1 {
                 font-size: 18px;
@@ -614,8 +627,9 @@
 <body>
     <header class="header">
         <h1>大学杯 配信サポート (運営ページ)</h1>
-        <div class="connection-indicator">
-            <span class="connection-text">接続状況: <span id="connection-status">接続中...</span></span>
+        <div class="connection-indicator" id="connection-indicator">
+            <div class="status-dot"></div><span class="connection-text">接続状況: <span
+                    id="connection-status">接続中...</span></span>
         </div>
     </header>
     <main>
@@ -641,14 +655,14 @@
                 <div class="team-selector"><select id="matchup-alpha-select"></select><span
                         class="vs-text">VS</span><select id="matchup-bravo-select"></select></div>
             </div>
-            <div class="sync-button-mobile"><button id="sync-view-button-mobile" class="sync-button"
+            <div class="sync-button-mobile mobile-only"><button id="sync-view-button-mobile" class="sync-button"
                     title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button></div>
             <div class="control-group">
                 <h2>▼ 表示チーム切り替え</h2>
                 <div class="local-view-group">
                     <div class="team-selector"><select id="view-alpha-select"></select><span
                             class="vs-text">VS</span><select id="view-bravo-select"></select></div>
-                    <div class="sync-button-pc"><button id="sync-view-button-pc" class="sync-button"
+                    <div class="sync-button-pc pc-only"><button id="sync-view-button-pc" class="sync-button"
                             title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button>
                     </div>
                 </div>
@@ -686,11 +700,11 @@
         let teamsData = [], scriptData = [], mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
-        const pageLoadTime = Date.now(); // ▼▼▼ ページ読み込み時刻を記録 ▼▼▼
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
-            connectionStatus: getEl('connection-status'), commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
+            connectionIndicator: getEl('connection-indicator'), connectionStatus: getEl('connection-status'),
+            commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
             openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'), nextScriptButton: getEl('next-script-button'), prevScriptButton: getEl('prev-script-button'),
             scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
             commentModal: getEl('comment-modal'), commentModalHeading: getEl('comment-modal-heading'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
@@ -701,26 +715,33 @@
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
         };
 
+        const setConnectionStatus = (status) => {
+            DOMElements.connectionIndicator.classList.remove('is-connected', 'is-connecting', 'is-disconnected');
+            DOMElements.connectionIndicator.classList.add(`is-${status}`);
+            const statusText = { connecting: '接続中...', connected: '正常', disconnected: '切断' };
+            DOMElements.connectionStatus.textContent = statusText[status];
+        };
+
         sessionDocRef.onSnapshot((doc) => {
-            if (!doc.exists) { DOMElements.connectionStatus.textContent = "DBエラー"; return; }
+            if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
-            DOMElements.connectionStatus.textContent = "正常";
+            setConnectionStatus('connected');
             if (state.matchup && state.matchup.alphaTeamId) {
                 DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
                 DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
             }
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
-
-            // ▼▼▼ モーダル表示ロジックを修正 ▼▼▼
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
-                if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
+                if (lastComment.timestamp && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role);
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
             }
+        }, (error) => {
+            setConnectionStatus('disconnected');
         });
 
         const renderComments = (comments = []) => {
@@ -754,7 +775,7 @@
             const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
             return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
         };
-        const showCommentModal = (text, role = '運営') => {
+        const showCommentModal = (text, role = '不明') => {
             DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
             DOMElements.commentModalText.textContent = text;
             DOMElements.commentModal.classList.add('is-active');
@@ -772,6 +793,7 @@
         };
 
         const initializePage = async () => {
+            setConnectionStatus('connecting');
             try {
                 const [teamsRes, scriptRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json')]);
                 teamsData = await teamsRes.json();
@@ -822,7 +844,7 @@
         const syncViewToMatchup = async () => {
             const doc = await sessionDocRef.get();
             const matchup = doc.data().matchup;
-            if (matchup) {
+            if (matchup && matchup.alphaTeamId) {
                 DOMElements.viewAlphaSelect.value = matchup.alphaTeamId;
                 DOMElements.viewBravoSelect.value = matchup.bravoTeamId;
                 updateTeamDisplay();
