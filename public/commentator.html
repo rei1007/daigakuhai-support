@@ -8,461 +8,173 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXX",
+        authDomain: "daigakuhai-support.firebaseapp.com",
+        projectId: "daigakuhai-support",
+        storageBucket: "daigakuhai-support.appspot.com",
+        messagingSenderId: "123456789012",
+        appId: "1:123456789012:web:xxxxxxxxxxxxxxxxxxxxxx"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
 
     <style>
         :root {
-            --primary-color: #202124;
-            --surface-container-color: #F1F3F4;
-            --surface-color: #FFFFFF;
-            --on-surface-color: #202124;
-            --on-surface-variant-color: #5F6368;
-            --outline-color: #BDC1C6;
-            --primary-container-color: #E8EAED;
-            --on-primary-container-color: #202124;
-            --font-family: 'Noto Sans JP', sans-serif;
-            --border-radius-large: 12px;
-            --border-radius-medium: 8px;
-            --greyed-out-color: #9AA0A6;
-            --xp-highlight-color: #E53935;
-            --xp-highlight-bg: #FFEBEE;
+            --primary-color: #202124; --surface-container-color: #F1F3F4; --surface-color: #FFFFFF;
+            --on-surface-color: #202124; --on-surface-variant-color: #5F6368; --outline-color: #BDC1C6;
+            --primary-container-color: #E8EAED; --on-primary-container-color: #202124;
+            --font-family: 'Noto Sans JP', sans-serif; --border-radius-large: 12px; --border-radius-medium: 8px;
+            --greyed-out-color: #9AA0A6; --xp-highlight-color: #E53935; --xp-highlight-bg: #FFEBEE;
         }
-        body {
-            margin: 0;
-            padding: 16px;
-            font-family: var(--font-family);
-            font-size: 16px;
-            color: var(--on-surface-color);
-            background-color: var(--surface-container-color);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            background-color: var(--surface-color);
-            border-radius: var(--border-radius-large);
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 500;
-        }
-        .connection-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--on-primary-container-color);
-            background-color: var(--primary-container-color);
-            border-radius: var(--border-radius-medium);
-        }
-        .connection-indicator .status-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #34A853;
-            border-radius: 50%;
-        }
-
-        .script-card {
-            margin-top: 16px;
-            padding: 16px;
-            background-color: var(--surface-color);
-            border-radius: var(--border-radius-large);
-        }
-        .script-card h2 {
-            margin: 0 0 10px 0;
-            font-size: 15px;
-            font-weight: 700;
-        }
-        .script-card .script-paragraph {
-            margin: 0 0 8px 0;
-            padding: 4px;
-            font-size: 15px;
-        }
-        .script-card .script-paragraph.is-done {
-            color: var(--greyed-out-color);
-        }
-        .script-card .script-paragraph b {
-            font-weight: 700;
-        }
-        .script-card .card-footer {
-            text-align: right;
-        }
-        .script-card .card-footer .outline-button {
-            padding: 6px 12px;
-            border: 1px solid var(--outline-color);
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--on-surface-variant-color);
-            background: none;
-            border-radius: var(--border-radius-medium);
-            cursor: pointer;
-        }
-        .script-card .card-footer .outline-button:hover {
-            background-color: var(--primary-container-color);
-        }
-
-        .control-panel {
-            margin-top: 16px;
-            padding: 16px;
-            background-color: var(--surface-color);
-            border-radius: var(--border-radius-large);
-        }
-        .control-panel h2 {
-            margin: 0 0 10px 0;
-            font-size: 15px;
-            font-weight: 700;
-        }
-        .control-group {
-            margin-bottom: 16px;
-        }
-        .control-group:last-child {
-            margin-bottom: 0;
-        }
-        .team-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .team-selector select, .team-selector .static-team-name {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid var(--outline-color);
-            font-size: 15px;
-            background-color: var(--surface-container-color);
-            border-radius: var(--border-radius-medium);
-        }
-        .team-selector .vs-text {
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .team-selector button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 40px;
-            height: 40px;
-            border: none;
-            background-color: var(--primary-container-color);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .team-display-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
-        }
-        .team-card {
-            padding: 24px;
-            background-color: var(--surface-color);
-            border-radius: var(--border-radius-large);
-        }
-        .team-card .university-name {
-            font-size: 18px;
-            font-weight: 700;
-        }
-        .team-card .team-name {
-            margin: 2px 0 0 0;
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .team-card .sub-info {
-            margin: 4px 0 16px 0;
-            font-size: 14px;
-            color: var(--on-surface-variant-color);
-        }
-        .team-card h3 {
-            margin-top: 24px;
-            margin-bottom: 12px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--primary-container-color);
-            font-size: 16px;
-            font-weight: 700;
-        }
-        .team-card p {
-            margin: 12px 0;
-            line-height: 1.7;
-            white-space: pre-wrap;
-        }
-        .player-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        .player-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--surface-container-color);
-        }
-        .player-item:last-child {
-            border-bottom: none;
-        }
-        .player-main-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-            font-weight: 500;
-        }
-        .player-main-info .xp-badge {
-            padding: 3px 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--on-primary-container-color);
-            background-color: var(--primary-container-color);
-            border-radius: 12px;
-        }
-        .player-main-info .xp-badge.is-highlight {
-            color: var(--xp-highlight-color);
-            background-color: var(--xp-highlight-bg);
-        }
-        .player-weapons {
-            margin-top: 6px;
-            font-size: 15px;
-            color: var(--on-surface-variant-color);
-        }
-        
-        /* --- モーダル --- */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-        }
-        .modal.is-active {
-            display: flex;
-        }
-        .modal-content {
-            position: relative;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            padding: 24px;
-            background: var(--surface-color);
-            border-radius: var(--border-radius-large);
-            overflow-y: auto;
-        }
-        .modal-close {
-            position: sticky;
-            top: -24px;
-            z-index: 10;
-            float: right;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 36px;
-            height: 36px;
-            margin-right: -12px;
-            border: none;
-            background: var(--surface-container-color);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .modal-script-list .script-paragraph {
-            padding: 12px 8px;
-            border-radius: var(--border-radius-medium);
-        }
-        .modal-script-list .script-paragraph.is-done {
-            color: var(--greyed-out-color);
-        }
-        .modal-comment-content {
-            padding: 16px;
-            font-size: 18px;
-            line-height: 1.6;
-        }
-        .modal-comment-content h2 {
-            margin: 0 0 12px 0;
-            font-size: 16px;
-        }
-
-        .test-button-area {
-            margin-top: 24px;
-            padding: 16px;
-            text-align: center;
-        }
-        .test-button-area button {
-            padding: 10px 20px;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        body { font-family: var(--font-family); background-color: var(--surface-container-color); color: var(--on-surface-color); margin: 0; padding: 16px; font-size: 16px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background-color: var(--surface-color); padding: 12px 20px; border-radius: var(--border-radius-large); }
+        .header h1 { font-size: 22px; font-weight: 500; margin: 0; }
+        .connection-indicator { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: var(--border-radius-medium); background-color: var(--primary-container-color); color: var(--on-primary-container-color); font-weight: 500; font-size: 14px; }
+        .connection-indicator .status-dot { width: 10px; height: 10px; background-color: #34A853; border-radius: 50%; }
+        .script-card { margin-top: 16px; background-color: var(--surface-color); padding: 16px; border-radius: var(--border-radius-large); }
+        .script-card h2 { font-size: 15px; font-weight: 700; margin: 0 0 10px 0; }
+        .script-card .script-paragraph { margin: 0 0 8px 0; padding: 4px 4px 4px 8px; font-size: 15px; border-left: 4px solid transparent; }
+        .script-card .script-paragraph.is-done { color: var(--greyed-out-color); }
+        .script-card .script-paragraph b { font-weight: 700; }
+        .script-card .script-paragraph.is-current { font-size: 17px; border-left: 4px solid var(--primary-color); }
+        .script-card .card-footer { text-align: right; }
+        .script-card .card-footer .outline-button { font-size: 12px; color: var(--on-surface-variant-color); background: none; border: 1px solid var(--outline-color); border-radius: var(--border-radius-medium); cursor: pointer; padding: 6px 12px; font-weight: 500; width: fit-content; }
+        .script-card .card-footer .outline-button:hover { background-color: var(--primary-container-color); }
+        .control-panel { margin-top: 16px; background-color: var(--surface-color); padding: 16px; border-radius: var(--border-radius-large); }
+        .control-panel h2 { font-size: 15px; font-weight: 700; margin: 0 0 10px 0; }
+        .control-group { margin-bottom: 16px; }
+        .control-group:last-child { margin-bottom: 0; }
+        .team-selector { display: flex; align-items: center; gap: 10px; }
+        .team-selector select, .team-selector .static-team-name { flex-grow: 1; padding: 10px; border: 1px solid var(--outline-color); border-radius: var(--border-radius-medium); font-size: 15px; background-color: var(--surface-container-color);}
+        .team-selector .vs-text { font-weight: 700; font-size: 14px; }
+        .team-selector button { background-color: var(--primary-container-color); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .team-display-area { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .team-card { background-color: var(--surface-color); padding: 24px; border-radius: var(--border-radius-large); }
+        .team-card .university-name { font-size: 18px; font-weight: 700; }
+        .team-card .team-name { font-size: 26px; font-weight: 700; color: var(--primary-color); margin: 2px 0 0 0; }
+        .team-card .sub-info { font-size: 14px; color: var(--on-surface-variant-color); margin: 4px 0 16px 0; }
+        .team-card h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--primary-container-color); padding-bottom: 6px; margin-top: 24px; margin-bottom: 12px; }
+        .team-card p { line-height: 1.7; white-space: pre-wrap; margin: 12px 0; }
+        .player-list { list-style: none; padding: 0; margin: 0; }
+        .player-item { padding: 12px 0; border-bottom: 1px solid var(--surface-container-color); }
+        .player-main-info { display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 18px; }
+        .player-main-info .xp-badge { font-size: 12px; padding: 3px 8px; border-radius: 12px; font-weight: 700; background-color: var(--primary-container-color); color: var(--on-primary-container-color); }
+        .player-main-info .xp-badge.is-highlight { background-color: var(--xp-highlight-bg); color: var(--xp-highlight-color); }
+        .player-weapons { margin-top: 6px; font-size: 15px; color: var(--on-surface-variant-color); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal.is-active { display: flex; }
+        .modal-content { background: var(--surface-color); padding: 24px; border-radius: var(--border-radius-large); width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto; position: relative; }
+        .modal-close { position: sticky; top: -24px; float: right; margin-right: -12px; background: var(--surface-container-color); border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .modal-script-list .script-paragraph { padding: 12px 8px; border-radius: var(--border-radius-medium); }
+        .modal-script-list .script-paragraph.is-done { color: var(--greyed-out-color); }
+        .modal-comment-content { padding: 16px; font-size: 18px; line-height: 1.6; }
+        .modal-comment-content h2 { margin: 0 0 12px 0; font-size: 16px; }
+        .test-button-area { margin-top: 24px; padding: 16px; text-align: center; }
+        .test-button-area button { padding: 10px 20px; font-size: 14px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <h1>大学杯 配信サポート (実況解説ページ)</h1>
-        <div class="connection-indicator">
-            <div class="status-dot"></div>
-            <span>接続状況: <span id="connection-status">正常</span></span>
-        </div>
-    </header>
-
+    <header class="header"><h1>大学杯 配信サポート (実況解説ページ)</h1><div class="connection-indicator"><div class="status-dot"></div><span>接続状況: <span id="connection-status">接続中...</span></span></div></header>
     <main>
-        <section class="script-card">
-            <h2>台本</h2>
-            <div id="script-card-content"></div>
-            <div class="card-footer">
-                <button class="outline-button" id="open-script-modal-button">全体表示</button>
-            </div>
-        </section>
-
-        <section class="control-panel">
-            <div class="control-group">
-                <h2>▼ 現在の対戦チーム</h2>
-                <div class="team-selector">
-                    <div id="matchup-alpha-display" class="static-team-name">（チーム情報待機中）</div>
-                    <span class="vs-text">VS</span>
-                    <div id="matchup-bravo-display" class="static-team-name">（チーム情報待機中）</div>
-                </div>
-            </div>
-            <div class="control-group">
-                <h2>▼ 表示チーム切り替え (ローカル)</h2>
-                <div class="team-selector">
-                    <select id="view-alpha-select"></select>
-                    <span class="vs-text">VS</span>
-                    <select id="view-bravo-select"></select>
-                    <button id="sync-view-button" title="対戦チームの表示に切り替え"><span class="material-icons-outlined">sync_alt</span></button>
-                </div>
-            </div>
-        </section>
-
-        <div class="team-display-area">
-            <div id="team-alpha-card" class="team-card"></div>
-            <div id="team-bravo-card" class="team-card"></div>
-        </div>
-
-        <div class="test-button-area">
-            <button id="comment-test-button">コメント受信テスト</button>
-        </div>
+        <section class="script-card"><h2 >台本</h2><div id="script-card-content"></div><div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button></div></section>
+        <section class="control-panel"><div class="control-group"><h2>▼ 現在の対戦チーム</h2><div class="team-selector"><div id="matchup-alpha-display" class="static-team-name">（情報待機中）</div><span class="vs-text">VS</span><div id="matchup-bravo-display" class="static-team-name">（情報待機中）</div></div></div><div class="control-group"><h2>▼ 表示チーム切り替え (ローカル)</h2><div class="team-selector"><select id="view-alpha-select"></select><span class="vs-text">VS</span><select id="view-bravo-select"></select><button id="sync-view-button" title="対戦チームの表示に切り替え"><span class="material-icons-outlined">sync_alt</span></button></div></div></section>
+        <div class="team-display-area"><div id="team-alpha-card" class="team-card"></div><div id="team-bravo-card" class="team-card"></div></div>
+        <div class="test-button-area"><button id="comment-test-button">コメント受信テスト</button></div>
     </main>
-
-    <div id="script-modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" id="script-modal-close"><span class="material-icons-outlined">close</span></button>
-            <h2>台本全体</h2>
-            <div class="modal-script-list" id="modal-script-list"></div>
-        </div>
-    </div>
-    
-    <div id="comment-modal" class="modal">
-        <div class="modal-content">
-             <button class="modal-close" id="comment-modal-close"><span class="material-icons-outlined">close</span></button>
-             <div class="modal-comment-content">
-                 <h2>運営からのコメント</h2>
-                 <p id="comment-modal-text"></p>
-             </div>
-        </div>
-    </div>
-    
+    <div id="script-modal" class="modal"><div class="modal-content"><button class="modal-close" id="script-modal-close"><span class="material-icons-outlined">close</span></button><h2>台本全体</h2><div class="modal-script-list" id="modal-script-list"></div></div></div>
+    <div id="comment-modal" class="modal"><div class="modal-content"><button class="modal-close" id="comment-modal-close"><span class="material-icons-outlined">close</span></button><div class="modal-comment-content"><h2>運営からのコメント</h2><p id="comment-modal-text"></p></div></div></div>
     <script>
-        // --- データ定義 (運営ページと共通) ---
-        const teamsData = [
-            { id: 'team_a', university: 'イカ大学', teamName: 'インクリングス', players: [
-                { name: 'プレイヤーA', xp: 3250, weapons: ['スプラシューター', 'N-ZAP85', 'シャープマーカー'] },
-                { name: 'プレイヤーB', xp: 2750, weapons: ['プライムシューター'] },
-                { name: 'プレイヤーC', xp: 2600, weapons: ['リッター4K', 'スプラスコープ'] },
-                { name: 'プレイヤーD', xp: 2650, weapons: ['スクリュースロッシャー'] }],
-                comment: '優勝目指して頑張ります！チーム一丸となって、最高のプレイを見せたいです。応援よろしくお願いします！',
-                teamInfo: '各メンバーの連携力を武器に、安定して前線を押し上げるのが得意なチームです。昨年度の大学対抗戦ではベスト4に入賞しており、今大会でも優勝候補の一角と目されています。',
-                playerInfo: 'プレイヤーAはXP3200を超えるチームのエースです。特に近距離での対面性能が非常に高く、相手を圧倒します。\nプレイヤーCは長射程ブキでの正確なエイムが光り、後方からチームを支える重要な役割を担っています。',
-                circleName: 'インク研究会',
-                circleInfo: '週3回、オンラインとオフラインを組み合わせて活動しています。初心者から上級者まで幅広く在籍しており、学内では最大規模のスプラトゥーンサークルです。'
-            },
-            { id: 'team_b', university: 'オクト大学', teamName: 'オクトエキスパンションズ', players: [
-                { name: 'プレイヤーE', xp: 2900, weapons: ['デュアルスイーパーカスタム'] },
-                { name: 'プレイヤーF', xp: 3300, weapons: ['スプラチャージャー', 'ジェットスイーパー'] },
-                { name: 'プレイヤーG', xp: 2720, weapons: ['ジムワイパー'] },
-                { name: 'プレイヤーH', xp: 2680, weapons: ['LACT-450', 'プロモデラーRG'] }],
-                comment: '一戦一戦、楽しんで勝ちにいきます。私たちのユニークな戦術に注目してください。',
-                teamInfo: 'メンバー個々の対面能力が非常に高く、どんな状況からでも逆転を狙える攻撃的なチーム編成です。特にガチエリアでの打開力には定評があり、その爆発力は大会屈指です。',
-                playerInfo: 'プレイヤーFはXP3300を誇る、チームの司令塔的存在です。広い視野と的確な判断力でチームを勝利に導きます。\nプレイヤーHは塗り性能の高いブキを得意とし、盤面をコントロールする能力に長けています。',
-                circleName: 'タコゲーミング',
-                circleInfo: 'プロ選手を複数輩出したこともある、全国でも有名な強豪サークルです。厳しい練習環境で知られています。'
-            },
-        ];
-        const scriptData = [
-            { speaker: '実況', line: 'さあ、始まりました大学杯決勝トーナメント！全国の強豪を勝ち抜いてきた2チームによる、頂上決戦です！' },
-            { speaker: '解説', line: '今日の注目はやはり、イカ大学のエース、プレイヤーA選手ですね。彼のパフォーマンスが試合の鍵を握るでしょう。' },
-            { speaker: '実況', line: 'XP3200超え、まさに今大会のスタープレイヤーです！対するオクト大学も、チーム全体の練度が非常に高く、一筋縄ではいきません。' },
-            { speaker: '解説', line: '特にプレイヤーF選手は、長射程ブキを使いこなし、相手チームに大きなプレッシャーを与え続けることができますからね。' },
-            { speaker: '実況', line: '両チーム一歩も譲らない展開！これは序盤から目が離せない、面白い試合になりそうだ！' },
-            { speaker: '解説', line: 'そうですね、選手たちの細かな動きや連携にも注目していきたいです。' },
-        ];
+        // --- グローバル変数 ---
+        let teamsData = [];
+        let scriptData = [];
+        const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
 
-        // --- 状態管理 (本来はWebSocketで同期) ---
-        let scriptState = { currentIndex: 0 };
-        
         // --- DOM要素 ---
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
+            connectionStatus: getEl('connection-status'),
             openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'),
             scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
             commentModal: getEl('comment-modal'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
             commentTestButton: getEl('comment-test-button'),
             matchupAlphaDisplay: getEl('matchup-alpha-display'), matchupBravoDisplay: getEl('matchup-bravo-display'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
-            syncViewButton: getEl('sync-view-button'), teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'),
+            syncViewButton: getEl('sync-view-button'), teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card')
         };
+
+        // --- Firestoreリスナー ---
+        sessionDocRef.onSnapshot((doc) => {
+            if (!doc.exists) { DOMElements.connectionStatus.textContent = "DBエラー"; return; }
+            const state = doc.data();
+            DOMElements.connectionStatus.textContent = "正常";
+
+            renderScript(state.scriptIndex || 0);
+            
+            if (state.matchup) {
+                const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
+                const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
+                if(alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
+                if(bravo) DOMElements.matchupBravoDisplay.textContent = bravo.teamName;
+            }
+            
+            const comments = state.comments || [];
+            const latestComment = comments[comments.length - 1];
+            const lastCommentTime = DOMElements.commentModal.dataset.lastCommentTime || 0;
+            if (latestComment && latestComment.timestamp && latestComment.timestamp.toMillis() > lastCommentTime) {
+                showCommentModal(latestComment.text);
+                DOMElements.commentModal.dataset.lastCommentTime = latestComment.timestamp.toMillis();
+            }
+        });
 
         // --- レンダリング関数 ---
-        const renderScript = () => {
-            const cardContent = scriptData.slice(scriptState.currentIndex, scriptState.currentIndex + 2).map((p) =>
-                `<p class="script-paragraph"><b>${p.speaker}:</b> ${p.line}</p>`
-            ).join('');
-            DOMElements.scriptCardContent.innerHTML = cardContent || '<p class="script-paragraph is-done">台本は終了しました。</p>';
-            
-            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) =>
-                `<div class="script-paragraph ${i < scriptState.currentIndex ? 'is-done' : ''}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`
-            ).join('');
+        const renderScript = (currentIndex = 0) => {
+            let cardContentHTML = '';
+            if (currentIndex < scriptData.length) {
+                const currentP = scriptData[currentIndex];
+                cardContentHTML += `<p class="script-paragraph is-current"><b>${currentP.speaker}:</b> ${currentP.line}</p>`;
+            } else {
+                cardContentHTML += '<p class="script-paragraph is-done">台本は終了しました。</p>';
+            }
+            if (currentIndex < scriptData.length - 1) {
+                const nextP = scriptData[currentIndex + 1];
+                cardContentHTML += `<p class="script-paragraph"><b>${nextP.speaker}:</b> ${nextP.line}</p>`;
+            } else if (currentIndex === scriptData.length - 1) {
+                cardContentHTML += '<p class="script-paragraph is-done">- 次で終了です -</p>';
+            }
+            DOMElements.scriptCardContent.innerHTML = cardContentHTML;
+            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
         };
-        const createTeamCardHTML = (team) => {
+        const createTeamCardHTML = (teamId) => {
+            const team = teamsData.find(t => t.id === teamId);
             if (!team) return '<h3>チームを選択してください</h3>';
-            const playerListHTML = team.players.map(p => `
-                <li class="player-item">
-                    <div class="player-main-info">
-                        <span class="name">${p.name}</span>
-                        <span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span>
-                    </div>
-                    <div class="player-weapons">${p.weapons.join(' / ')}</div>
-                </li>`).join('');
-            return `
-                <p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2>
-                <p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul>
-                <h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p>
-                <h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
+            const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
+            const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
+            return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
         };
         const updateTeamDisplay = () => {
-            const alphaTeam = teamsData.find(t => t.id === DOMElements.viewAlphaSelect.value);
-            const bravoTeam = teamsData.find(t => t.id === DOMElements.viewBravoSelect.value);
-            DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(alphaTeam);
-            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(bravoTeam);
+            DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
+            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
         };
-
-        // --- イベントリスナー ---
-        DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
-        DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
-        DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
-
         const showCommentModal = (text) => {
             DOMElements.commentModalText.textContent = text;
             DOMElements.commentModal.classList.add('is-active');
         };
-        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
-        DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
-        DOMElements.commentTestButton.onclick = () => showCommentModal('まもなく試合が再開します。準備をお願いします。');
 
-        // --- 初期化 & WebSocketのダミー ---
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- 初期化 ---
+        const initializePage = async () => {
+            try {
+                const [teamsRes, scriptRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json')]);
+                teamsData = await teamsRes.json();
+                scriptData = await scriptRes.json();
+            } catch(e) { return alert("データファイルの読み込みに失敗しました。"); }
+
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
@@ -472,26 +184,32 @@
                 });
             });
 
-            const initialAlpha = teamsData[0];
-            const initialBravo = teamsData[1];
-            DOMElements.matchupAlphaDisplay.textContent = initialAlpha.teamName;
-            DOMElements.matchupBravoDisplay.textContent = initialBravo.teamName;
-            DOMElements.viewAlphaSelect.value = initialAlpha.id;
-            DOMElements.viewBravoSelect.value = initialBravo.id;
-
-            DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
-            DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
-            DOMElements.syncViewButton.onclick = () => {
-                const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
-                const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
-                if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
-                if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
-                updateTeamDisplay();
-            };
-
-            renderScript();
+            DOMElements.viewAlphaSelect.value = teamsData[0]?.id || null;
+            DOMElements.viewBravoSelect.value = teamsData[1]?.id || null;
             updateTeamDisplay();
-        });
+            renderScript();
+        };
+
+        // --- イベントリスナー ---
+        DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
+        DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
+        
+        DOMElements.syncViewButton.onclick = () => {
+            const alphaTeam = teamsData.find(t => t.teamName === DOMElements.matchupAlphaDisplay.textContent);
+            const bravoTeam = teamsData.find(t => t.teamName === DOMElements.matchupBravoDisplay.textContent);
+            if (alphaTeam) DOMElements.viewAlphaSelect.value = alphaTeam.id;
+            if (bravoTeam) DOMElements.viewBravoSelect.value = bravoTeam.id;
+            updateTeamDisplay();
+        };
+
+        DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
+        DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
+        DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
+        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+        DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
+        DOMElements.commentTestButton.onclick = () => showCommentModal('まもなく試合が再開します。準備をお願いします。');
+
+        document.addEventListener("DOMContentLoaded", initializePage);
     </script>
 </body>
 </html>
