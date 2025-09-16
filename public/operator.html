@@ -700,6 +700,7 @@
         let teamsData = [], scriptData = [], mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
+        const pageLoadTime = Date.now(); // ▼▼▼ ページ読み込み時刻を記録する変数を追加 ▼▼▼
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -732,10 +733,12 @@
             }
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
+
+            // ▼▼▼ モーダル表示ロジックに pageLoadTime の条件を追加 ▼▼▼
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
-                if (lastComment.timestamp && lastComment.timestamp.toMillis() > lastShownTime) {
+                if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role);
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
