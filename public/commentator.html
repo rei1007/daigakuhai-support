@@ -225,19 +225,31 @@
             background-color: var(--surface-color);
             padding: 16px;
             border-radius: var(--border-radius-large);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
         .control-panel h2 {
             font-size: 15px;
             font-weight: 700;
             margin: 0 0 10px 0;
+            width: 100%;
         }
 
         .control-group {
             margin-bottom: 16px;
         }
 
-        .control-group:last-child {
+        .control-group.matchup-group {
+            width: 100%;
+        }
+
+        .control-group.local-view-group {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 0;
         }
 
@@ -245,6 +257,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-grow: 1;
         }
 
         .team-selector select,
@@ -263,7 +276,7 @@
             font-size: 14px;
         }
 
-        .team-selector button {
+        .sync-view-button-wrapper button {
             background-color: var(--primary-container-color);
             border: none;
             width: 40px;
@@ -273,6 +286,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .team-display-area {
@@ -414,9 +428,17 @@
             color: var(--greyed-out-color);
         }
 
-        .modal-comment-content h2 {
-            margin: 0 0 12px 0;
+        .modal-comment-content #comment-modal-heading {
+            margin: 0 0 16px 0;
             font-size: 16px;
+            font-weight: 700;
+            color: var(--on-surface-variant-color);
+        }
+
+        .modal-comment-content #comment-modal-text {
+            font-size: 24px;
+            line-height: 1.6;
+            margin: 0;
         }
 
         .highlight-new {
@@ -481,18 +503,22 @@
 
         @media (max-width: 768px) {
             .control-panel {
-                display: flex;
                 flex-direction: column;
-                align-items: center;
+                align-items: stretch;
             }
 
-            .control-group {
-                width: 100%;
+            .control-group.matchup-group {
+                order: 1;
             }
 
             .sync-view-button-wrapper {
+                order: 2;
                 text-align: center;
-                margin: 8px 0;
+                margin: -8px 0 8px 0;
+            }
+
+            .control-group.local-view-group {
+                order: 3;
             }
         }
     </style>
@@ -518,7 +544,7 @@
             <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button></div>
         </section>
         <section class="control-panel">
-            <div class="control-group">
+            <div class="control-group matchup-group">
                 <h2>▼ 現在の対戦チーム</h2>
                 <div class="team-selector">
                     <div id="matchup-alpha-display" class="static-team-name">（情報待機中）</div><span
@@ -527,8 +553,8 @@
                 </div>
             </div>
             <div class="sync-view-button-wrapper"><button id="sync-view-button" title="表示チームを対戦チームに同期"><span
-                        class="material-icons-outlined">sync</span></button></div>
-            <div class="control-group">
+                        class="material-icons-outlined">arrow_downward</span></button></div>
+            <div class="control-group local-view-group">
                 <h2>▼ 表示チーム切り替え (ローカル)</h2>
                 <div class="team-selector"><select id="view-alpha-select"></select><span
                         class="vs-text">VS</span><select id="view-bravo-select"></select></div>
@@ -555,7 +581,7 @@
     <div id="comment-modal" class="modal">
         <div class="modal-content"><button class="modal-close" id="comment-modal-close"><span
                     class="material-icons-outlined">close</span></button>
-            <h2>新着コメント</h2>
+            <h2 id="comment-modal-heading">新着コメント</h2>
             <p id="comment-modal-text"></p>
         </div>
     </div>
@@ -571,7 +597,7 @@
             commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
             openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'),
             scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
-            commentModal: getEl('comment-modal'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
+            commentModal: getEl('comment-modal'), commentModalHeading: getEl('comment-modal-heading'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
             matchupAlphaDisplay: getEl('matchup-alpha-display'), matchupBravoDisplay: getEl('matchup-bravo-display'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButton: getEl('sync-view-button'),
@@ -598,7 +624,7 @@
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > lastShownTime) {
-                    showCommentModal(lastComment.text);
+                    showCommentModal(lastComment.text, lastComment.role);
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
             }
@@ -624,12 +650,8 @@
         };
         const renderScript = (currentIndex = 0) => {
             let cardContentHTML = '';
-            if (currentIndex < scriptData.length) {
-                cardContentHTML += `<p class="script-paragraph is-current"><b>${scriptData[currentIndex].speaker}:</b> ${scriptData[currentIndex].line}</p>`;
-            } else { cardContentHTML += '<p class="script-paragraph is-done">台本は終了しました。</p>'; }
-            if (currentIndex < scriptData.length - 1) {
-                cardContentHTML += `<p class="script-paragraph"><b>${scriptData[currentIndex + 1].speaker}:</b> ${scriptData[currentIndex + 1].line}</p>`;
-            } else if (currentIndex === scriptData.length - 1) { cardContentHTML += '<p class="script-paragraph is-done">- 次で終了です -</p>'; }
+            if (currentIndex < scriptData.length) { cardContentHTML += `<p class="script-paragraph is-current"><b>${scriptData[currentIndex].speaker}:</b> ${scriptData[currentIndex].line}</p>`; } else { cardContentHTML += '<p class="script-paragraph is-done">台本は終了しました。</p>'; }
+            if (currentIndex < scriptData.length - 1) { cardContentHTML += `<p class="script-paragraph"><b>${scriptData[currentIndex + 1].speaker}:</b> ${scriptData[currentIndex + 1].line}</p>`; } else if (currentIndex === scriptData.length - 1) { cardContentHTML += '<p class="script-paragraph is-done">- 次で終了です -</p>'; }
             DOMElements.scriptCardContent.innerHTML = cardContentHTML;
             DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
         };
@@ -651,7 +673,8 @@
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
         };
-        const showCommentModal = (text) => {
+        const showCommentModal = (text, role = '運営') => {
+            DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
             DOMElements.commentModalText.textContent = text;
             DOMElements.commentModal.classList.add('is-active');
         };
