@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
             authDomain: "daigakuhai-support-fb.firebaseapp.com",
@@ -45,27 +46,27 @@
         }
 
         body {
-            font-family: var(--font-family);
-            background-color: var(--surface-container-color);
-            color: var(--on-surface-color);
             margin: 0;
             padding: 16px;
+            font-family: var(--font-family);
             font-size: 16px;
+            color: var(--on-surface-color);
+            background-color: var(--surface-container-color);
         }
 
         .header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background-color: var(--surface-color);
+            justify-content: space-between;
             padding: 12px 20px;
+            background-color: var(--surface-color);
             border-radius: var(--border-radius-large);
         }
 
         .header h1 {
+            margin: 0;
             font-size: 22px;
             font-weight: 500;
-            margin: 0;
         }
 
         .connection-indicator {
@@ -73,11 +74,11 @@
             align-items: center;
             gap: 8px;
             padding: 6px 12px;
-            border-radius: var(--border-radius-medium);
-            background-color: var(--primary-container-color);
-            color: var(--on-primary-container-color);
-            font-weight: 500;
             font-size: 14px;
+            font-weight: 500;
+            color: var(--on-primary-container-color);
+            background-color: var(--primary-container-color);
+            border-radius: var(--border-radius-medium);
         }
 
         .connection-indicator .status-dot {
@@ -90,16 +91,16 @@
         .comment-area {
             margin-top: 16px;
             margin-bottom: 16px;
-            background-color: var(--surface-color);
             padding: 16px;
+            background-color: var(--surface-color);
             border-radius: var(--border-radius-large);
         }
 
         .comment-area h2,
         .script-card h2 {
+            margin: 0 0 10px 0;
             font-size: 15px;
             font-weight: 700;
-            margin: 0 0 10px 0;
         }
 
         .comment-input-group {
@@ -112,53 +113,53 @@
             flex-grow: 1;
             padding: 10px;
             border: 1px solid var(--outline-color);
-            border-radius: var(--border-radius-medium);
             font-size: 15px;
+            border-radius: var(--border-radius-medium);
         }
 
         .comment-input-group button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 16px;
-            border-radius: var(--border-radius-medium);
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
+            padding: 0 16px;
+            border: none;
+            color: white;
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius-medium);
+            cursor: pointer;
         }
 
         .comment-history .comment-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             padding: 6px 0;
             font-size: 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
         }
 
         .comment-history .badge {
-            font-size: 10px;
-            padding: 2px 0;
-            border-radius: 4px;
-            font-weight: 700;
-            width: 50px;
-            text-align: center;
             flex-shrink: 0;
+            width: 50px;
+            padding: 2px 0;
+            font-size: 10px;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 4px;
         }
 
         .comment-history .badge.is-self {
-            background-color: var(--primary-container-color);
             color: var(--on-primary-container-color);
+            background-color: var(--primary-container-color);
         }
 
         .comment-history .badge.is-other {
-            background-color: var(--on-surface-variant-color);
             color: white;
+            background-color: var(--on-surface-variant-color);
         }
 
         .script-card {
-            background-color: var(--surface-color);
             padding: 16px;
+            background-color: var(--surface-color);
             border-radius: var(--border-radius-large);
         }
 
@@ -178,21 +179,21 @@
 
         .script-card .card-footer {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             margin-top: 12px;
         }
 
         .script-card .card-footer .outline-button {
+            width: fit-content;
+            padding: 6px 12px;
+            border: 1px solid var(--outline-color);
             font-size: 12px;
+            font-weight: 500;
             color: var(--on-surface-variant-color);
             background: none;
-            border: 1px solid var(--outline-color);
             border-radius: var(--border-radius-medium);
             cursor: pointer;
-            padding: 6px 12px;
-            font-weight: 500;
-            width: fit-content;
         }
 
         .script-card .card-footer .outline-button:hover {
@@ -205,28 +206,28 @@
         }
 
         .script-card .card-footer button {
-            background-color: var(--primary-container-color);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background-color: var(--primary-container-color);
+            border-radius: 50%;
+            cursor: pointer;
         }
 
         .control-panel {
             margin-top: 16px;
-            background-color: var(--surface-color);
             padding: 16px;
+            background-color: var(--surface-color);
             border-radius: var(--border-radius-large);
         }
 
         .control-panel h2 {
+            margin: 0 0 10px 0;
             font-size: 15px;
             font-weight: 700;
-            margin: 0 0 10px 0;
         }
 
         .control-group {
@@ -247,25 +248,25 @@
             flex-grow: 1;
             padding: 10px;
             border: 1px solid var(--outline-color);
-            border-radius: var(--border-radius-medium);
             font-size: 15px;
+            border-radius: var(--border-radius-medium);
         }
 
         .team-selector .vs-text {
-            font-weight: 700;
             font-size: 14px;
+            font-weight: 700;
         }
 
         .team-selector button {
-            background-color: var(--primary-container-color);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background-color: var(--primary-container-color);
+            border-radius: 50%;
+            cursor: pointer;
         }
 
         .team-display-area {
@@ -276,8 +277,8 @@
         }
 
         .team-card {
-            background-color: var(--surface-color);
             padding: 24px;
+            background-color: var(--surface-color);
             border-radius: var(--border-radius-large);
         }
 
@@ -287,37 +288,37 @@
         }
 
         .team-card .team-name {
+            margin: 2px 0 0 0;
             font-size: 26px;
             font-weight: 700;
             color: var(--primary-color);
-            margin: 2px 0 0 0;
         }
 
         .team-card .sub-info {
+            margin: 4px 0 16px 0;
             font-size: 14px;
             color: var(--on-surface-variant-color);
-            margin: 4px 0 16px 0;
         }
 
         .team-card h3 {
-            font-size: 16px;
-            font-weight: 700;
-            border-bottom: 1px solid var(--primary-container-color);
-            padding-bottom: 6px;
             margin-top: 24px;
             margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--primary-container-color);
+            font-size: 16px;
+            font-weight: 700;
         }
 
         .team-card p {
+            margin: 12px 0;
             line-height: 1.7;
             white-space: pre-wrap;
-            margin: 12px 0;
         }
 
         .player-list {
-            list-style: none;
-            padding: 0;
             margin: 0;
+            padding: 0;
+            list-style: none;
         }
 
         .player-item {
@@ -327,24 +328,24 @@
 
         .player-main-info {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-weight: 500;
+            justify-content: space-between;
             font-size: 18px;
+            font-weight: 500;
         }
 
         .player-main-info .xp-badge {
-            font-size: 12px;
             padding: 3px 8px;
-            border-radius: 12px;
+            font-size: 12px;
             font-weight: 700;
-            background-color: var(--primary-container-color);
             color: var(--on-primary-container-color);
+            background-color: var(--primary-container-color);
+            border-radius: 12px;
         }
 
         .player-main-info .xp-badge.is-highlight {
-            background-color: var(--xp-highlight-bg);
             color: var(--xp-highlight-color);
+            background-color: var(--xp-highlight-bg);
         }
 
         .player-weapons {
@@ -355,15 +356,15 @@
 
         .modal {
             position: fixed;
+            z-index: 1000;
             top: 0;
             left: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
         }
 
         .modal.is-active {
@@ -371,38 +372,38 @@
         }
 
         .modal-content {
-            background: var(--surface-color);
-            padding: 24px;
-            border-radius: var(--border-radius-large);
+            position: relative;
             width: 90%;
             max-width: 800px;
             max-height: 80vh;
+            padding: 24px;
+            background: var(--surface-color);
+            border-radius: var(--border-radius-large);
             overflow-y: auto;
-            position: relative;
         }
 
         .modal-close {
             position: sticky;
+            z-index: 10;
             top: -24px;
             float: right;
-            margin-right: -12px;
-            background: var(--surface-container-color);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            width: 36px;
+            height: 36px;
+            margin-right: -12px;
+            border: none;
+            background: var(--surface-container-color);
+            border-radius: 50%;
+            cursor: pointer;
         }
 
         .modal-script-list .script-paragraph {
             padding: 12px 8px;
             border-radius: var(--border-radius-medium);
-            cursor: pointer;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .modal-script-list .script-paragraph.is-done {
@@ -411,8 +412,8 @@
 
         .modal-script-list .script-paragraph:hover {
             /* ホバーエフェクトを改善 */
-            outline: 2px solid var(--primary-color);
             background-color: var(--primary-container-color);
+            outline: 2px solid var(--primary-color);
         }
     </style>
 </head>
@@ -424,6 +425,7 @@
             <div class="status-dot"></div><span>接続状況: <span id="connection-status">接続中...</span></span>
         </div>
     </header>
+
     <main>
         <section class="comment-area">
             <h2>コメント送信</h2>
@@ -431,6 +433,7 @@
                     id="send-comment-button"><span class="material-icons-outlined">send</span>送信</button></div>
             <div class="comment-history" id="comment-history"></div>
         </section>
+
         <section class="script-card">
             <h2>台本</h2>
             <div id="script-card-content"></div>
@@ -440,6 +443,7 @@
                         title="次の段落へ"><span class="material-icons-outlined">skip_next</span></button></div>
             </div>
         </section>
+
         <section class="control-panel">
             <div class="control-group">
                 <h2>▼ 対戦チーム設定 (全体反映)</h2>
@@ -453,11 +457,13 @@
                         title="対戦チームの表示に切り替え"><span class="material-icons-outlined">sync_alt</span></button></div>
             </div>
         </section>
+
         <div class="team-display-area">
             <div id="team-alpha-card" class="team-card"></div>
             <div id="team-bravo-card" class="team-card"></div>
         </div>
     </main>
+
     <div id="script-modal" class="modal">
         <div class="modal-content"><button class="modal-close" id="script-modal-close"><span
                     class="material-icons-outlined">close</span></button>
@@ -465,11 +471,13 @@
             <div class="modal-script-list" id="modal-script-list"></div>
         </div>
     </div>
+
     <script>
         // --- グローバル変数 ---
         let teamsData = [];
         let scriptData = [];
-        let mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`; // 簡易的な自分ID
+        // 簡易的な自分ID
+        let mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
 
         // --- DOM要素 ---
@@ -591,7 +599,8 @@
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
                     const newComment = { text: text, senderId: mySessionId, timestamp: new Date() };
-                    const updatedComments = [...currentComments, newComment].slice(-3); // 末尾3件を保持
+                    // 末尾3件を保持
+                    const updatedComments = [...currentComments, newComment].slice(-3);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
                 DOMElements.commentInput.value = '';
