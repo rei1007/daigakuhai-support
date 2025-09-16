@@ -84,6 +84,7 @@
             color: var(--on-primary-container-color);
             font-weight: 500;
             font-size: 14px;
+            transition: padding 0.2s;
         }
 
         .connection-indicator .status-dot {
@@ -131,7 +132,9 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 4px;
+            transition: padding 0.2s;
         }
 
         .comment-history .comment-item {
@@ -262,7 +265,8 @@
             gap: 10px;
         }
 
-        .team-selector select {
+        .team-selector select,
+        .team-selector .static-team-name {
             flex-grow: 1;
             padding: 10px;
             border: 1px solid var(--outline-color);
@@ -433,14 +437,14 @@
             background-color: var(--primary-container-color);
         }
 
-        .modal-content #comment-modal-heading {
+        .modal-comment-content #comment-modal-heading {
             margin: 0 0 16px 0;
             font-size: 16px;
             font-weight: 700;
             color: var(--on-surface-variant-color);
         }
 
-        .modal-content #comment-modal-text {
+        .modal-comment-content #comment-modal-text {
             font-size: 24px;
             line-height: 1.6;
             margin: 0;
@@ -470,28 +474,20 @@
             flex: 1;
             padding: 8px;
             border: 1px solid var(--outline-color);
-            /* 枠線を追加 */
             background-color: var(--surface-color);
-            /* 背景色を白に */
             color: var(--on-surface-variant-color);
-            /* 文字色をグレーに */
             border-radius: var(--border-radius-medium);
             font-size: 14px;
             font-weight: 500;
-            /* 太さを通常に */
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .segmented-control button.active {
             background-color: var(--primary-color);
-            /* アクティブな背景色をテーマカラーに */
             color: white;
-            /* 文字色を白に */
             border-color: var(--primary-color);
-            /* 枠線の色も合わせる */
             font-weight: 700;
-            /* 太字にする */
         }
 
         .team-card-wrapper {
@@ -506,7 +502,15 @@
             margin-top: 16px;
         }
 
-        /* --- ▼▼▼ PC表示用のレイアウト ▼▼▼ --- */
+        .pc-only {
+            display: block;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        /* PC表示 (769px以上) */
         @media (min-width: 769px) {
             .team-display-area {
                 grid-template-columns: 1fr 1fr;
@@ -517,10 +521,6 @@
             }
 
             .segmented-control {
-                display: none;
-            }
-
-            .sync-button-mobile {
                 display: none;
             }
 
@@ -538,14 +538,23 @@
             }
         }
 
-        /* --- ▼▼▼ スマホ表示用のレイアウト ▼▼▼ --- */
+        /* タブレット表示 (651px - 768px) */
         @media (max-width: 768px) {
-            .sync-button-pc {
+            .control-panel {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pc-only {
                 display: none;
             }
 
-            .sync-button-mobile {
+            .mobile-only {
                 display: block;
+            }
+
+            .sync-button-mobile {
                 text-align: center;
                 margin-bottom: 16px;
             }
@@ -564,6 +573,41 @@
                 order: 2;
             }
         }
+
+        /* --- ▼▼▼ スマホ表示用の新しいブレイクポイント (650px以下) ▼▼▼ --- */
+        @media (max-width: 650px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .connection-text {
+                display: none;
+            }
+
+            .connection-indicator {
+                padding: 8px;
+            }
+
+            .send-text {
+                display: none;
+            }
+
+            #send-comment-button {
+                padding: 8px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .team-selector {
+                flex-direction: column;
+                gap: 8px;
+                align-items: stretch;
+            }
+
+            .team-selector .vs-text {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -571,14 +615,15 @@
     <header class="header">
         <h1>大学杯 配信サポート (運営ページ)</h1>
         <div class="connection-indicator">
-            <div class="status-dot"></div><span>接続状況: <span id="connection-status">接続中...</span></span>
+            <span class="connection-text">接続状況: <span id="connection-status">接続中...</span></span>
         </div>
     </header>
     <main>
         <section class="comment-area">
             <h2>コメント</h2>
             <div class="comment-input-group"><input type="text" id="comment-input" placeholder="メッセージを入力"><button
-                    id="send-comment-button"><span class="material-icons-outlined">send</span>送信</button></div>
+                    id="send-comment-button"><span class="material-icons-outlined">send</span><span
+                        class="send-text">送信</span></button></div>
             <div class="comment-history" id="comment-history"></div>
         </section>
         <section class="script-card">
