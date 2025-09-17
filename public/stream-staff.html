@@ -53,6 +53,8 @@
             --status-connected: #34A853;
             --status-connecting: #FBBC05;
             --status-disconnected: #EA4335;
+            --winner-alpha-color: #d0be08;
+            --winner-bravo-color: #3a0ccd;
         }
 
         body {
@@ -445,6 +447,7 @@
             background-color: var(--surface-color);
             border-radius: var(--border-radius-medium);
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .bo-selector button.active {
@@ -489,18 +492,19 @@
             font-size: 12px;
             width: 36px;
             height: 36px;
+            transition: all 0.2s;
         }
 
         .stage-winner-row .winner-selector button.alpha.active {
-            background-color: #4285F4;
+            background-color: var(--winner-alpha-color);
             color: white;
-            border-color: #4285F4;
+            border-color: var(--winner-alpha-color);
         }
 
         .stage-winner-row .winner-selector button.bravo.active {
-            background-color: #EA4335;
+            background-color: var(--winner-bravo-color);
             color: white;
-            border-color: #EA4335;
+            border-color: var(--winner-bravo-color);
         }
 
         @media (min-width: 769px) {
@@ -514,6 +518,26 @@
 
             .segmented-control {
                 display: none;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .send-text {
+                display: none;
+            }
+
+            .comment-input-group button {
+                padding: 8px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .connection-text {
+                display: none;
+            }
+
+            .connection-indicator {
+                padding: 8px;
             }
         }
     </style>
@@ -587,6 +611,7 @@
             <p id="comment-modal-text"></p>
         </div>
     </div>
+
     <script>
         const MY_ROLE = '配信担当';
         let teamsData = [], scriptData = [], stagesData = [];
@@ -609,7 +634,13 @@
             roundInfoInput: getEl('round-info-input'), bo3Btn: getEl('bo3-btn'), bo5Btn: getEl('bo5-btn'), stageWinnerRows: getEl('stage-winner-rows'),
         };
 
-        const setConnectionStatus = (status) => { /* ... (省略) ... */ };
+        const setConnectionStatus = (status) => {
+            DOMElements.connectionIndicator.classList.remove('is-connected', 'is-connecting', 'is-disconnected');
+            DOMElements.connectionIndicator.classList.add(`is-${status}`);
+            const statusText = { connecting: '接続中...', connected: '正常', disconnected: '切断' };
+            DOMElements.connectionStatus.textContent = statusText[status];
+        };
+
         sessionDocRef.onSnapshot((doc) => {
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
@@ -651,9 +682,25 @@
             }).join('');
             if (latestCommentId) { const latestEl = getEl(`comment-${latestCommentId}`); if (latestEl && !latestEl.classList.contains('highlighted')) { latestEl.classList.add('highlight-new', 'highlighted'); setTimeout(() => { latestEl.classList.remove('highlight-new'); }, 2000); } }
         };
-        const renderScript = (currentIndex = 0) => { /* ... (省略) ... */ };
-        const createTeamCardHTML = (teamId) => { /* ... (省略) ... */ };
-        const showCommentModal = (text, role = '不明') => { /* ... (省略) ... */ };
+        const renderScript = (currentIndex = 0) => {
+            let cardContentHTML = '';
+            if (currentIndex < scriptData.length) { cardContentHTML += `<p class="script-paragraph is-current"><b>${scriptData[currentIndex].speaker}:</b> ${scriptData[currentIndex].line}</p>`; } else { cardContentHTML += '<p class="script-paragraph is-done">台本は終了しました。</p>'; }
+            if (currentIndex < scriptData.length - 1) { cardContentHTML += `<p class="script-paragraph"><b>${scriptData[currentIndex + 1].speaker}:</b> ${scriptData[currentIndex + 1].line}</p>`; } else if (currentIndex === scriptData.length - 1) { cardContentHTML += '<p class="script-paragraph is-done">- 次で終了です -</p>'; }
+            DOMElements.scriptCardContent.innerHTML = cardContentHTML;
+            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
+        };
+        const createTeamCardHTML = (teamId) => {
+            const team = teamsData.find(t => t.id === teamId);
+            if (!team) return '<h3>チーム情報を読み込み中...</h3>';
+            const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
+            const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
+            return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
+        };
+        const showCommentModal = (text, role = '不明') => {
+            DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
+            DOMElements.commentModalText.textContent = text;
+            DOMElements.commentModal.classList.add('is-active');
+        };
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.matchupAlphaSelect.value);
             DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.matchupBravoSelect.value);
@@ -667,7 +714,7 @@
         };
 
         const renderMatchSettings = (state) => {
-            DOMElements.roundInfoInput.value = state.roundInfo || '';
+            if (DOMElements.roundInfoInput.value !== (state.roundInfo || '')) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
             const bestOf = state.bestOf || 'BO3';
             DOMElements.bo3Btn.classList.toggle('active', bestOf === 'BO3');
             DOMElements.bo5Btn.classList.toggle('active', bestOf === 'BO5');
@@ -693,30 +740,43 @@
                 stagesData = await stagesRes.json();
             } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
 
-            document.querySelectorAll('select').forEach(select => {
-                if (select.id.includes('matchup')) {
-                    teamsData.forEach(team => {
-                        const option = document.createElement('option');
-                        option.value = team.id; option.textContent = team.teamName;
-                        select.appendChild(option);
-                    });
-                }
+            teamsData.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.id; option.textContent = team.teamName;
+                DOMElements.matchupAlphaSelect.appendChild(option.cloneNode(true));
+                DOMElements.matchupBravoSelect.appendChild(option.cloneNode(true));
             });
             updateTeamDisplay();
             renderScript();
         };
 
-        const matchupChangeHandler = () => {
-            sessionDocRef.update({ matchup: { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value } });
-        };
+        const matchupChangeHandler = () => { sessionDocRef.update({ matchup: { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value } }); };
         DOMElements.matchupAlphaSelect.onchange = matchupChangeHandler;
         DOMElements.matchupBravoSelect.onchange = matchupChangeHandler;
 
-        const updateScriptIndex = (newIndex) => { /* ... (省略) ... */ };
-        DOMElements.nextScriptButton.onclick = async () => { /* ... (省略) ... */ };
-        DOMElements.prevScriptButton.onclick = async () => { /* ... (省略) ... */ };
-        DOMElements.modalScriptList.onclick = async (e) => { /* ... (省略) ... */ };
-        const sendComment = () => { /* ... (省略) ... */ };
+        const updateScriptIndex = (newIndex) => { if (newIndex >= 0 && newIndex <= scriptData.length) { sessionDocRef.update({ scriptIndex: newIndex }); } };
+        DOMElements.nextScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) + 1); };
+        DOMElements.prevScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) - 1); };
+        DOMElements.modalScriptList.onclick = async (e) => {
+            const target = e.target.closest('.script-paragraph'); if (!target) return;
+            const clickedIndex = parseInt(target.dataset.index, 10);
+            const doc = await sessionDocRef.get();
+            const currentIndex = doc.data().scriptIndex || 0;
+            updateScriptIndex(clickedIndex < currentIndex ? clickedIndex : clickedIndex + 1);
+        };
+        const sendComment = () => {
+            const text = DOMElements.commentInput.value.trim();
+            if (text) {
+                db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(sessionDocRef);
+                    const currentComments = doc.data().comments || [];
+                    const newComment = { id: Math.random().toString(36).substr(2, 9), text, senderId: mySessionId, role: MY_ROLE, timestamp: new Date() };
+                    const updatedComments = [...currentComments, newComment].slice(-3);
+                    transaction.update(sessionDocRef, { comments: updatedComments });
+                });
+                DOMElements.commentInput.value = '';
+            }
+        };
         DOMElements.sendCommentButton.onclick = sendComment;
 
         const updateMatchSettings = () => {
@@ -755,9 +815,13 @@
         DOMElements.displayAlphaBtn.onclick = () => setDisplayTeam('alpha');
         DOMElements.displayBravoBtn.onclick = () => setDisplayTeam('bravo');
 
+        DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
+        DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
+        DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
+        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+        DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
         window.onresize = updateTeamDisplay;
         document.addEventListener("DOMContentLoaded", initializePage);
-        // ... (モーダル開閉などのイベントリスナー)
     </script>
 </body>
 
