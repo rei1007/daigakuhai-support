@@ -47,6 +47,8 @@
             --badge-operator-text: #0D47A1;
             --badge-commentator-bg: #E8F5E9;
             --badge-commentator-text: #1B5E20;
+            --badge-stream-staff-bg: #F3E5F5;
+            --badge-stream-staff-text: #4A148C;
             --badge-me-bg: #FFF3E0;
             --badge-me-text: #E65100;
             --status-connected: #34A853;
@@ -190,6 +192,11 @@
         .comment-history .badge.is-commentator {
             background-color: var(--badge-commentator-bg);
             color: var(--badge-commentator-text);
+        }
+
+        .comment-history .badge.is-stream-staff {
+            background-color: var(--badge-stream-staff-bg);
+            color: var(--badge-stream-staff-text);
         }
 
         .script-card {
@@ -700,7 +707,7 @@
         let teamsData = [], scriptData = [], mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
-        const pageLoadTime = Date.now(); // ▼▼▼ ページ読み込み時刻を記録する変数を追加 ▼▼▼
+        const pageLoadTime = Date.now();
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -712,7 +719,8 @@
             matchupAlphaSelect: getEl('matchup-alpha-select'), matchupBravoSelect: getEl('matchup-bravo-select'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButtonMobile: getEl('sync-view-button-mobile'), syncViewButtonPC: getEl('sync-view-button-pc'),
-            teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'), teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
+            teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'),
+            teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
         };
 
@@ -727,6 +735,7 @@
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
+
             if (state.matchup && state.matchup.alphaTeamId) {
                 DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
                 DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
@@ -734,7 +743,6 @@
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
 
-            // ▼▼▼ モーダル表示ロジックに pageLoadTime の条件を追加 ▼▼▼
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
@@ -751,8 +759,18 @@
             const latestCommentId = (comments.slice(-1)[0] || {}).id;
             DOMElements.commentHistory.innerHTML = comments.map(c => {
                 const isMe = c.senderId === mySessionId;
-                let badgeClass = isMe ? 'is-me' : (c.role === '運営' ? 'is-operator' : 'is-commentator');
-                let badgeText = isMe ? 'Me' : c.role;
+                let badgeClass = 'is-other';
+                let badgeText = c.role;
+                if (isMe) {
+                    badgeClass = 'is-me';
+                    badgeText = 'Me';
+                } else if (c.role === '運営') {
+                    badgeClass = 'is-operator';
+                } else if (c.role === '実況解説') {
+                    badgeClass = 'is-commentator';
+                } else if (c.role === '配信担当') {
+                    badgeClass = 'is-stream-staff';
+                }
                 const isLatestClass = c.id === latestCommentId ? 'is-latest' : '';
                 return `<div class="comment-item ${isLatestClass}" id="comment-${c.id}"><span class="badge ${badgeClass}">${badgeText}</span><span class="text">${c.text}</span></div>`;
             }).join('');
