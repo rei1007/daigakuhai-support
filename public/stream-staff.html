@@ -349,14 +349,18 @@
             background-color: var(--primary-container-color);
         }
 
-        .modal-comment-content #comment-modal-heading {
+        .modal-script-list .script-paragraph.is-done {
+            color: var(--greyed-out-color);
+        }
+
+        .modal-content #comment-modal-heading {
             margin: 0 0 16px 0;
             font-size: 16px;
             font-weight: 700;
             color: var(--on-surface-variant-color);
         }
 
-        .modal-comment-content #comment-modal-text {
+        .modal-content #comment-modal-text {
             font-size: 24px;
             line-height: 1.6;
             margin: 0;
@@ -493,17 +497,16 @@
             width: 36px;
             height: 36px;
             transition: all 0.2s;
+            color: white;
         }
 
         .stage-winner-row .winner-selector button.alpha.active {
             background-color: var(--winner-alpha-color);
-            color: white;
             border-color: var(--winner-alpha-color);
         }
 
         .stage-winner-row .winner-selector button.bravo.active {
             background-color: var(--winner-bravo-color);
-            color: white;
             border-color: var(--winner-bravo-color);
         }
 
@@ -538,6 +541,16 @@
 
             .connection-indicator {
                 padding: 8px;
+            }
+
+            .team-selector {
+                flex-direction: column;
+                gap: 8px;
+                align-items: stretch;
+            }
+
+            .team-selector .vs-text {
+                display: none;
             }
         }
     </style>
@@ -691,7 +704,7 @@
         };
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
-            if (!team) return '<h3>チーム情報を読み込み中...</h3>';
+            if (!team) return '';
             const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
             const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
             return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
@@ -714,7 +727,7 @@
         };
 
         const renderMatchSettings = (state) => {
-            if (DOMElements.roundInfoInput.value !== (state.roundInfo || '')) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
+            if (document.activeElement !== DOMElements.roundInfoInput) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
             const bestOf = state.bestOf || 'BO3';
             DOMElements.bo3Btn.classList.toggle('active', bestOf === 'BO3');
             DOMElements.bo5Btn.classList.toggle('active', bestOf === 'BO5');
@@ -748,6 +761,7 @@
             });
             updateTeamDisplay();
             renderScript();
+            renderMatchSettings({});
         };
 
         const matchupChangeHandler = () => { sessionDocRef.update({ matchup: { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value } }); };

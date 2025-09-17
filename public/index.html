@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -56,7 +56,7 @@
 
         .layout-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 24px;
         }
 
@@ -82,6 +82,7 @@
             border-left: 3px solid var(--primary-container-color);
             padding-left: 16px;
             margin: 0 0 24px 0;
+            min-height: 80px;
         }
 
         .info-card h3 {
@@ -135,13 +136,15 @@
             opacity: 0.8;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1200px) {
+            .layout-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 820px) {
             .layout-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 28px;
             }
         }
     </style>
@@ -156,35 +159,39 @@
         <main class="layout-grid">
             <section class="info-card">
                 <h2>運営ページ</h2>
-                <p class="description">配信に表示する情報を管理・操作するためのページです。複数人での同時操作に対応しています。</p>
+                <p class="description">台本の進行管理や、次の試合のチーム情報を確認するなど、配信の全体進行を管理するためのページです。</p>
                 <h3>主な機能</h3>
                 <ul>
-                    <li><span class="material-icons-outlined">chat</span><strong>コメント送受信:</strong>
-                        実況解説者とリアルタイムでメッセージを交換できます。</li>
-                    <li><span class="material-icons-outlined">skip_next</span><strong>台本進行:</strong>
-                        台本の進行状況を管理し、全部のページで同期させます。</li>
-                    <li><span class="material-icons-outlined">people</span><strong>対戦カード設定:</strong>
-                        現在の公式な対戦カードを設定し、全ページに反映させます。</li>
-                    <li><span class="material-icons-outlined">search</span><strong>ローカル表示切替:</strong>
-                        他のチーム情報などを、他の人に影響を与えずに自分だけで閲覧できます。</li>
+                    <li><span class="material-icons-outlined">send</span><strong>コメント送受信</strong></li>
+                    <li><span class="material-icons-outlined">skip_next</span><strong>台本進行</strong></li>
+                    <li><span class="material-icons-outlined">people</span><strong>対戦カード設定</strong></li>
+                    <li><span class="material-icons-outlined">search</span><strong>ローカル表示切替</strong></li>
                 </ul>
                 <div class="link-area"><a href="./operator.html" class="page-link-button">運営ページを開く</a></div>
             </section>
             <section class="info-card">
                 <h2>実況解説ページ</h2>
-                <p class="description">実況・解説者が、配信に必要な情報をリアルタイムで確認・連絡するためのページです。</p>
+                <p class="description">実況・解説者が、配信に必要な情報をリアルタイムで確認し、運営と連携を取るためのページです。</p>
                 <h3>主な機能</h3>
                 <ul>
-                    <li><span class="material-icons-outlined">chat</span><strong>コメント送受信:</strong>
-                        運営とリアルタイムでメッセージを交換できます。</li>
-                    <li><span class="material-icons-outlined">auto_stories</span><strong>台本閲覧:</strong>
-                        運営が管理する台本の進行状況が、自動で画面に反映されます。</li>
-                    <li><span class="material-icons-outlined">people</span><strong>対戦カード確認:</strong>
-                        現在の公式な対戦カードが常に表示されます。</li>
-                    <li><span class="material-icons-outlined">search</span><strong>ローカル表示切替:</strong>
-                        話題に上がったチームの情報などを、自由に閲覧できます。</li>
+                    <li><span class="material-icons-outlined">chat</span><strong>コメント送受信</strong></li>
+                    <li><span class="material-icons-outlined">auto_stories</span><strong>台本閲覧</strong></li>
+                    <li><span class="material-icons-outlined">people</span><strong>対戦カード確認</strong></li>
+                    <li><span class="material-icons-outlined">search</span><strong>ローカル表示切替</strong></li>
                 </ul>
                 <div class="link-area"><a href="./commentator.html" class="page-link-button">実況解説ページを開く</a></div>
+            </section>
+            <section class="info-card">
+                <h2>配信担当者ページ</h2>
+                <p class="description">OBSのブラウザドックに設定し、試合情報（ラウンド、勝敗）を管理・操作するためのページです。</p>
+                <h3>主な機能</h3>
+                <ul>
+                    <li><span class="material-icons-outlined">edit</span><strong>対戦設定（ラウンド・勝敗管理）</strong></li>
+                    <li><span class="material-icons-outlined">send</span><strong>コメント送受信</strong></li>
+                    <li><span class="material-icons-outlined">skip_next</span><strong>台本進行</strong></li>
+                    <li><span class="material-icons-outlined">people</span><strong>対戦カード設定</strong></li>
+                </ul>
+                <div class="link-area"><a href="./stream-staff.html" class="page-link-button">配信担当ページを開く</a></div>
             </section>
         </main>
     </div>
