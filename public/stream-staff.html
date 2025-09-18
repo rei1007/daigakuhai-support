@@ -497,17 +497,19 @@
             width: 36px;
             height: 36px;
             transition: all 0.2s;
-            color: white;
+            color: black;
         }
 
         .stage-winner-row .winner-selector button.alpha.active {
             background-color: var(--winner-alpha-color);
             border-color: var(--winner-alpha-color);
+            color: white;
         }
 
         .stage-winner-row .winner-selector button.bravo.active {
             background-color: var(--winner-bravo-color);
             border-color: var(--winner-bravo-color);
+            color: white;
         }
 
         @media (min-width: 769px) {
@@ -521,6 +523,54 @@
 
             .segmented-control {
                 display: none;
+            }
+
+            .control-panel .local-view-group {
+                display: flex;
+                align-items: center;
+            }
+
+            .control-panel .local-view-group .team-selector {
+                flex-grow: 1;
+            }
+
+            .control-panel .local-view-group .sync-button-pc {
+                margin-left: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .control-panel {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pc-only {
+                display: none;
+            }
+
+            .mobile-only {
+                display: block;
+            }
+
+            .sync-button-mobile {
+                text-align: center;
+                margin-bottom: 16px;
+            }
+
+            .content-wrapper {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .segmented-control {
+                order: 1;
+                margin-bottom: 16px;
+            }
+
+            .team-display-area {
+                order: 2;
             }
         }
 
