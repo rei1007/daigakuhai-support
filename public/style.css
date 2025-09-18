@@ -197,7 +197,7 @@ h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 .script-card .card-footer .outline-button {
