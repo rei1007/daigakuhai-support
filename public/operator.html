@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大学杯 配信サポート (運営ページ)</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -14,7 +15,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // ▼▼▼ ご提供いただいたFirebase設定情報に更新 ▼▼▼
         const firebaseConfig = {
             apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
             authDomain: "daigakuhai-support-fb.firebaseapp.com",
@@ -26,609 +26,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
-
-    <style>
-        :root {
-            --primary-color: #202124;
-            --surface-container-color: #F1F3F4;
-            --surface-color: #FFFFFF;
-            --on-surface-color: #202124;
-            --on-surface-variant-color: #5F6368;
-            --outline-color: #BDC1C6;
-            --primary-container-color: #E8EAED;
-            --on-primary-container-color: #202124;
-            --font-family: 'Noto Sans JP', sans-serif;
-            --border-radius-large: 12px;
-            --border-radius-medium: 8px;
-            --greyed-out-color: #9AA0A6;
-            --xp-highlight-color: #E53935;
-            --xp-highlight-bg: #FFEBEE;
-            --badge-operator-bg: #E3F2FD;
-            --badge-operator-text: #0D47A1;
-            --badge-commentator-bg: #E8F5E9;
-            --badge-commentator-text: #1B5E20;
-            --badge-stream-staff-bg: #F3E5F5;
-            --badge-stream-staff-text: #4A148C;
-            --badge-me-bg: #FFF3E0;
-            --badge-me-text: #E65100;
-            --status-connected: #34A853;
-            --status-connecting: #FBBC05;
-            --status-disconnected: #EA4335;
-        }
-
-        body {
-            font-family: var(--font-family);
-            background-color: var(--surface-container-color);
-            color: var(--on-surface-color);
-            margin: 0;
-            padding: 16px;
-            font-size: 16px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--surface-color);
-            padding: 12px 20px;
-            border-radius: var(--border-radius-large);
-        }
-
-        .header h1 {
-            font-size: 22px;
-            font-weight: 500;
-            margin: 0;
-        }
-
-        .connection-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            border-radius: var(--border-radius-medium);
-            background-color: var(--primary-container-color);
-            color: var(--on-primary-container-color);
-            font-weight: 500;
-            font-size: 14px;
-            transition: padding 0.2s;
-        }
-
-        .connection-indicator .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        /* --- ▼▼▼ 接続状況ランプの色のスタイルを追加 ▼▼▼ --- */
-        .connection-indicator.is-connecting .status-dot {
-            background-color: var(--status-connecting);
-        }
-
-        .connection-indicator.is-connected .status-dot {
-            background-color: var(--status-connected);
-        }
-
-        .connection-indicator.is-disconnected .status-dot {
-            background-color: var(--status-disconnected);
-        }
-
-        .comment-area {
-            margin-top: 16px;
-            margin-bottom: 16px;
-            background-color: var(--surface-color);
-            padding: 16px;
-            border-radius: var(--border-radius-large);
-        }
-
-        .comment-area h2,
-        .script-card h2 {
-            font-size: 15px;
-            font-weight: 700;
-            margin: 0 0 10px 0;
-        }
-
-        .comment-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .comment-input-group input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid var(--outline-color);
-            border-radius: var(--border-radius-medium);
-            font-size: 15px;
-        }
-
-        .comment-input-group button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 16px;
-            border-radius: var(--border-radius-medium);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: padding 0.2s;
-        }
-
-        .comment-history .comment-item {
-            padding: 6px 8px;
-            font-size: 14px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            border-radius: var(--border-radius-medium);
-            border-left: 4px solid transparent;
-        }
-
-        .comment-history .comment-item.is-latest {
-            border-left: 4px solid var(--badge-me-text);
-        }
-
-        .comment-history .badge {
-            font-size: 10px;
-            padding: 2px 0;
-            border-radius: 4px;
-            font-weight: 700;
-            width: 60px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .comment-history .badge.is-me {
-            background-color: var(--badge-me-bg);
-            color: var(--badge-me-text);
-        }
-
-        .comment-history .badge.is-operator {
-            background-color: var(--badge-operator-bg);
-            color: var(--badge-operator-text);
-        }
-
-        .comment-history .badge.is-commentator {
-            background-color: var(--badge-commentator-bg);
-            color: var(--badge-commentator-text);
-        }
-
-        .comment-history .badge.is-stream-staff {
-            background-color: var(--badge-stream-staff-bg);
-            color: var(--badge-stream-staff-text);
-        }
-
-        .script-card {
-            background-color: var(--surface-color);
-            padding: 16px;
-            border-radius: var(--border-radius-large);
-        }
-
-        .script-card .script-paragraph {
-            margin: 0 0 8px 0;
-            padding: 4px 4px 4px 8px;
-            font-size: 15px;
-            border-left: 4px solid transparent;
-        }
-
-        .script-card .script-paragraph.is-done {
-            color: var(--greyed-out-color);
-        }
-
-        .script-card .script-paragraph b {
-            font-weight: 700;
-        }
-
-        .script-card .script-paragraph.is-current {
-            font-size: 17px;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .script-card .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .script-card .card-footer .outline-button {
-            font-size: 12px;
-            color: var(--on-surface-variant-color);
-            background: none;
-            border: 1px solid var(--outline-color);
-            border-radius: var(--border-radius-medium);
-            cursor: pointer;
-            padding: 6px 12px;
-            font-weight: 500;
-            width: fit-content;
-        }
-
-        .script-card .card-footer .outline-button:hover {
-            background-color: var(--primary-container-color);
-        }
-
-        .script-card .card-footer .nav-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .script-card .card-footer button {
-            background-color: var(--primary-container-color);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-panel {
-            margin-top: 16px;
-            background-color: var(--surface-color);
-            padding: 16px;
-            border-radius: var(--border-radius-large);
-        }
-
-        .control-panel h2 {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .control-group {
-            margin-bottom: 16px;
-        }
-
-        .team-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .team-selector select,
-        .team-selector .static-team-name {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid var(--outline-color);
-            border-radius: var(--border-radius-medium);
-            font-size: 15px;
-        }
-
-        .team-selector .vs-text {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .sync-button {
-            background-color: var(--primary-container-color);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .team-display-area {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .team-card {
-            background-color: var(--surface-color);
-            padding: 24px;
-            border-radius: var(--border-radius-large);
-        }
-
-        .team-card .university-name {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .team-card .team-name {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 2px 0 0 0;
-        }
-
-        .team-card .sub-info {
-            font-size: 14px;
-            color: var(--on-surface-variant-color);
-            margin: 4px 0 16px 0;
-        }
-
-        .team-card h3 {
-            font-size: 16px;
-            font-weight: 700;
-            border-bottom: 1px solid var(--primary-container-color);
-            padding-bottom: 6px;
-            margin-top: 24px;
-            margin-bottom: 12px;
-        }
-
-        .team-card p {
-            line-height: 1.7;
-            white-space: pre-wrap;
-            margin: 12px 0;
-        }
-
-        .player-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .player-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--surface-container-color);
-        }
-
-        .player-main-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 500;
-            font-size: 18px;
-        }
-
-        .player-main-info .xp-badge {
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: 700;
-            background-color: var(--primary-container-color);
-            color: var(--on-primary-container-color);
-        }
-
-        .player-main-info .xp-badge.is-highlight {
-            background-color: var(--xp-highlight-bg);
-            color: var(--xp-highlight-color);
-        }
-
-        .player-weapons {
-            margin-top: 6px;
-            font-size: 15px;
-            color: var(--on-surface-variant-color);
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal.is-active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--surface-color);
-            padding: 24px;
-            border-radius: var(--border-radius-large);
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: sticky;
-            top: -24px;
-            float: right;
-            margin-right: -12px;
-            background: var(--surface-container-color);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .modal-script-list .script-paragraph {
-            padding: 12px 8px;
-            border-radius: var(--border-radius-medium);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .modal-script-list .script-paragraph.is-done {
-            color: var(--greyed-out-color);
-        }
-
-        .modal-script-list .script-paragraph:hover {
-            outline: 2px solid var(--primary-color);
-            background-color: var(--primary-container-color);
-        }
-
-        .modal-content #comment-modal-heading {
-            margin: 0 0 16px 0;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--on-surface-variant-color);
-        }
-
-        .modal-content #comment-modal-text {
-            font-size: 24px;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        .highlight-new {
-            animation: highlight-fade 2s ease-out;
-        }
-
-        @keyframes highlight-fade {
-            0% {
-                background-color: var(--badge-me-bg);
-            }
-
-            100% {
-                background-color: transparent;
-            }
-        }
-
-        .segmented-control {
-            display: flex;
-            border-radius: var(--border-radius-medium);
-            gap: 8px;
-        }
-
-        .segmented-control button {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid var(--outline-color);
-            background-color: var(--surface-color);
-            color: var(--on-surface-variant-color);
-            border-radius: var(--border-radius-medium);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .segmented-control button.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            font-weight: 700;
-        }
-
-        .team-card-wrapper {
-            display: none;
-        }
-
-        .team-card-wrapper.active {
-            display: block;
-        }
-
-        .content-wrapper {
-            margin-top: 16px;
-        }
-
-        .pc-only {
-            display: block;
-        }
-
-        .mobile-only {
-            display: none;
-        }
-
-        @media (min-width: 769px) {
-            .team-display-area {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .team-card-wrapper {
-                display: block !important;
-            }
-
-            .segmented-control {
-                display: none;
-            }
-
-            .control-panel .local-view-group {
-                display: flex;
-                align-items: center;
-            }
-
-            .control-panel .local-view-group .team-selector {
-                flex-grow: 1;
-            }
-
-            .control-panel .local-view-group .sync-button-pc {
-                margin-left: 10px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .control-panel {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .pc-only {
-                display: none;
-            }
-
-            .mobile-only {
-                display: block;
-            }
-
-            .sync-button-mobile {
-                text-align: center;
-                margin-bottom: 16px;
-            }
-
-            .content-wrapper {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .segmented-control {
-                order: 1;
-                margin-bottom: 16px;
-            }
-
-            .team-display-area {
-                order: 2;
-            }
-        }
-
-        @media (max-width: 650px) {
-            .header h1 {
-                font-size: 18px;
-            }
-
-            .connection-text {
-                display: none;
-            }
-
-            .connection-indicator {
-                padding: 8px;
-            }
-
-            .send-text {
-                display: none;
-            }
-
-            #send-comment-button {
-                padding: 8px;
-                width: 40px;
-                height: 40px;
-            }
-
-            .team-selector {
-                flex-direction: column;
-                gap: 8px;
-                align-items: stretch;
-            }
-
-            .team-selector .vs-text {
-                display: none;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -640,14 +37,14 @@
         </div>
     </header>
     <main>
-        <section class="comment-area">
+        <section class="card comment-area">
             <h2>コメント</h2>
             <div class="comment-input-group"><input type="text" id="comment-input" placeholder="メッセージを入力"><button
                     id="send-comment-button"><span class="material-icons-outlined">send</span><span
                         class="send-text">送信</span></button></div>
             <div class="comment-history" id="comment-history"></div>
         </section>
-        <section class="script-card">
+        <section class="card script-card">
             <h2>台本</h2>
             <div id="script-card-content"></div>
             <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button>
@@ -656,7 +53,18 @@
                         title="次の段落へ"><span class="material-icons-outlined">skip_next</span></button></div>
             </div>
         </section>
-        <section class="control-panel">
+        <section class="card" id="match-settings-card">
+            <h2>対戦設定</h2>
+            <div class="form-group"><label for="round-info-input">ラウンド情報</label><input type="text" id="round-info-input"
+                    placeholder="例: 決勝トーナメント 第1試合"></div>
+            <div class="form-group"><label>試合本数</label>
+                <div class="bo-selector"><button id="bo3-btn">BO3</button><button id="bo5-btn">BO5</button></div>
+            </div>
+            <div class="form-group"><label>ステージ & 勝敗</label>
+                <div class="stage-winner-rows" id="stage-winner-rows"></div>
+            </div>
+        </section>
+        <section class="card control-panel">
             <div class="control-group">
                 <h2>▼ 対戦チーム設定</h2>
                 <div class="team-selector"><select id="matchup-alpha-select"></select><span
@@ -704,7 +112,8 @@
     </div>
     <script>
         const MY_ROLE = '運営';
-        let teamsData = [], scriptData = [], mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
+        let teamsData = [], scriptData = [], stagesData = [];
+        let mySessionId = `op-${Math.random().toString(36).substr(2, 9)}`;
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
@@ -719,9 +128,9 @@
             matchupAlphaSelect: getEl('matchup-alpha-select'), matchupBravoSelect: getEl('matchup-bravo-select'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButtonMobile: getEl('sync-view-button-mobile'), syncViewButtonPC: getEl('sync-view-button-pc'),
-            teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'),
-            teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
+            teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'), teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
+            roundInfoInput: getEl('round-info-input'), bo3Btn: getEl('bo3-btn'), bo5Btn: getEl('bo5-btn'), stageWinnerRows: getEl('stage-winner-rows'),
         };
 
         const setConnectionStatus = (status) => {
@@ -735,14 +144,13 @@
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
-
             if (state.matchup && state.matchup.alphaTeamId) {
                 DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
                 DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
             }
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
-
+            renderMatchSettings(state);
             const lastComment = (state.comments || []).slice(-1)[0];
             if (lastComment && lastComment.senderId !== mySessionId) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
@@ -751,36 +159,24 @@
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
             }
-        }, (error) => {
-            setConnectionStatus('disconnected');
-        });
+        }, (error) => { setConnectionStatus('disconnected'); });
 
         const renderComments = (comments = []) => {
             const latestCommentId = (comments.slice(-1)[0] || {}).id;
             DOMElements.commentHistory.innerHTML = comments.map(c => {
                 const isMe = c.senderId === mySessionId;
-                let badgeClass = 'is-other';
-                let badgeText = c.role;
+                let badgeClass = 'is-other'; let badgeText = c.role;
                 if (isMe) {
-                    badgeClass = 'is-me';
-                    badgeText = 'Me';
+                    badgeClass = 'is-me'; badgeText = 'Me';
                 } else if (c.role === '運営') {
                     badgeClass = 'is-operator';
                 } else if (c.role === '実況解説') {
                     badgeClass = 'is-commentator';
-                } else if (c.role === '配信担当') {
-                    badgeClass = 'is-stream-staff';
-                }
+                } else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
                 const isLatestClass = c.id === latestCommentId ? 'is-latest' : '';
                 return `<div class="comment-item ${isLatestClass}" id="comment-${c.id}"><span class="badge ${badgeClass}">${badgeText}</span><span class="text">${c.text}</span></div>`;
             }).join('');
-            if (latestCommentId) {
-                const latestEl = getEl(`comment-${latestCommentId}`);
-                if (latestEl && !latestEl.classList.contains('highlighted')) {
-                    latestEl.classList.add('highlight-new', 'highlighted');
-                    setTimeout(() => { latestEl.classList.remove('highlight-new'); }, 2000);
-                }
-            }
+            if (latestCommentId) { const latestEl = getEl(`comment-${latestCommentId}`); if (latestEl && !latestEl.classList.contains('highlighted')) { latestEl.classList.add('highlight-new', 'highlighted'); setTimeout(() => { latestEl.classList.remove('highlight-new'); }, 2000); } }
         };
         const renderScript = (currentIndex = 0) => {
             let cardContentHTML = '';
@@ -793,8 +189,13 @@
             const team = teamsData.find(t => t.id === teamId);
             if (!team) return '<h3>チームを選択してください</h3>';
             const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
-            const playerListHTML = players.filter(p => p.name).map(p => `<li class="player-item"><div class="player-main-info"><span class="name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-weapons">${(p.weapons || '').replace(/\//g, ' / ')}</div></li>`).join('');
-            return `<p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2><p class="sub-info">${team.circleName}</p><h3>プレイヤー情報</h3><ul class="player-list">${playerListHTML}</ul><h3>コメント</h3><p>${team.comment}</p><h3>チーム補足情報</h3><p>${team.teamInfo}</p><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p><h3>サークル情報</h3><p>${team.circleInfo}</p>`;
+            const playerListHTML = players.filter(p => p.name).map(p => `<div class="player-tile"><div class="player-tile-top"><span class="player-name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-tile-bottom">${(p.weapons || '').replace(/\//g, ' / ')}</div></div>`).join('');
+            return `<div class="team-card-header"><p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2></div>
+                    <h3>プレイヤー情報</h3><div class="player-tiles-container">${playerListHTML}</div>
+                    <div class="info-tile"><h3>コメント</h3><p>${team.comment}</p></div>
+                    <div class="info-tile"><h3>チーム補足情報</h3><p>${team.teamInfo}</p></div>
+                    <div class="info-tile"><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p></div>
+                    <div class="info-tile"><h3>サークル情報</h3><p>${team.circleInfo}</p></div>`;
         };
         const showCommentModal = (text, role = '不明') => {
             DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
@@ -812,24 +213,42 @@
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
         };
+        const renderMatchSettings = (state) => {
+            if (document.activeElement !== DOMElements.roundInfoInput) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
+            const bestOf = state.bestOf || 'BO3';
+            DOMElements.bo3Btn.classList.toggle('active', bestOf === 'BO3');
+            DOMElements.bo5Btn.classList.toggle('active', bestOf === 'BO5');
+            const numStages = bestOf === 'BO5' ? 5 : 3;
+            const stages = state.stages || [];
+            DOMElements.stageWinnerRows.innerHTML = '';
+            for (let i = 0; i < numStages; i++) {
+                const stageData = stages[i] || { stage: '', winner: null };
+                const row = document.createElement('div');
+                row.className = 'stage-winner-row';
+                const stageOptions = stagesData.map(s => `<option value="${s}" ${s === stageData.stage ? 'selected' : ''}>${s}</option>`).join('');
+                row.innerHTML = `<span>${i + 1}.</span><select class="stage-select" data-index="${i}"><option value="">ステージ選択</option>${stageOptions}</select><div class="winner-selector" data-index="${i}"><button class="alpha ${stageData.winner === 'alpha' ? 'active' : ''}" data-winner="alpha">A</button><button class="bravo ${stageData.winner === 'bravo' ? 'active' : ''}" data-winner="bravo">B</button></div>`;
+                DOMElements.stageWinnerRows.appendChild(row);
+            }
+        };
 
         const initializePage = async () => {
             setConnectionStatus('connecting');
             try {
-                const [teamsRes, scriptRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json')]);
+                const [teamsRes, scriptRes, stagesRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json'), fetch('./stages.json')]);
                 teamsData = await teamsRes.json();
                 scriptData = await scriptRes.json();
+                stagesData = await stagesRes.json();
             } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
-                    option.value = team.id;
-                    option.textContent = team.teamName;
+                    option.value = team.id; option.textContent = team.teamName;
                     select.appendChild(option);
                 });
             });
             updateTeamDisplay();
             renderScript();
+            renderMatchSettings({});
         };
 
         const matchupChangeHandler = () => { sessionDocRef.update({ matchup: { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value } }); };
@@ -862,6 +281,7 @@
             }
         };
         DOMElements.sendCommentButton.onclick = sendComment;
+
         const syncViewToMatchup = async () => {
             const doc = await sessionDocRef.get();
             const matchup = doc.data().matchup;
@@ -874,6 +294,33 @@
         DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
         DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
 
+        const updateMatchSettings = () => {
+            const newBestOf = DOMElements.bo3Btn.classList.contains('active') ? 'BO3' : 'BO5';
+            const newStages = Array.from(DOMElements.stageWinnerRows.querySelectorAll('.stage-winner-row')).map(row => {
+                const stageSelect = row.querySelector('.stage-select');
+                const activeWinnerBtn = row.querySelector('.winner-selector button.active');
+                return { stage: stageSelect.value, winner: activeWinnerBtn ? activeWinnerBtn.dataset.winner : null };
+            });
+            sessionDocRef.update({
+                roundInfo: DOMElements.roundInfoInput.value,
+                bestOf: newBestOf,
+                stages: newStages
+            });
+        };
+        DOMElements.roundInfoInput.onchange = updateMatchSettings;
+        DOMElements.bo3Btn.onclick = () => { DOMElements.bo3Btn.classList.add('active'); DOMElements.bo5Btn.classList.remove('active'); updateMatchSettings(); };
+        DOMElements.bo5Btn.onclick = () => { DOMElements.bo5Btn.classList.add('active'); DOMElements.bo3Btn.classList.remove('active'); updateMatchSettings(); };
+        DOMElements.stageWinnerRows.addEventListener('change', (e) => { if (e.target.classList.contains('stage-select')) updateMatchSettings(); });
+        DOMElements.stageWinnerRows.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' && e.target.closest('.winner-selector')) {
+                const parent = e.target.parentElement;
+                const currentlyActive = parent.querySelector('.active');
+                if (currentlyActive === e.target) { e.target.classList.remove('active'); }
+                else { if (currentlyActive) currentlyActive.classList.remove('active'); e.target.classList.add('active'); }
+                updateMatchSettings();
+            }
+        });
+
         const setDisplayTeam = (team) => {
             currentlyDisplayedTeam = team;
             DOMElements.displayAlphaBtn.classList.toggle('active', team === 'alpha');
@@ -882,6 +329,7 @@
         };
         DOMElements.displayAlphaBtn.onclick = () => setDisplayTeam('alpha');
         DOMElements.displayBravoBtn.onclick = () => setDisplayTeam('bravo');
+
         DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
         DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
         DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
