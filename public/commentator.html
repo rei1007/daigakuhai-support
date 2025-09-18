@@ -255,8 +255,9 @@
                 if (game.winner === 'alpha') tile.classList.add('alpha-win');
                 if (game.winner === 'bravo') tile.classList.add('bravo-win');
 
-                const winnerMark = game.winner ? (game.winner === 'alpha' ? 'A WIN' : 'B WIN') : '未定';
-                tile.innerHTML = `<div class="stage-name">${game.stage || '未選択'}</div><div class="winner-mark">${winnerMark}</div>`;
+                //const winnerMark = game.winner ? (game.winner === 'alpha' ? 'アルファ WIN' : 'ブラボー WIN') : '---';
+                //tile.innerHTML = `<div class="stage-name">${game.stage || '未決定'}</div><div class="winner-mark">${winnerMark}</div>`;
+                tile.innerHTML = `<div class="stage-name">${game.stage || '未決定'}</div>`;
                 DOMElements.stageTilesDisplay.appendChild(tile);
             }
         };

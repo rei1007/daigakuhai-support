@@ -1,6 +1,6 @@
 :root {
     --primary-color: #202124;
-    --surface-container-color: #F1F3F4;
+    --surface-container-color: #f6f6f7;
     --surface-color: #FFFFFF;
     --on-surface-color: #202124;
     --on-surface-variant-color: #5F6368;
@@ -139,11 +139,12 @@ h2 {
 
 .comment-history .comment-item.is-latest {
     border-left: 4px solid var(--badge-me-text);
+    font-weight: 700;
 }
 
 .comment-history .badge {
-    font-size: 10px;
-    padding: 2px 0;
+    font-size: 12px;
+    padding: 4px;
     border-radius: 4px;
     font-weight: 700;
     width: 60px;
@@ -174,7 +175,7 @@ h2 {
 .script-card .script-paragraph {
     margin: 0 0 8px 0;
     padding: 4px 4px 4px 8px;
-    font-size: 15px;
+    font-size: 16px;
     border-left: 4px solid transparent;
 }
 
@@ -187,7 +188,8 @@ h2 {
 }
 
 .script-card .script-paragraph.is-current {
-    font-size: 17px;
+    font-size: 18px;
+    font-weight: 700;
     border-left: 4px solid var(--primary-color);
 }
 
@@ -354,6 +356,8 @@ h2 {
 }
 
 .modal-script-list .script-paragraph {
+    font-size: 16px;
+    font-weight: 700;
     padding: 12px 8px;
     border-radius: var(--border-radius-medium);
     cursor: pointer;
@@ -367,16 +371,17 @@ h2 {
 
 .modal-script-list .script-paragraph.is-done {
     color: var(--greyed-out-color);
+    font-weight: normal;
+    font-size: 16px;
 }
 
-.modal-comment-content #comment-modal-heading {
+.modal-content #comment-modal-heading {
     margin: 0 0 16px 0;
-    font-size: 16px;
     font-weight: 700;
     color: var(--on-surface-variant-color);
 }
 
-.modal-comment-content #comment-modal-text {
+.modal-content #comment-modal-text {
     font-size: 24px;
     line-height: 1.6;
     margin: 0;
@@ -536,23 +541,27 @@ h2 {
     color: white;
 }
 
+.match-status-card h2 {
+    margin-bottom: 8px;
+}
+
 .match-status-card .round-info {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .match-status-card .score-display {
     font-size: 24px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .match-status-card .score-display .team-name {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 700;
     display: block;
 }
 
@@ -568,16 +577,15 @@ h2 {
     display: flex;
     justify-content: center;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .match-status-card .stage-tile {
-    flex: 1;
-    min-width: 100px;
+    width: 250px;
     border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
     padding: 8px;
-    font-size: 12px;
+    font-size: 14px;
     text-align: center;
 }
 
@@ -608,6 +616,7 @@ h2 {
 .team-card-header .university-name {
     font-size: 18px;
     font-weight: 700;
+    margin: 8px 0;
 }
 
 .team-card-header .team-name {
@@ -617,14 +626,20 @@ h2 {
     margin: 2px 0 0 0;
 }
 
+.team-card h3 {
+    color: var(--on-surface-variant-color);
+    margin: 8px 0 0;
+    font-size: 16px;
+}
+
 .player-tiles-container {
     display: grid;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .player-tile {
-    background-color: var(--surface-container-color);
+    border: solid 1px var(--outline-color);
     border-radius: var(--border-radius-medium);
     padding: 12px;
 }
@@ -638,8 +653,8 @@ h2 {
 }
 
 .xp-badge {
-    font-size: 12px;
-    padding: 3px 8px;
+    font-size: 14px;
+    padding: 2px 8px;
     border-radius: 12px;
     font-weight: 700;
     background-color: var(--primary-container-color);
@@ -653,7 +668,7 @@ h2 {
 
 .player-tile-bottom {
     margin-top: 6px;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--on-surface-variant-color);
 }
 
@@ -665,7 +680,7 @@ h2 {
 }
 
 .info-tile h3 {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     margin: 0 0 8px 0;
     padding-bottom: 6px;
@@ -673,7 +688,7 @@ h2 {
 }
 
 .info-tile p {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.6;
     margin: 0;
     white-space: pre-wrap;
