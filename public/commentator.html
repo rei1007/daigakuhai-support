@@ -37,76 +37,103 @@
         </div>
     </header>
     <main>
-        <section class="card comment-area">
-            <h2>コメント</h2>
-            <div class="comment-input-group"><input type="text" id="comment-input" placeholder="メッセージを入力"><button
-                    id="send-comment-button"><span class="material-icons-outlined">send</span><span
-                        class="send-text">送信</span></button></div>
+        <div id="tab-content-comment" class="tab-content active">
             <div class="comment-history" id="comment-history"></div>
-        </section>
-        <section class="card script-card">
-            <h2>台本</h2>
-            <div class="card-footer"><button class="outline-button" id="open-script-modal-button">全体表示</button></div>
-            <div id="script-card-content"></div>
-        </section>
-        <section class="card match-status-card">
-            <h2>対戦状況</h2>
-            <div id="round-info-display" class="round-info"></div>
-            <div id="score-display" class="score-display"></div>
-            <div id="stage-tiles-display" class="stage-tiles"></div>
-        </section>
-        <section class="card control-panel">
-            <div class="control-group">
-                <h2>▼ 現在の対戦チーム</h2>
-                <div class="team-selector">
-                    <div id="matchup-alpha-display" class="static-team-name">（情報待機中）</div><span
-                        class="vs-text">VS</span>
-                    <div id="matchup-bravo-display" class="static-team-name">（情報待機中）</div>
-                </div>
+            <div class="tab-action-bar">
+                <div class="comment-input-group"><input type="text" id="comment-input" placeholder="メッセージを入力"><button
+                        id="send-comment-button"><span class="material-icons-outlined">send</span><span
+                            class="send-text">送信</span></button></div>
             </div>
-            <div class="sync-button-mobile mobile-only"><button id="sync-view-button-mobile" class="sync-button"
-                    title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button></div>
-            <div class="control-group">
-                <h2>▼ 表示チーム切り替え</h2>
-                <div class="local-view-group">
-                    <div class="team-selector"><select id="view-alpha-select"></select><span
-                            class="vs-text">VS</span><select id="view-bravo-select"></select></div>
-                    <div class="sync-button-pc pc-only"><button id="sync-view-button-pc" class="sync-button"
-                            title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button>
+        </div>
+
+        <div id="tab-content-script" class="tab-content">
+            <div class="tab-main-content">
+                <section class="script-card">
+                    <h2>台本</h2>
+                    <div id="script-card-content" class="script-full-list"></div>
+                </section>
+            </div>
+        </div>
+
+        <div id="tab-content-match-info" class="tab-content">
+            <div class="tab-main-content">
+                <section class="matchup-header">
+                    <div id="header-alpha-team" class="team-name-display">（情報待機中）</div>
+                    <div class="vs-text">VS</div>
+                    <div id="header-bravo-team" class="team-name-display">（情報待機中）</div>
+                </section>
+                <section class="match-status-display">
+                    <div id="round-info-display" class="round-info"></div>
+                    <div id="score-display" class="score-display"></div>
+                    <div id="stage-images-display" class="stage-images"></div>
+                </section>
+                <section class="team-details-display">
+                     <h2>チーム詳細</h2>
+                    <div class="team-display-area">
+                        <div id="team-alpha-card-wrapper" class="team-card-wrapper active">
+                            <div id="team-alpha-card" class="team-card"></div>
+                        </div>
+                        <div id="team-bravo-card-wrapper" class="team-card-wrapper">
+                            <div id="team-bravo-card" class="team-card"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="tab-action-bar">
+                <div class="control-group">
+                    <h2>表示チーム切り替え</h2>
+                    <div class="local-view-group">
+                        <div class="team-selector"><select id="view-alpha-select"></select><span
+                                class="vs-text">VS</span><select id="view-bravo-select"></select></div>
+                        <div class="sync-button-pc pc-only"><button id="sync-view-button-pc" class="sync-button"
+                                title="表示チームを対戦チームに同期"><span
+                                    class="material-icons-outlined">arrow_downward</span></button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <div class="content-wrapper">
-            <div class="segmented-control"><button id="display-alpha-btn" class="active">アルファ</button><button
-                    id="display-bravo-btn">ブラボー</button></div>
-            <div class="team-display-area">
-                <div id="team-alpha-card-wrapper" class="team-card-wrapper active">
-                    <div id="team-alpha-card" class="team-card"></div>
-                </div>
-                <div id="team-bravo-card-wrapper" class="team-card-wrapper">
-                    <div id="team-bravo-card" class="team-card"></div>
+                <div class="mobile-action-group mobile-only">
+                    <div class="segmented-control"><button id="display-alpha-btn"
+                            class="active">アルファ</button><button id="display-bravo-btn">ブラボー</button></div>
+                    <button id="sync-view-button-mobile" class="sync-button" title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button>
                 </div>
             </div>
         </div>
+
     </main>
-    <div id="script-modal" class="modal">
-        <div class="modal-content"><button class="modal-close" id="script-modal-close"><span
-                    class="material-icons-outlined">close</span></button>
-            <h2>台本全体</h2>
-            <div class="modal-script-list" id="modal-script-list"></div>
-        </div>
-    </div>
     <div id="comment-modal" class="modal">
-        <div class="modal-content"><button class="modal-close" id="comment-modal-close"><span
+        <div class="modal-content">
+            <button class="modal-close" id="comment-modal-close"><span
                     class="material-icons-outlined">close</span></button>
             <h2 id="comment-modal-heading">新着コメント</h2>
             <p id="comment-modal-text"></p>
         </div>
     </div>
+
+    <nav class="tab-bar">
+        <button class="tab-button" data-tab="comment">
+            <span class="material-icons-outlined">chat</span>
+            <span class="tab-label">コメント</span>
+        </button>
+        <button class="tab-button" data-tab="script">
+            <span class="material-icons-outlined">description</span>
+            <span class="tab-label">台本</span>
+        </button>
+        <button class="tab-button" data-tab="match-info">
+            <span class="material-icons-outlined">wysiwyg</span>
+            <span class="tab-label">対戦情報</span>
+        </button>
+    </nav>
+
     <script>
         const MY_ROLE = '実況解説';
-        let teamsData = [], scriptData = [], mySessionId = `com-${Math.random().toString(36).substr(2, 9)}`;
+        let teamsData = [], scriptData = [];
+
+        let mySessionId = localStorage.getItem('mySessionId');
+        if (!mySessionId || !mySessionId.startsWith('com-')) {
+            mySessionId = `com-${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem('mySessionId', mySessionId);
+        }
+
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
@@ -116,16 +143,15 @@
         const DOMElements = {
             connectionIndicator: getEl('connection-indicator'), connectionStatus: getEl('connection-status'),
             commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
-            openScriptModalButton: getEl('open-script-modal-button'), scriptCardContent: getEl('script-card-content'),
-            scriptModal: getEl('script-modal'), modalScriptList: getEl('modal-script-list'), scriptModalClose: getEl('script-modal-close'),
+            scriptCardContent: getEl('script-card-content'),
             commentModal: getEl('comment-modal'), commentModalHeading: getEl('comment-modal-heading'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
-            matchupAlphaDisplay: getEl('matchup-alpha-display'), matchupBravoDisplay: getEl('matchup-bravo-display'),
+            headerAlphaTeam: getEl('header-alpha-team'), headerBravoTeam: getEl('header-bravo-team'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButtonMobile: getEl('sync-view-button-mobile'), syncViewButtonPC: getEl('sync-view-button-pc'),
             teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'),
             teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
-            roundInfoDisplay: getEl('round-info-display'), scoreDisplay: getEl('score-display'), stageTilesDisplay: getEl('stage-tiles-display'),
+            roundInfoDisplay: getEl('round-info-display'), scoreDisplay: getEl('score-display'), stageImagesDisplay: getEl('stage-images-display'),
         };
 
         const setConnectionStatus = (status) => {
@@ -137,9 +163,9 @@
 
         const checkSyncStatus = () => {
             if (!officialMatchup.alphaTeamId) return;
-            const isSynced = DOMElements.viewAlphaSelect.value === officialMatchup.alphaTeamId && DOMElements.viewBravoSelect.value === officialMatchup.bravoTeamId;
-            DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', !isSynced);
-            DOMElements.syncViewButtonPC.classList.toggle('is-desynced', !isSynced);
+            const isDesynced = DOMElements.viewAlphaSelect.value !== officialMatchup.alphaTeamId || DOMElements.viewBravoSelect.value !== officialMatchup.bravoTeamId;
+            if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
+            if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
         };
 
         sessionDocRef.onSnapshot((doc) => {
@@ -149,18 +175,15 @@
 
             if (state.matchup && state.matchup.alphaTeamId) {
                 officialMatchup = state.matchup;
-                const alpha = teamsData.find(t => t.id === state.matchup.alphaTeamId);
-                const bravo = teamsData.find(t => t.id === state.matchup.bravoTeamId);
-                if (alpha) DOMElements.matchupAlphaDisplay.textContent = alpha.teamName;
-                if (bravo) DOMElements.matchupBravoDisplay.textContent = bravo.teamName;
             }
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchStatus(state);
-            checkSyncStatus();
+            updateTeamDisplay(); 
 
             const lastComment = (state.comments || []).slice(-1)[0];
-            if (lastComment && lastComment.senderId !== mySessionId) {
+            const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]').classList.contains('active');
+            if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role);
@@ -172,38 +195,28 @@
         });
 
         const renderComments = (comments = []) => {
-            const latestCommentId = (comments.slice(-1)[0] || {}).id;
             DOMElements.commentHistory.innerHTML = comments.map(c => {
                 const isMe = c.senderId === mySessionId;
                 let badgeClass = 'is-other';
                 let badgeText = c.role;
-                if (isMe) {
-                    badgeClass = 'is-me';
-                    badgeText = 'Me';
-                } else if (c.role === '運営') {
-                    badgeClass = 'is-operator';
-                } else if (c.role === '実況解説') {
-                    badgeClass = 'is-commentator';
-                } else if (c.role === '配信担当') {
-                    badgeClass = 'is-stream-staff';
-                }
-                const isLatestClass = c.id === latestCommentId ? 'is-latest' : '';
-                return `<div class="comment-item ${isLatestClass}" id="comment-${c.id}"><span class="badge ${badgeClass}">${badgeText}</span><span class="text">${c.text}</span></div>`;
+                if (isMe) { badgeClass = 'is-me'; badgeText = 'Me'; } 
+                else if (c.role === '運営') { badgeClass = 'is-operator'; } 
+                else if (c.role === '実況解説') { badgeClass = 'is-commentator'; } 
+                else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
+                return `<div class="comment-item-wrapper ${isMe ? 'is-me' : ''}"><div class="comment-item" id="comment-${c.id}"><span class="badge ${badgeClass}">${badgeText}</span><span class="text">${c.text}</span></div></div>`;
             }).join('');
-            if (latestCommentId) {
-                const latestEl = getEl(`comment-${latestCommentId}`);
-                if (latestEl && !latestEl.classList.contains('highlighted')) {
-                    latestEl.classList.add('highlight-new', 'highlighted');
-                    setTimeout(() => { latestEl.classList.remove('highlight-new'); }, 2000);
-                }
-            }
+            DOMElements.commentHistory.scrollTop = DOMElements.commentHistory.scrollHeight;
         };
         const renderScript = (currentIndex = 0) => {
-            let cardContentHTML = '';
-            if (currentIndex < scriptData.length) { cardContentHTML += `<p class="script-paragraph is-current"><b>${scriptData[currentIndex].speaker}:</b> ${scriptData[currentIndex].line}</p>`; } else { cardContentHTML += '<p class="script-paragraph is-done">台本は終了しました。</p>'; }
-            if (currentIndex < scriptData.length - 1) { cardContentHTML += `<p class="script-paragraph"><b>${scriptData[currentIndex + 1].speaker}:</b> ${scriptData[currentIndex + 1].line}</p>`; } else if (currentIndex === scriptData.length - 1) { cardContentHTML += '<p class="script-paragraph is-done">- 次で終了です -</p>'; }
-            DOMElements.scriptCardContent.innerHTML = cardContentHTML;
-            DOMElements.modalScriptList.innerHTML = scriptData.map((p, i) => `<div class="script-paragraph ${i < currentIndex ? 'is-done' : ''}" data-index="${i}"><b>${p.speaker}:</b> ${p.line}</div>`).join('');
+            DOMElements.scriptCardContent.innerHTML = scriptData.map((p, i) => {
+                 let statusClass = '';
+                 if (i < currentIndex) statusClass = 'is-done';
+                 if (i === currentIndex) statusClass = 'is-current';
+                 return `<div class="script-paragraph ${statusClass}" data-index="${i}" id="script-item-${i}"><b>${p.speaker}:</b> ${p.line}</div>`
+            }).join('');
+            
+            const currentEl = getEl(`script-item-${currentIndex}`);
+            if(currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
@@ -241,24 +254,36 @@
             const alphaScore = stages.filter(s => s.winner === 'alpha').length;
             const bravoScore = stages.filter(s => s.winner === 'bravo').length;
 
-            const alphaTeamName = (teamsData.find(t => t.id === state.matchup?.alphaTeamId) || { teamName: 'アルファ' }).teamName;
-            const bravoTeamName = (teamsData.find(t => t.id === state.matchup?.bravoTeamId) || { teamName: 'ブラボー' }).teamName;
-
-            DOMElements.scoreDisplay.innerHTML = `<span class="team-name">${alphaTeamName}</span> <span class="alpha-score">${alphaScore}</span> - <span class="bravo-score">${bravoScore}</span> <span class="team-name">${bravoTeamName}</span>`;
+            const alphaTeam = teamsData.find(t => t.id === state.matchup?.alphaTeamId);
+            const bravoTeam = teamsData.find(t => t.id === state.matchup?.bravoTeamId);
+            
+            DOMElements.headerAlphaTeam.textContent = alphaTeam?.teamName || 'アルファ';
+            DOMElements.headerBravoTeam.textContent = bravoTeam?.teamName || 'ブラボー';
+            DOMElements.scoreDisplay.innerHTML = `<span class="score">${alphaScore}</span> - <span class="score">${bravoScore}</span>`;
 
             const numGames = state.bestOf === 'BO5' ? 5 : 3;
-            DOMElements.stageTilesDisplay.innerHTML = '';
+            DOMElements.stageImagesDisplay.innerHTML = '';
             for (let i = 0; i < numGames; i++) {
                 const game = stages[i] || {};
+                const stageName = game.stage || '未決定';
                 const tile = document.createElement('div');
-                tile.className = 'stage-tile';
-                if (game.winner === 'alpha') tile.classList.add('alpha-win');
-                if (game.winner === 'bravo') tile.classList.add('bravo-win');
+                tile.className = 'stage-image-item';
 
-                //const winnerMark = game.winner ? (game.winner === 'alpha' ? 'アルファ WIN' : 'ブラボー WIN') : '---';
-                //tile.innerHTML = `<div class="stage-name">${game.stage || '未決定'}</div><div class="winner-mark">${winnerMark}</div>`;
-                tile.innerHTML = `<div class="stage-name">${game.stage || '未決定'}</div>`;
-                DOMElements.stageTilesDisplay.appendChild(tile);
+                let winnerOverlay = '';
+                if (game.winner === 'alpha') {
+                    tile.classList.add('alpha-win');
+                    winnerOverlay = `<div class="winner-overlay">WIN</div>`;
+                }
+                if (game.winner === 'bravo') {
+                    tile.classList.add('bravo-win');
+                    winnerOverlay = `<div class="winner-overlay">WIN</div>`;
+                }
+                
+                tile.innerHTML = `
+                    <img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
+                    ${winnerOverlay}
+                    <div class="stage-name-bar">${stageName}</div>`;
+                DOMElements.stageImagesDisplay.appendChild(tile);
             }
         };
 
@@ -289,13 +314,14 @@
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
                     const newComment = { id: Math.random().toString(36).substr(2, 9), text: text, senderId: mySessionId, role: MY_ROLE, timestamp: new Date() };
-                    const updatedComments = [...currentComments, newComment].slice(-3);
+                    const updatedComments = [...currentComments, newComment].slice(-10);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
                 DOMElements.commentInput.value = '';
             }
         };
         DOMElements.sendCommentButton.onclick = sendComment;
+        DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); }});
 
         const setDisplayTeam = (team) => {
             currentlyDisplayedTeam = team;
@@ -315,17 +341,42 @@
                 updateTeamDisplay();
             }
         };
-        DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
-        DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
+        if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
+        if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
 
-        DOMElements.openScriptModalButton.onclick = () => DOMElements.scriptModal.classList.add('is-active');
-        DOMElements.scriptModalClose.onclick = () => DOMElements.scriptModal.classList.remove('is-active');
-        DOMElements.scriptModal.onclick = (e) => { if (e.target === DOMElements.scriptModal) DOMElements.scriptModal.classList.remove('is-active'); };
+        const switchToTab = (tabId) => {
+            if (!tabId) return;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
+        };
+
+        const setupTabs = () => {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetTab = button.dataset.tab;
+                    location.hash = targetTab;
+                    switchToTab(targetTab);
+                });
+            });
+
+            const initialTabId = location.hash.substring(1);
+            const firstTab = document.querySelector('.tab-button')?.dataset.tab;
+            if (document.querySelector(`.tab-button[data-tab="${initialTabId}"]`)) {
+                switchToTab(initialTabId);
+            } else if (firstTab) {
+                switchToTab(firstTab);
+            }
+        };
+        
         DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
         DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
 
         window.onresize = updateTeamDisplay;
-        document.addEventListener("DOMContentLoaded", initializePage);
+        document.addEventListener("DOMContentLoaded", () => {
+            initializePage();
+            setupTabs();
+        });
     </script>
 </body>
 
