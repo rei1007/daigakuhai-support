@@ -40,7 +40,7 @@
         <div id="tab-content-comment" class="tab-content active">
             <div class="comment-history" id="comment-history"></div>
             <div class="tab-action-bar">
-                <div class="comment-input-group"><input type="text" id="comment-input" placeholder="メッセージを入力"><button
+                <div class="comment-input-group"><input type="text" id="comment-input" placeholder="コメントを入力"><button
                         id="send-comment-button"><span class="material-icons-outlined">send</span><span
                             class="send-text">送信</span></button></div>
             </div>
@@ -68,7 +68,7 @@
                     <div id="stage-images-display" class="stage-images"></div>
                 </section>
                 <section class="team-details-display">
-                     <h2>チーム詳細</h2>
+                    <h2>チーム詳細</h2>
                     <div class="team-display-area">
                         <div id="team-alpha-card-wrapper" class="team-card-wrapper active">
                             <div id="team-alpha-card" class="team-card"></div>
@@ -92,9 +92,10 @@
                     </div>
                 </div>
                 <div class="mobile-action-group mobile-only">
-                    <div class="segmented-control"><button id="display-alpha-btn"
-                            class="active">アルファ</button><button id="display-bravo-btn">ブラボー</button></div>
-                    <button id="sync-view-button-mobile" class="sync-button" title="表示チームを対戦チームに同期"><span class="material-icons-outlined">arrow_downward</span></button>
+                    <div class="segmented-control"><button id="display-alpha-btn" class="active">アルファ</button><button
+                            id="display-bravo-btn">ブラボー</button></div>
+                    <button id="sync-view-button-mobile" class="sync-button" title="表示チームを対戦チームに同期"><span
+                            class="material-icons-outlined">arrow_downward</span></button>
                 </div>
             </div>
         </div>
@@ -179,7 +180,7 @@
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchStatus(state);
-            updateTeamDisplay(); 
+            updateTeamDisplay();
 
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]').classList.contains('active');
@@ -199,9 +200,9 @@
                 const isMe = c.senderId === mySessionId;
                 let badgeClass = 'is-other';
                 let badgeText = c.role;
-                if (isMe) { badgeClass = 'is-me'; badgeText = 'Me'; } 
-                else if (c.role === '運営') { badgeClass = 'is-operator'; } 
-                else if (c.role === '実況解説') { badgeClass = 'is-commentator'; } 
+                if (isMe) { badgeClass = 'is-me'; badgeText = 'Me'; }
+                else if (c.role === '運営') { badgeClass = 'is-operator'; }
+                else if (c.role === '実況解説') { badgeClass = 'is-commentator'; }
                 else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
                 return `<div class="comment-item-wrapper ${isMe ? 'is-me' : ''}"><div class="comment-item" id="comment-${c.id}"><span class="badge ${badgeClass}">${badgeText}</span><span class="text">${c.text}</span></div></div>`;
             }).join('');
@@ -209,14 +210,14 @@
         };
         const renderScript = (currentIndex = 0) => {
             DOMElements.scriptCardContent.innerHTML = scriptData.map((p, i) => {
-                 let statusClass = '';
-                 if (i < currentIndex) statusClass = 'is-done';
-                 if (i === currentIndex) statusClass = 'is-current';
-                 return `<div class="script-paragraph ${statusClass}" data-index="${i}" id="script-item-${i}"><b>${p.speaker}:</b> ${p.line}</div>`
+                let statusClass = '';
+                if (i < currentIndex) statusClass = 'is-done';
+                if (i === currentIndex) statusClass = 'is-current';
+                return `<div class="script-paragraph ${statusClass}" data-index="${i}" id="script-item-${i}"><b>${p.speaker}:</b> ${p.line}</div>`
             }).join('');
-            
+
             const currentEl = getEl(`script-item-${currentIndex}`);
-            if(currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
@@ -256,7 +257,7 @@
 
             const alphaTeam = teamsData.find(t => t.id === state.matchup?.alphaTeamId);
             const bravoTeam = teamsData.find(t => t.id === state.matchup?.bravoTeamId);
-            
+
             DOMElements.headerAlphaTeam.textContent = alphaTeam?.teamName || 'アルファ';
             DOMElements.headerBravoTeam.textContent = bravoTeam?.teamName || 'ブラボー';
             DOMElements.scoreDisplay.innerHTML = `<span class="score">${alphaScore}</span> - <span class="score">${bravoScore}</span>`;
@@ -278,7 +279,7 @@
                     tile.classList.add('bravo-win');
                     winnerOverlay = `<div class="winner-overlay">WIN</div>`;
                 }
-                
+
                 tile.innerHTML = `
                     <img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
                     ${winnerOverlay}
@@ -321,7 +322,7 @@
             }
         };
         DOMElements.sendCommentButton.onclick = sendComment;
-        DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); }});
+        DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); } });
 
         const setDisplayTeam = (team) => {
             currentlyDisplayedTeam = team;
@@ -368,7 +369,7 @@
                 switchToTab(firstTab);
             }
         };
-        
+
         DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
         DOMElements.commentModal.onclick = (e) => { if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active'); };
 

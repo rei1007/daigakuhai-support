@@ -149,14 +149,14 @@ main {
 }
 
 .tab-action-bar h2 {
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 8px;
 }
 
 .tab-bar {
     position: relative;
     z-index: 1000;
-    height: 64px;
+    height: 80px;
     background-color: var(--surface-color);
     border-top: 1px solid var(--outline-color);
     display: flex;
@@ -181,7 +181,7 @@ main {
 }
 
 .tab-button .tab-label {
-    font-size: 11px;
+    font-size: 16px;
     font-family: var(--font-family);
     font-weight: 500;
 }
@@ -209,6 +209,7 @@ main {
 .comment-input-group {
     display: flex;
     gap: 8px;
+    margin: 5px;
 }
 
 .comment-input-group input {
@@ -216,7 +217,7 @@ main {
     padding: 10px;
     border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
-    font-size: 15px;
+    font-size: 20px;
 }
 
 .comment-input-group button {
@@ -256,7 +257,7 @@ main {
 }
 
 .comment-item .badge {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
     margin-bottom: 4px;
     padding: 0;
@@ -282,9 +283,13 @@ main {
 }
 
 .comment-item .text {
-    font-size: 16px;
+    font-size: 20px;
     line-height: 1.6;
     word-wrap: break-word;
+}
+
+.send-text {
+    font-size: 16px;
 }
 
 /* --- Script Tab --- */
@@ -331,8 +336,8 @@ main {
 .script-action-bar button {
     background-color: var(--primary-container-color);
     border: none;
-    width: 60px;
-    height: 50px;
+    width: 75px;
+    height: 55px;
     border-radius: var(--border-radius-large);
     cursor: pointer;
     display: flex;
@@ -404,7 +409,7 @@ main {
     padding: 10px;
     border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
-    font-size: 15px;
+    font-size: 20px;
     background-color: var(--surface-color);
 }
 
@@ -794,7 +799,7 @@ main {
     background-color: var(--surface-color);
     color: var(--on-surface-variant-color);
     border-radius: var(--border-radius-medium);
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 500;
     cursor: pointer;
 }
@@ -809,8 +814,8 @@ main {
 .sync-button {
     background-color: var(--primary-container-color);
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 47px;
+    height: 47px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -864,7 +869,7 @@ main {
 }
 
 /* --- Responsive Adjustments --- */
-@media (min-width: 769px) {
+@media (min-width: 741px) {
     .team-display-area {
         grid-template-columns: 1fr 1fr;
     }
@@ -878,7 +883,7 @@ main {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 740px) {
     .pc-only {
         display: none;
     }
@@ -887,16 +892,11 @@ main {
         display: block;
     }
 
-    .tab-action-bar {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
     .mobile-action-group {
         display: flex;
         align-items: center;
         gap: 8px;
+        margin-top: 8px;
     }
 
     .mobile-action-group .segmented-control {
@@ -925,7 +925,7 @@ main {
     }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 600px) {
     .header h1 {
         font-size: 18px;
     }
@@ -938,8 +938,47 @@ main {
         padding: 8px;
     }
 
+    .tab-action-bar h2 {
+        font-size: 12px;
+    }
+
+    .tab-bar {
+        height: 62px;
+    }
+
+    .tab-button .tab-label {
+        font-size: 11px;
+    }
+
+    .segmented-control button {
+        font-size: 16px;
+        height: 40px;
+    }
+
+    .sync-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .comment-item .badge {
+        font-size: 12px;
+    }
+
+    .comment-item .text {
+        font-size: 16px;
+    }
+
+    .script-action-bar button {
+        width: 6cqb;
+        height: 40px;
+    }
+
     .send-text {
         display: none;
+    }
+
+    .comment-input-group {
+        margin: 0;
     }
 
     .comment-input-group button {
@@ -948,10 +987,18 @@ main {
         height: 40px;
     }
 
+    .comment-input-group input {
+        font-size: 16px;
+    }
+
     .team-selector {
-        flex-direction: column;
         gap: 8px;
         align-items: stretch;
+    }
+
+    .team-selector select {
+        font-size: 16px;
+        width: 100%;
     }
 
     .team-selector .vs-text {
