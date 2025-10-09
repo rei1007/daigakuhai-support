@@ -282,8 +282,7 @@
 
                 tile.innerHTML = `
                     <img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
-                    ${winnerOverlay}
-                    <div class="stage-name-bar">${stageName}</div>`;
+                    ${winnerOverlay}`;
                 DOMElements.stageImagesDisplay.appendChild(tile);
             }
         };

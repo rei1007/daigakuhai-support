@@ -636,16 +636,17 @@ main {
 }
 
 .stage-images {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    display: flex;
+    justify-content: center;
     gap: 8px;
 }
 
 .stage-image-item {
+    max-width: 200px;
+    min-width: 120px;
     position: relative;
     border-radius: var(--border-radius-medium);
     overflow: hidden;
-    border: 2px solid var(--outline-color);
     background-color: var(--surface-color);
 }
 
@@ -681,11 +682,11 @@ main {
 }
 
 .stage-image-item.alpha-win .winner-overlay {
-    background: linear-gradient(0deg, rgba(208, 190, 8, 0.7) 0%, rgba(208, 190, 8, 0) 100%);
+    background: linear-gradient(0deg, rgba(208, 190, 8, 0) 20%, rgba(208, 190, 8, 0.4) 20%);
 }
 
 .stage-image-item.bravo-win .winner-overlay {
-    background: linear-gradient(0deg, rgba(58, 12, 205, 0.7) 0%, rgba(58, 12, 205, 0) 100%);
+    background: linear-gradient(0deg, rgba(58, 12, 205, 0) 20%, rgba(58, 12, 205, 0.4) 20%);
 }
 
 .team-details-display h2 {
@@ -901,6 +902,14 @@ main {
 
     .mobile-action-group .segmented-control {
         flex-grow: 1;
+    }
+
+    .stage-images {
+        flex-wrap: wrap;
+    }
+
+    .stage-image-item {
+        width: 125px;
     }
 
     .team-card-wrapper {
