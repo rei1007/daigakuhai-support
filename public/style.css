@@ -1,18 +1,23 @@
 :root {
-    --primary-color: #202124;
-    --surface-container-color: #f6f6f7;
+    /* New Monochrome Palette */
+    --primary-color: #000000;
+    --primary-container-color: #E5E5E5;
+    --on-primary-container-color: #000000;
+    --surface-container-low-color: #F5F5F5;
+    --surface-container-color: #FFFFFF;
     --surface-color: #FFFFFF;
-    --on-surface-color: #202124;
-    --on-surface-variant-color: #5F6368;
-    --outline-color: #BDC1C6;
-    --primary-container-color: #E8EAED;
-    --on-primary-container-color: #202124;
+    --on-surface-color: #1C1C1C;
+    --on-surface-variant-color: #5A5A5A;
+    --outline-color: #E0E0E0;
     --font-family: 'Noto Sans JP', sans-serif;
-    --border-radius-large: 12px;
-    --border-radius-medium: 8px;
-    --greyed-out-color: #9AA0A6;
-    --xp-highlight-color: #E53935;
-    --xp-highlight-bg: #FFEBEE;
+    --border-radius-large: 16px;
+    --border-radius-medium: 12px;
+    --border-radius-small: 8px;
+
+    /* Semantic & Other Colors (Preserved from original) */
+    --greyed-out-color: #757575;
+    --xp-highlight-color: #B3261E;
+    --xp-highlight-bg: #F9DEDC;
     --badge-operator-bg: #E3F2FD;
     --badge-operator-text: #0D47A1;
     --badge-commentator-bg: #E8F5E9;
@@ -34,21 +39,31 @@ html {
 
 body {
     font-family: var(--font-family);
-    background-color: var(--surface-container-color);
+    background-color: var(--surface-container-low-color);
     color: var(--on-surface-color);
     margin: 0;
     font-size: 16px;
     height: 100%;
     overflow: hidden;
-    /* Prevent body scroll */
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 h1,
-h2 {
+h2,
+h3 {
     font-weight: 700;
     margin: 0 0 10px 0;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+h3 {
+    font-size: 16px;
+    color: var(--on-surface-variant-color);
 }
 
 a {
@@ -60,16 +75,19 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--surface-color);
-    padding: 20px 24px 12px;
-    border-bottom: 1px solid var(--outline-color);
+    background-color: var(--surface-container-color);
+    padding: 16px 24px;
     flex-shrink: 0;
     position: relative;
     z-index: 100;
+    border-bottom: 1px solid var(--outline-color);
+    max-width: 1200px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .header h1 {
-    font-size: 26px;
+    font-size: 22px;
     margin-bottom: 0;
 }
 
@@ -79,8 +97,9 @@ a {
     gap: 8px;
     padding: 6px 12px;
     border-radius: var(--border-radius-medium);
-    background-color: var(--primary-container-color);
-    color: var(--on-primary-container-color);
+    background-color: var(--surface-color);
+    border: 1px solid var(--outline-color);
+    color: var(--on-surface-variant-color);
     font-weight: 500;
     font-size: 14px;
 }
@@ -103,15 +122,16 @@ a {
     background-color: var(--status-disconnected);
 }
 
-
 /* ========== TABS & LAYOUT ========== */
 main {
     flex-grow: 1;
-    /* Fill available space */
     min-height: 0;
-    /* Fix flexbox overflow issue */
     display: flex;
     flex-direction: column;
+    max-width: 1200px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--surface-color);
 }
 
 .tab-content {
@@ -128,29 +148,27 @@ main {
     flex-grow: 1;
     overflow-y: auto;
     padding: 0 16px;
-    /* Horizontal padding only */
 }
 
 .tab-main-content>section {
     padding: 24px 0;
+}
+
+.tab-main-content>section:not(:last-child) {
     border-bottom: 1px solid var(--outline-color);
 }
 
-.tab-main-content>section:last-child {
-    border-bottom: none;
-}
-
 .tab-main-content h2 {
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 8px;
 }
-
 
 .tab-action-bar {
     flex-shrink: 0;
-    padding: 12px 16px;
-    background-color: var(--surface-color);
+    padding: 16px;
+    background-color: #F7F7F7;
     border-top: 1px solid var(--outline-color);
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .tab-action-bar h2 {
@@ -162,11 +180,23 @@ main {
     position: relative;
     z-index: 1000;
     height: 80px;
-    background-color: var(--surface-color);
+    background-color: var(--surface-container-color);
     border-top: 1px solid var(--outline-color);
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    align-items: center;
     flex-shrink: 0;
+    width: 100%;
+}
+
+.tab-bar-inner {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 16px;
+    box-sizing: border-box;
 }
 
 .tab-button {
@@ -175,29 +205,35 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 4px;
     background: none;
     border: none;
-    border-top: 3px solid transparent;
     cursor: pointer;
     color: var(--on-surface-variant-color);
     padding: 8px 4px;
-    transition: color 0.2s, border-color 0.2s;
+    transition: all 0.2s;
+    border-radius: var(--border-radius-large);
+    height: 56px;
+    max-width: 180px;
 }
 
 .tab-button .tab-label {
-    font-size: 16px;
+    font-size: 14px;
     font-family: var(--font-family);
     font-weight: 500;
 }
 
 .tab-button:hover {
-    color: var(--on-surface-color);
+    background-color: var(--primary-container-color);
 }
 
 .tab-button.active {
-    color: var(--primary-color);
-    border-top-color: var(--primary-color);
+    background-color: var(--primary-container-color);
+    color: var(--on-primary-container-color);
+}
+
+.tab-button.active .tab-label {
+    font-weight: 700;
 }
 
 /* --- Comment Tab --- */
@@ -212,40 +248,77 @@ main {
 }
 
 #comment-modal-heading {
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--on-surface-variant-color);
 }
 
 #comment-modal-text {
-    font-size: 22px;
-    margin: 12px;
+    font-size: 24px;
+    margin: 16px 0;
     font-weight: 600;
+    color: var(--on-surface-color);
 }
 
 .comment-input-group {
     display: flex;
     gap: 8px;
-    margin: 5px;
+    align-items: center;
 }
 
 .comment-input-group input {
     flex-grow: 1;
-    padding: 10px;
+    padding: 12px 16px;
     border: 1px solid var(--outline-color);
-    border-radius: var(--border-radius-medium);
-    font-size: 20px;
+    border-radius: var(--border-radius-large);
+    font-size: 16px;
+    background-color: var(--surface-color);
 }
 
 .comment-input-group button {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 0 16px;
-    border-radius: var(--border-radius-medium);
+    padding: 0 24px;
+    height: 48px;
+    border-radius: var(--border-radius-large);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.comment-input-group button:hover {
+    background-color: #333333;
+}
+
+.icon-button {
+    background-color: transparent;
+    border: 1px solid var(--outline-color);
+    color: var(--on-surface-variant-color);
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.icon-button:hover {
+    background-color: var(--primary-container-color);
+}
+
+.primary-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--border-radius-large);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    width: 100%;
 }
 
 .comment-item-wrapper {
@@ -260,45 +333,62 @@ main {
 .comment-item {
     display: flex;
     flex-direction: column;
-    padding: 10px 14px;
-    border-radius: 16px;
+    padding: 10px 16px;
+    border-radius: var(--border-radius-large);
     max-width: 80%;
-    background-color: var(--surface-color);
-    border: 1px solid #DADCE0;
+    background-color: #F0F0F0;
+    border: 1px solid var(--outline-color);
 }
 
 .comment-item-wrapper.is-me .comment-item {
-    background-color: var(--badge-operator-bg);
+    background-color: var(--badge-me-bg);
+    border-color: transparent;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.comment-header .display-name {
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .comment-item .badge {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    padding: 0;
-    width: auto;
-    text-align: left;
-    background: none !important;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #ccc;
+    color: #fff;
 }
 
-.comment-item .badge.is-operator {
-    color: var(--badge-operator-text);
+.badge.is-operator {
+    background-color: var(--badge-operator-bg) !important;
+    color: var(--badge-operator-text) !important;
 }
 
-.comment-item .badge.is-commentator {
-    color: var(--badge-commentator-text);
+.badge.is-commentator {
+    background-color: var(--badge-commentator-bg) !important;
+    color: var(--badge-commentator-text) !important;
 }
 
-.comment-item .badge.is-stream-staff {
-    color: var(--badge-stream-staff-text);
+.badge.is-stream-staff {
+    background-color: var(--badge-stream-staff-bg) !important;
+    color: var(--badge-stream-staff-text) !important;
 }
 
-.comment-item .badge.is-me {
-    color: var(--badge-me-text);
+.badge.is-me {
+    background-color: transparent !important;
+    color: var(--badge-me-text) !important;
+    padding: 0 !important;
 }
 
 .comment-item .text {
-    font-size: 20px;
+    font-size: 16px;
     line-height: 1.6;
     word-wrap: break-word;
 }
@@ -307,9 +397,18 @@ main {
     font-size: 16px;
 }
 
-/* --- Script Tab --- */
+/* Script Tab, Match Settings, Modals, Team Display, etc. remain the same as previous correct version */
+/* ... (The rest of the CSS is identical to the last provided style.css) ... */
+.script-card {
+    background: var(--surface-color);
+    border-radius: var(--border-radius-large);
+    padding: 16px;
+    margin-top: 24px;
+}
+
 .script-card h2 {
     margin-bottom: 16px;
+    padding: 0 8px;
 }
 
 .script-full-list {
@@ -318,7 +417,7 @@ main {
 
 .script-full-list .script-paragraph {
     margin: 0 0 8px 0;
-    padding: 8px 12px;
+    padding: 12px 16px;
     font-size: 16px;
     border-left: 4px solid transparent;
     border-radius: var(--border-radius-medium);
@@ -327,19 +426,20 @@ main {
 }
 
 .script-full-list .script-paragraph:hover {
-    background-color: var(--primary-container-color);
+    background-color: var(--surface-container-low-color);
 }
 
 .script-full-list .script-paragraph.is-done {
     color: var(--greyed-out-color);
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .script-full-list .script-paragraph.is-current {
     font-weight: 700;
     font-size: 18px;
-    border-left: 4px solid var(--primary-color);
-    background-color: var(--badge-me-bg);
+    border-left-color: var(--primary-color);
+    background-color: var(--primary-container-color);
+    color: var(--on-primary-container-color);
 }
 
 .script-action-bar {
@@ -349,27 +449,28 @@ main {
 }
 
 .script-action-bar button {
-    background-color: var(--primary-container-color);
-    border: none;
-    width: 75px;
-    height: 55px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--outline-color);
+    width: 72px;
+    height: 56px;
     border-radius: var(--border-radius-large);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--primary-color);
 }
 
-/* --- Operator: Match Settings --- */
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 }
 
 .form-group .label-with-button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    padding: 0 8px;
 }
 
 .form-group .label-with-button label {
@@ -378,59 +479,63 @@ main {
 
 .form-group label {
     display: block;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 14px;
     margin-bottom: 6px;
+    color: var(--on-surface-variant-color);
 }
 
 .form-group input[type="text"],
 .form-group select {
     width: 100%;
-    padding: 10px;
+    padding: 14px;
     border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
-    font-size: 15px;
+    font-size: 16px;
     box-sizing: border-box;
+    background-color: var(--surface-color);
 }
 
 .outline-button {
-    font-size: 12px;
-    color: var(--on-surface-variant-color);
+    font-size: 14px;
+    color: var(--primary-color);
     background: none;
     border: 1px solid var(--outline-color);
-    border-radius: var(--border-radius-medium);
+    border-radius: var(--border-radius-large);
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 8px 16px;
     font-weight: 500;
 }
 
 .outline-button:hover {
-    background-color: var(--primary-container-color);
+    background-color: #F0F0F0;
 }
 
 .small-button {
-    padding: 4px 10px;
+    padding: 4px 12px;
 }
 
 .team-selector {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .team-selector select,
 .team-selector .static-team-name {
     flex-grow: 1;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 500;
     background-color: var(--surface-color);
 }
 
 .team-selector .vs-text {
     font-weight: 700;
     font-size: 14px;
+    color: var(--on-surface-variant-color);
 }
 
 .bo-selector {
@@ -440,17 +545,21 @@ main {
 
 .bo-selector button {
     flex: 1;
-    padding: 10px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
     border: 1px solid var(--outline-color);
     background-color: var(--surface-color);
+    color: var(--on-surface-variant-color);
     border-radius: var(--border-radius-medium);
     cursor: pointer;
 }
 
 .bo-selector button.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background-color: var(--primary-container-color);
+    color: var(--on-primary-container-color);
+    border-color: #A0A0A0;
+    font-weight: 700;
 }
 
 .stage-winner-rows {
@@ -471,8 +580,8 @@ main {
 }
 
 .stage-winner-row .winner-selector button {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     border: 2px solid var(--outline-color);
     background-color: var(--surface-color);
     border-radius: 50%;
@@ -499,42 +608,42 @@ main {
     flex-grow: 1;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
-    padding: 6px;
+    padding: 8px;
     background-color: var(--surface-color);
     cursor: pointer;
     text-align: left;
     overflow: hidden;
+    font-family: var(--font-family);
 }
 
 .stage-select-button:hover {
-    background-color: var(--primary-container-color);
+    background-color: var(--surface-container-low-color);
 }
 
 .stage-select-button img {
-    height: 46.5px;
-    width: 60px;
+    height: 50px;
+    width: 64px;
     aspect-ratio: 40 / 31;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--border-radius-small);
     flex-shrink: 0;
 }
 
 .stage-select-button .stage-name {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
 }
 
-/* --- Modals --- */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
     display: none;
     justify-content: center;
     align-items: center;
@@ -546,7 +655,7 @@ main {
 }
 
 .modal-content {
-    background: var(--surface-color);
+    background: var(--surface-container-low-color);
     padding: 24px;
     border-radius: var(--border-radius-large);
     width: 90%;
@@ -554,6 +663,7 @@ main {
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .modal-close {
@@ -561,11 +671,11 @@ main {
     top: -16px;
     float: right;
     margin: -16px -16px 0 0;
-    background: var(--surface-container-color);
-    border: none;
+    background: #EAEAEA;
+    border: 1px solid var(--outline-color);
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -583,13 +693,14 @@ main {
     cursor: pointer;
     border-radius: var(--border-radius-medium);
     overflow: hidden;
-    border: 1px solid var(--outline-color);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .stage-grid-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: scale(1.03);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .stage-grid-item img {
@@ -599,7 +710,6 @@ main {
     display: block;
 }
 
-/* --- Commentator: Match Info Tab --- */
 .matchup-header {
     display: flex;
     align-items: center;
@@ -610,11 +720,12 @@ main {
 .matchup-header .team-name-display {
     flex: 1;
     text-align: center;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     background: var(--surface-color);
     padding: 16px;
     border-radius: var(--border-radius-medium);
+    border: 1px solid var(--outline-color);
 }
 
 .matchup-header .vs-text {
@@ -624,7 +735,7 @@ main {
 }
 
 .match-status-display .round-info {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     text-align: center;
     margin-bottom: 12px;
@@ -663,6 +774,7 @@ main {
     border-radius: var(--border-radius-medium);
     overflow: hidden;
     background-color: var(--surface-color);
+    border: 2px solid transparent;
 }
 
 .stage-image-item img {
@@ -692,62 +804,57 @@ main {
     font-size: 32px;
     font-weight: 700;
     color: white;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     text-shadow: 0 0 5px black;
 }
 
 .stage-image-item.alpha-win .winner-overlay {
-    background: linear-gradient(0deg, rgba(208, 190, 8, 0) 20%, rgba(208, 190, 8, 0.4) 20%);
+    background: linear-gradient(0deg, rgba(208, 190, 8, 0.2) 20%, rgba(208, 190, 8, 0.5) 80%);
 }
 
 .stage-image-item.bravo-win .winner-overlay {
-    background: linear-gradient(0deg, rgba(58, 12, 205, 0) 20%, rgba(58, 12, 205, 0.4) 20%);
+    background: linear-gradient(0deg, rgba(58, 12, 205, 0.2) 20%, rgba(58, 12, 205, 0.5) 80%);
 }
 
-.team-details-display h2 {
-    margin-top: 16px;
-}
-
-/* --- General Team Display Components --- */
 .team-display-area {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
+    padding-top: 24px;
 }
 
 .team-card {
     background-color: var(--surface-color);
     padding: 24px;
     border-radius: var(--border-radius-large);
+    border: 1px solid var(--outline-color);
 }
 
 .team-card-header .university-name {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 8px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--on-surface-variant-color);
+    margin: 0 0 4px 0;
 }
 
 .team-card-header .team-name {
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 700;
-    color: var(--primary-color);
-    margin: 2px 0 0 0;
+    color: var(--on-surface-color);
+    margin: 0 0 24px 0;
 }
 
 .team-card h3 {
-    color: var(--on-surface-variant-color);
-    margin: 8px 0 0;
-    font-size: 16px;
+    margin: 24px 0 12px;
 }
 
 .player-tiles-container {
     display: grid;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 12px;
 }
 
 .player-tile {
-    border: solid 1px var(--outline-color);
+    border: 1px solid var(--outline-color);
     border-radius: var(--border-radius-medium);
     padding: 12px;
 }
@@ -757,13 +864,13 @@ main {
     justify-content: space-between;
     align-items: center;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .xp-badge {
     font-size: 14px;
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: 4px 10px;
+    border-radius: var(--border-radius-large);
     font-weight: 700;
     background-color: var(--primary-container-color);
     color: var(--on-primary-container-color);
@@ -775,47 +882,47 @@ main {
 }
 
 .player-tile-bottom {
-    margin-top: 6px;
-    font-size: 16px;
+    margin-top: 8px;
+    font-size: 14px;
     color: var(--on-surface-variant-color);
 }
 
 .info-tile {
     margin-top: 16px;
-    background-color: var(--surface-container-color);
+    background-color: var(--surface-container-low-color);
     border-radius: var(--border-radius-medium);
     padding: 16px;
 }
 
 .info-tile h3 {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     margin: 0 0 8px 0;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #DADCE0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--outline-color);
 }
 
 .info-tile p {
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.7;
     margin: 0;
     white-space: pre-wrap;
 }
 
 .segmented-control {
     display: flex;
-    border-radius: var(--border-radius-medium);
+    border-radius: var(--border-radius-large);
     gap: 8px;
 }
 
 .segmented-control button {
     flex: 1;
-    padding: 8px;
+    padding: 12px;
     border: 1px solid var(--outline-color);
     background-color: var(--surface-color);
     color: var(--on-surface-variant-color);
-    border-radius: var(--border-radius-medium);
-    font-size: 20px;
+    border-radius: var(--border-radius-large);
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
 }
@@ -828,38 +935,40 @@ main {
 }
 
 .sync-button {
-    background-color: var(--primary-container-color);
-    border: none;
-    width: 47px;
-    height: 47px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--outline-color);
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: var(--primary-color);
 }
 
 .sync-button.is-desynced {
     background-color: var(--badge-me-bg);
     color: var(--badge-me-text);
+    border-color: #FFB951;
     animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
     0% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(230, 81, 0, 0.7);
+        box-shadow: 0 0 0 0 rgba(255, 185, 81, 0.7);
     }
 
     70% {
-        transform: scale(1.1);
-        box-shadow: 0 0 10px 15px rgba(230, 81, 0, 0);
+        transform: scale(1.05);
+        box-shadow: 0 0 10px 15px rgba(255, 185, 81, 0);
     }
 
     100% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(230, 81, 0, 0);
+        box-shadow: 0 0 0 0 rgba(255, 185, 81, 0);
     }
 }
 
@@ -884,7 +993,6 @@ main {
     margin-left: 12px;
 }
 
-/* --- Responsive Adjustments --- */
 @media (min-width: 741px) {
     .team-display-area {
         grid-template-columns: 1fr 1fr;
@@ -963,29 +1071,30 @@ main {
     }
 
     .tab-action-bar h2 {
-        font-size: 12px;
+        font-size: 14px;
     }
 
-    .tab-bar {
-        height: 62px;
+    .tab-bar-inner {
+        gap: 4px;
+        padding: 0 8px;
+    }
+
+    .tab-button .material-icons-outlined {
+        font-size: 24px;
     }
 
     .tab-button .tab-label {
-        font-size: 11px;
+        font-size: 12px;
     }
 
     .segmented-control button {
-        font-size: 16px;
-        height: 40px;
+        font-size: 14px;
+        padding: 8px;
     }
 
     .sync-button {
-        width: 40px;
-        height: 40px;
-    }
-
-    .comment-item .badge {
-        font-size: 12px;
+        width: 48px;
+        height: 48px;
     }
 
     .comment-item .text {
@@ -993,8 +1102,8 @@ main {
     }
 
     .script-action-bar button {
-        width: 6cqb;
-        height: 40px;
+        height: 48px;
+        width: 64px;
     }
 
     .send-text {
@@ -1006,12 +1115,12 @@ main {
     }
 
     .comment-input-group button {
-        padding: 8px;
-        width: 40px;
-        height: 40px;
+        padding: 12px;
+        min-width: 48px;
     }
 
     .comment-input-group input {
+        padding: 12px;
         font-size: 16px;
     }
 

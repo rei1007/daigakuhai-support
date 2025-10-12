@@ -31,9 +31,9 @@
 
 <body>
     <header class="header">
-        <h1><a href="index.html">大学杯 配信サポート (運営ページ)</a></h1>
+        <h1><a href="index.html">大学杯 配信サポート (運営)</a></h1>
         <div class="connection-indicator" id="connection-indicator">
-            <div class="status-dot"></div><span class="connection-text">接続状況: <span
+            <div class="status-dot"></div><span class="connection-text">接続: <span
                     id="connection-status">接続中...</span></span>
         </div>
     </header>
@@ -41,9 +41,11 @@
         <div id="tab-content-comment" class="tab-content">
             <div class="comment-history" id="comment-history"></div>
             <div class="tab-action-bar">
-                <div class="comment-input-group"><input type="text" id="comment-input" placeholder="コメントを入力"><button
-                        id="send-comment-button"><span class="material-icons-outlined">send</span><span
-                            class="send-text">送信</span></button></div>
+                <div class="comment-input-group">
+                    <button id="edit-name-button" class="icon-button" title="表示名を設定"><span class="material-icons-outlined">settings</span></button>
+                    <input type="text" id="comment-input" placeholder="コメントを入力">
+                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span class="send-text">送信</span></button>
+                </div>
             </div>
         </div>
 
@@ -68,7 +70,7 @@
                     <h2>対戦設定</h2>
                     <div class="form-group"><label for="round-info-input">ラウンド情報</label><input type="text"
                             id="round-info-input" placeholder="例: 決勝トーナメント 第1試合"></div>
-                    <div class="form-group"><label>試合本数</label>
+                    <div class="form-group"><label>試合形式</label>
                         <div class="bo-selector"><button id="bo3-btn">BO3</button><button id="bo5-btn">BO5</button>
                         </div>
                     </div>
@@ -140,29 +142,45 @@
             <div class="stage-grid" id="stage-grid"></div>
         </div>
     </div>
+    <div id="name-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="name-modal-close"><span
+                    class="material-icons-outlined">close</span></button>
+            <h2>表示名を設定</h2>
+            <div class="form-group">
+                <label for="name-input">チャットで表示される名前を入力してください。</label>
+                <input type="text" id="name-input" placeholder="例: 運営A">
+            </div>
+            <button id="save-name-button" class="primary-button">保存</button>
+        </div>
+    </div>
+
 
     <nav class="tab-bar">
-        <button class="tab-button" data-tab="comment">
-            <span class="material-icons-outlined">chat</span>
-            <span class="tab-label">コメント</span>
-        </button>
-        <button class="tab-button" data-tab="script">
-            <span class="material-icons-outlined">description</span>
-            <span class="tab-label">台本</span>
-        </button>
-        <button class="tab-button" data-tab="match-settings">
-            <span class="material-icons-outlined">tune</span>
-            <span class="tab-label">対戦設定</span>
-        </button>
-        <button class="tab-button" data-tab="team-display">
-            <span class="material-icons-outlined">people</span>
-            <span class="tab-label">チーム情報</span>
-        </button>
+        <div class="tab-bar-inner">
+            <button class="tab-button" data-tab="comment">
+                <span class="material-icons-outlined">chat</span>
+                <span class="tab-label">コメント</span>
+            </button>
+            <button class="tab-button" data-tab="script">
+                <span class="material-icons-outlined">description</span>
+                <span class="tab-label">台本</span>
+            </button>
+            <button class="tab-button" data-tab="match-settings">
+                <span class="material-icons-outlined">tune</span>
+                <span class="tab-label">対戦設定</span>
+            </button>
+            <button class="tab-button" data-tab="team-display">
+                <span class="material-icons-outlined">people</span>
+                <span class="tab-label">チーム情報</span>
+            </button>
+        </div>
     </nav>
 
     <script>
         const MY_ROLE = '運営';
         let teamsData = [], scriptData = [], stagesData = [];
+        let myDisplayName = '';
 
         let mySessionId = localStorage.getItem('mySessionId');
         if (!mySessionId || !mySessionId.startsWith('op-')) {
@@ -173,6 +191,8 @@
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
+        let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
+        let isViewLocked = false; 
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -181,6 +201,7 @@
             scriptCardContent: getEl('script-card-content'), nextScriptButton: getEl('next-script-button'), prevScriptButton: getEl('prev-script-button'),
             commentModal: getEl('comment-modal'), commentModalHeading: getEl('comment-modal-heading'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
             stageModal: getEl('stage-modal'), stageModalClose: getEl('stage-modal-close'), stageGrid: getEl('stage-grid'),
+            nameModal: getEl('name-modal'), nameModalClose: getEl('name-modal-close'), nameInput: getEl('name-input'), saveNameButton: getEl('save-name-button'), editNameButton: getEl('edit-name-button'),
             matchupAlphaSelect: getEl('matchup-alpha-select'), matchupBravoSelect: getEl('matchup-bravo-select'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButtonPC: getEl('sync-view-button-pc'),
@@ -199,8 +220,9 @@
         };
 
         const checkSyncStatus = () => {
-            const isDesynced = DOMElements.matchupAlphaSelect.value !== DOMElements.viewAlphaSelect.value ||
-                DOMElements.matchupBravoSelect.value !== DOMElements.viewBravoSelect.value;
+            if (!officialMatchup.alphaTeamId) return;
+            const isDesynced = DOMElements.viewAlphaSelect.value !== officialMatchup.alphaTeamId ||
+                DOMElements.viewBravoSelect.value !== officialMatchup.bravoTeamId;
             if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
             if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
         };
@@ -209,20 +231,31 @@
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
+            
             if (state.matchup && state.matchup.alphaTeamId) {
-                DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
-                DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
+                officialMatchup = state.matchup;
+                DOMElements.matchupAlphaSelect.value = officialMatchup.alphaTeamId;
+                DOMElements.matchupBravoSelect.value = officialMatchup.bravoTeamId;
+
+                if (!isViewLocked) {
+                    DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+                    DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
+                    updateTeamDisplay();
+                } else {
+                    checkSyncStatus();
+                }
             }
+            
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchSettings(state);
-            checkSyncStatus();
+
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]').classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
-                    showCommentModal(lastComment.text, lastComment.role);
+                    showCommentModal(lastComment.text, lastComment.role, lastComment.displayName);
                     DOMElements.commentModal.dataset.lastShownTime = lastComment.timestamp.toMillis();
                 }
             }
@@ -238,9 +271,11 @@
                 else if (c.role === '実況解説') { badgeClass = 'is-commentator'; }
                 else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
 
+                const displayNameHTML = c.displayName ? `<span class="display-name">${c.displayName}</span>` : '';
+
                 return `<div class="comment-item-wrapper ${isMe ? 'is-me' : ''}">
                            <div class="comment-item" id="comment-${c.id}">
-                             <span class="badge ${badgeClass}">${badgeText}</span>
+                             <div class="comment-header">${displayNameHTML}<span class="badge ${badgeClass}">${badgeText}</span></div>
                              <span class="text">${c.text}</span>
                            </div>
                          </div>`;
@@ -261,24 +296,43 @@
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
             if (!team) return '<h3>チームを選択してください</h3>';
-            const players = [{ name: team.p1_name, xp: team.p1_xp, weapons: team.p1_weapons }, { name: team.p2_name, xp: team.p2_xp, weapons: team.p2_weapons }, { name: team.p3_name, xp: team.p3_xp, weapons: team.p3_weapons }, { name: team.p4_name, xp: team.p4_xp, weapons: team.p4_weapons }];
-            const playerListHTML = players.filter(p => p.name).map(p => `<div class="player-tile"><div class="player-tile-top"><span class="player-name">${p.name}</span><span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span></div><div class="player-tile-bottom">${(p.weapons || '').replace(/\//g, ' / ')}</div></div>`).join('');
-            return `<div class="team-card-header"><p class="university-name">${team.university}</p><h2 class="team-name">${team.teamName}</h2></div>
-                    <h3>プレイヤー情報</h3><div class="player-tiles-container">${playerListHTML}</div>
-                    <div class="info-tile"><h3>コメント</h3><p>${team.comment}</p></div>
-                    <div class="info-tile"><h3>チーム補足情報</h3><p>${team.teamInfo}</p></div>
-                    <div class="info-tile"><h3>プレイヤー補足情報</h3><p>${team.playerInfo}</p></div>
-                    <div class="info-tile"><h3>サークル情報</h3><p>${team.circleInfo}</p></div>`;
+            const players = [
+                { name: team.p1_name, xp: team.p1_xp, weapon: team.p1_weapon },
+                { name: team.p2_name, xp: team.p2_xp, weapon: team.p2_weapon },
+                { name: team.p3_name, xp: team.p3_xp, weapon: team.p3_weapon },
+                { name: team.p4_name, xp: team.p4_xp, weapon: team.p4_weapon }
+            ];
+            const playerListHTML = players.filter(p => p.name).map(p =>
+                `<div class="player-tile">
+                    <div class="player-tile-top">
+                        <span class="player-name">${p.name}</span>
+                        <span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span>
+                    </div>
+                    <div class="player-tile-bottom">${(p.weapon || '').replace(/\//g, ' / ')}</div>
+                </div>`
+            ).join('');
+
+            return `<div class="team-card-header">
+                        <p class="university-name">${team.university} / ${team.circle}</p>
+                        <h2 class="team-name">${team.teamName}</h2>
+                    </div>
+                    <h3>プレイヤー情報</h3>
+                    <div class="player-tiles-container">${playerListHTML}</div>
+                    <div class="info-tile"><h3>チームコメント</h3><p>${team.comment}</p></div>
+                    <div class="info-tile"><h3>戦略</h3><p>${team.tactics}</p></div>
+                    <div class="info-tile"><h3>実績</h3><p>${team.records}</p></div>
+                    <div class="info-tile"><h3>サークルからのメッセージ</h3><p>${team.message}</p></div>`;
         };
-        const showCommentModal = (text, role = '不明') => {
-            DOMElements.commentModalHeading.textContent = `【${role}】からのコメント`;
+        const showCommentModal = (text, role = '不明', displayName = '') => {
+            const sender = displayName ? `${displayName} (${role})` : role;
+            DOMElements.commentModalHeading.textContent = `【${sender}】からのコメント`;
             DOMElements.commentModalText.textContent = text;
             DOMElements.commentModal.classList.add('is-active');
         };
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
             DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
-            checkSyncStatus();
+            
             if (window.innerWidth <= 768) {
                 DOMElements.teamAlphaCardWrapper.style.display = currentlyDisplayedTeam === 'alpha' ? 'block' : 'none';
                 DOMElements.teamBravoCardWrapper.style.display = currentlyDisplayedTeam === 'bravo' ? 'block' : 'none';
@@ -286,6 +340,7 @@
                 DOMElements.teamAlphaCardWrapper.style.display = 'block';
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
+            checkSyncStatus();
         };
         const renderMatchSettings = (state) => {
             if (document.activeElement !== DOMElements.roundInfoInput) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
@@ -316,12 +371,14 @@
 
         const initializePage = async () => {
             setConnectionStatus('connecting');
+            myDisplayName = localStorage.getItem('myDisplayName') || '';
             try {
                 const [teamsRes, scriptRes, stagesRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json'), fetch('./stages.json')]);
                 teamsData = await teamsRes.json();
                 scriptData = await scriptRes.json();
                 stagesData = await stagesRes.json();
             } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
+            
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
@@ -329,16 +386,38 @@
                     select.appendChild(option);
                 });
             });
+
+            if (teamsData.length > 0) {
+                officialMatchup.alphaTeamId = teamsData[0].id;
+                officialMatchup.bravoTeamId = teamsData[0].id;
+                if (!isViewLocked) {
+                    DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+                    DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
+                }
+            }
+            
             updateTeamDisplay();
             renderScript();
             renderMatchSettings({});
         };
 
-        const matchupChangeHandler = () => { sessionDocRef.update({ matchup: { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value } }); checkSyncStatus(); };
+        const matchupChangeHandler = () => {
+            sessionDocRef.update({
+                matchup: {
+                    alphaTeamId: DOMElements.matchupAlphaSelect.value,
+                    bravoTeamId: DOMElements.matchupBravoSelect.value
+                }
+            });
+        };
         DOMElements.matchupAlphaSelect.onchange = matchupChangeHandler;
         DOMElements.matchupBravoSelect.onchange = matchupChangeHandler;
-        DOMElements.viewAlphaSelect.onchange = updateTeamDisplay;
-        DOMElements.viewBravoSelect.onchange = updateTeamDisplay;
+        
+        const viewChangeHandler = () => {
+            isViewLocked = true;
+            updateTeamDisplay();
+        };
+        DOMElements.viewAlphaSelect.onchange = viewChangeHandler;
+        DOMElements.viewBravoSelect.onchange = viewChangeHandler;
 
         const updateScriptIndex = (newIndex) => { if (newIndex >= 0 && newIndex < scriptData.length) { sessionDocRef.update({ scriptIndex: newIndex }); } };
         DOMElements.nextScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) + 1); };
@@ -355,8 +434,8 @@
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
-                    const newComment = { id: Math.random().toString(36).substr(2, 9), text, senderId: mySessionId, role: MY_ROLE, timestamp: new Date() };
-                    const updatedComments = [...currentComments, newComment].slice(-10);
+                    const newComment = { id: Math.random().toString(36).substr(2, 9), text, senderId: mySessionId, role: MY_ROLE, displayName: myDisplayName, timestamp: new Date() };
+                    const updatedComments = [...currentComments, newComment].slice(-15);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
                 DOMElements.commentInput.value = '';
@@ -366,9 +445,10 @@
         DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); } });
 
 
-        const syncViewToMatchup = async () => {
-            DOMElements.viewAlphaSelect.value = DOMElements.matchupAlphaSelect.value;
-            DOMElements.viewBravoSelect.value = DOMElements.matchupBravoSelect.value;
+        const syncViewToMatchup = () => {
+            isViewLocked = false;
+            DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+            DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
             updateTeamDisplay();
         };
         if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
@@ -377,7 +457,6 @@
         const updateMatchSettings = async () => {
             const doc = await sessionDocRef.get();
             const currentSettings = doc.data();
-            // Note: This function is now only for Round Info and Winner updates
             const newStages = Array.from(DOMElements.stageWinnerRows.querySelectorAll('.stage-winner-row')).map((row, i) => {
                 const winnerBtn = row.querySelector('.winner-selector button.active');
                 return {
@@ -459,10 +538,18 @@
         DOMElements.displayAlphaBtn.onclick = () => setDisplayTeam('alpha');
         DOMElements.displayBravoBtn.onclick = () => setDisplayTeam('bravo');
 
+        let isFirstCommentTabOpen = true;
         const switchToTab = (tabId) => {
             if (!tabId) return;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
+        
+            if (tabId === 'comment' && isFirstCommentTabOpen) {
+                if (!myDisplayName) {
+                    DOMElements.nameModal.classList.add('is-active');
+                }
+                isFirstCommentTabOpen = false;
+            }
         };
 
         const setupTabs = () => {
@@ -475,7 +562,7 @@
                 });
             });
 
-            const initialTabId = location.hash.substring(1);
+            const initialTabId = location.hash.substring(1) || 'comment';
             const firstTab = document.querySelector('.tab-button')?.dataset.tab;
             if (document.querySelector(`.tab-button[data-tab="${initialTabId}"]`)) {
                 switchToTab(initialTabId);
@@ -484,16 +571,23 @@
             }
         };
 
-        // --- Modal Close Logic ---
+        // --- Modal & Name Logic ---
+        DOMElements.editNameButton.onclick = () => {
+            DOMElements.nameInput.value = myDisplayName;
+            DOMElements.nameModal.classList.add('is-active');
+        };
+        DOMElements.saveNameButton.onclick = () => {
+            const newName = DOMElements.nameInput.value.trim();
+            if (newName) {
+                myDisplayName = newName;
+                localStorage.setItem('myDisplayName', myDisplayName);
+                DOMElements.nameModal.classList.remove('is-active');
+            }
+        };
         DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
-        DOMElements.commentModal.onclick = (e) => {
-            if (e.target === DOMElements.commentModal) DOMElements.commentModal.classList.remove('is-active');
-        };
         DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
-        DOMElements.stageModal.onclick = (e) => {
-            if (e.target === DOMElements.stageModal) DOMElements.stageModal.classList.remove('is-active');
-        };
-
+        DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
+        
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();

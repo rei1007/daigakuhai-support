@@ -11,22 +11,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #202124;
-            --surface-container-color: #F1F3F4;
+            /* New Monochrome Palette */
+            --primary-color: #000000;
+            --surface-container-low-color: #F5F5F5;
             --surface-color: #FFFFFF;
-            --on-surface-color: #202124;
-            --on-surface-variant-color: #5F6368;
+            --on-surface-color: #1C1C1C;
+            --on-surface-variant-color: #5A5A5A;
+            --outline-color: #E0E0E0;
             --font-family: 'Noto Sans JP', sans-serif;
-            --border-radius-large: 12px;
-            --border-radius-medium: 8px;
+            --border-radius-large: 16px;
         }
 
         body {
             font-family: var(--font-family);
-            background-color: var(--surface-container-color);
+            background-color: var(--surface-container-low-color);
             color: var(--on-surface-color);
             margin: 0;
-            padding: 16px;
+            padding: 24px;
             font-size: 16px;
             display: flex;
             justify-content: center;
@@ -36,62 +37,68 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             width: 100%;
+            margin: 0 auto;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 48px;
         }
 
         .header h1 {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             margin: 0;
         }
 
         .header p {
+            font-size: 18px;
             color: var(--on-surface-variant-color);
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .link-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 24px;
         }
 
         .page-link-button {
             display: block;
             background-color: var(--surface-color);
-            color: var(--primary-color);
+            color: var(--on-surface-color);
             text-decoration: none;
-            padding: 24px;
+            padding: 32px;
             border-radius: var(--border-radius-large);
             font-weight: 700;
-            font-size: 18px;
+            font-size: 20px;
             text-align: center;
-            border: 1px solid #DADCE0;
-            transition: all 0.2s;
+            border: 1px solid var(--outline-color);
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .page-link-button:hover {
             border-color: var(--primary-color);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
         }
 
         .page-link-button span {
             display: block;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 400;
             color: var(--on-surface-variant-color);
-            margin-top: 4px;
+            margin-top: 8px;
         }
 
         @media (min-width: 769px) {
             .link-grid {
                 grid-template-columns: 1fr 1fr 1fr;
+                max-width: 960px;
+                margin: 0 auto;
             }
         }
     </style>
