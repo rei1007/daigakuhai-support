@@ -558,6 +558,19 @@
             }
         };
 
+        const setupModals = () => {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('is-active');
+                    }
+                });
+            });
+            DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+            DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
+            DOMElements.settingsModalClose.onclick = () => DOMElements.settingsModal.classList.remove('is-active');
+        };
+
         DOMElements.editNameButton.onclick = () => {
             DOMElements.nameInput.value = myDisplayName;
             DOMElements.settingsModal.classList.add('is-active');
@@ -587,13 +600,10 @@
         };
         DOMElements.resetCommentsButton.onclick = resetComments;
 
-        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
-        DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
-        DOMElements.settingsModalClose.onclick = () => DOMElements.settingsModal.classList.remove('is-active');
-
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();
+            setupModals();
         });
     </script>
 </body>

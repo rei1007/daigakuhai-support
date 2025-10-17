@@ -33,7 +33,8 @@
     <header class="header">
         <h1><a href="index.html">大学杯 配信サポート (実況解説)</a></h1>
         <div class="connection-indicator" id="connection-indicator">
-            <div class="status-dot"></div><span class="connection-text">接続: <span id="connection-status">接続中...</span></span>
+            <div class="status-dot"></div><span class="connection-text">接続: <span
+                    id="connection-status">接続中...</span></span>
         </div>
     </header>
     <main>
@@ -41,9 +42,11 @@
             <div class="comment-history" id="comment-history"></div>
             <div class="tab-action-bar">
                 <div class="comment-input-group">
-                    <button id="edit-name-button" class="icon-button" title="表示名を設定"><span class="material-icons-outlined">settings</span></button>
+                    <button id="edit-name-button" class="icon-button" title="表示名を設定"><span
+                            class="material-icons-outlined">settings</span></button>
                     <input type="text" id="comment-input" placeholder="コメントを入力">
-                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span class="send-text">送信</span></button>
+                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span
+                            class="send-text">送信</span></button>
                 </div>
             </div>
         </div>
@@ -56,12 +59,12 @@
                 </section>
             </div>
         </div>
-        
+
         <div id="tab-content-match-team-info" class="tab-content">
             <div class="tab-main-content">
                 <section id="match-status-section">
                     <div id="match-status-display">
-                        </div>
+                    </div>
                 </section>
                 <section id="team-display-section">
                     <div class="team-display-area">
@@ -75,11 +78,29 @@
                 </section>
             </div>
             <div class="tab-action-bar">
-                 <div class="mobile-action-group mobile-only">
+                <div class="control-group">
+                    <h2>表示チーム切り替え</h2>
+                    <div class="local-view-group">
+                        <div class="team-selector">
+                            <select id="view-alpha-select"></select>
+                            <span class="vs-text">VS</span>
+                            <select id="view-bravo-select"></select>
+                        </div>
+                        <div class="sync-button-pc pc-only">
+                            <button id="sync-view-button-pc" class="sync-button" title="表示チームを対戦チームに同期">
+                                <span class="material-icons-outlined">arrow_downward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-action-group mobile-only">
                     <div class="segmented-control">
                         <button id="display-alpha-btn" class="active">アルファ</button>
                         <button id="display-bravo-btn">ブラボー</button>
                     </div>
+                    <button id="sync-view-button-mobile" class="sync-button" title="表示チームを対戦チームに同期">
+                        <span class="material-icons-outlined">arrow_downward</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -87,14 +108,16 @@
 
     <div id="comment-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" id="comment-modal-close"><span class="material-icons-outlined">close</span></button>
+            <button class="modal-close" id="comment-modal-close"><span
+                    class="material-icons-outlined">close</span></button>
             <h2 id="comment-modal-heading">新着コメント</h2>
             <p id="comment-modal-text"></p>
         </div>
     </div>
     <div id="name-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" id="name-modal-close"><span class="material-icons-outlined">close</span></button>
+            <button class="modal-close" id="name-modal-close"><span
+                    class="material-icons-outlined">close</span></button>
             <h2>表示名を設定</h2>
             <div class="form-group">
                 <label for="name-input">チャットで表示される名前を入力してください。</label>
@@ -136,6 +159,7 @@
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
         let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
+        let isViewLocked = false;
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -150,6 +174,10 @@
             teamBravoCard: getEl('team-bravo-card'),
             teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'),
             teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
+            viewAlphaSelect: getEl('view-alpha-select'),
+            viewBravoSelect: getEl('view-bravo-select'),
+            syncViewButtonPC: getEl('sync-view-button-pc'),
+            syncViewButtonMobile: getEl('sync-view-button-mobile'),
             displayAlphaBtn: getEl('display-alpha-btn'),
             displayBravoBtn: getEl('display-bravo-btn'),
             commentModal: getEl('comment-modal'),
@@ -170,6 +198,14 @@
             DOMElements.connectionStatus.textContent = statusText[status];
         };
 
+        const checkSyncStatus = () => {
+            if (!officialMatchup.alphaTeamId) return;
+            const isDesynced = DOMElements.viewAlphaSelect.value !== officialMatchup.alphaTeamId ||
+                DOMElements.viewBravoSelect.value !== officialMatchup.bravoTeamId;
+            if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
+            if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
+        };
+
         sessionDocRef.onSnapshot((doc) => {
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
@@ -177,7 +213,13 @@
 
             if (state.matchup && state.matchup.alphaTeamId) {
                 officialMatchup = state.matchup;
-                updateTeamDisplay();
+                if (!isViewLocked) {
+                    DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+                    DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
+                    updateTeamDisplay();
+                } else {
+                    checkSyncStatus();
+                }
             }
 
             renderScript(state.scriptIndex || 0);
@@ -260,7 +302,7 @@
                     <div class="info-tile"><h3>実績</h3><p>${team.records}</p></div>
                     <div class="info-tile"><h3>サークルからのメッセージ</h3><p>${team.message}</p></div>`;
         };
-        
+
         const renderMatchStatus = (state) => {
             if (!state.matchup || !teamsData.length) {
                 DOMElements.matchStatusDisplay.innerHTML = '<h2>対戦情報</h2><p>対戦情報が設定されていません。</p>';
@@ -289,7 +331,7 @@
                     imageFolder = './stage-bravo/';
                 }
                 const imagePath = `${imageFolder}${encodeURIComponent(stageName)}.png`;
-                
+
                 return `<div class="stage-image-item">
                             <img src="${imagePath}" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
                         </div>`;
@@ -315,10 +357,9 @@
         };
 
         const updateTeamDisplay = () => {
-            if (!officialMatchup.alphaTeamId) return;
-            DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(officialMatchup.alphaTeamId);
-            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(officialMatchup.bravoTeamId);
-            
+            DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
+            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
+
             if (window.innerWidth <= 768) {
                 DOMElements.teamAlphaCardWrapper.style.display = currentlyDisplayedTeam === 'alpha' ? 'block' : 'none';
                 DOMElements.teamBravoCardWrapper.style.display = currentlyDisplayedTeam === 'bravo' ? 'block' : 'none';
@@ -326,6 +367,7 @@
                 DOMElements.teamAlphaCardWrapper.style.display = 'block';
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
+            checkSyncStatus();
         };
 
         const showCommentModal = (text, role = '不明', displayName = '') => {
@@ -349,10 +391,23 @@
                 return;
             }
 
+            document.querySelectorAll('select').forEach(select => {
+                teamsData.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team.id; option.textContent = team.teamName;
+                    select.appendChild(option);
+                });
+            });
+
             if (teamsData.length > 0) {
                 officialMatchup = { alphaTeamId: teamsData[0].id, bravoTeamId: teamsData[0].id };
-                updateTeamDisplay();
+                if (!isViewLocked) {
+                    DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+                    DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
+                }
             }
+
+            updateTeamDisplay();
             renderScript();
             renderMatchStatus({});
         };
@@ -380,6 +435,22 @@
         DOMElements.sendCommentButton.onclick = sendComment;
         DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); } });
 
+        const viewChangeHandler = () => {
+            isViewLocked = true;
+            updateTeamDisplay();
+        };
+        DOMElements.viewAlphaSelect.onchange = viewChangeHandler;
+        DOMElements.viewBravoSelect.onchange = viewChangeHandler;
+
+        const syncViewToMatchup = () => {
+            isViewLocked = false;
+            DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
+            DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
+            updateTeamDisplay();
+        };
+        if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
+        if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
+
         const setDisplayTeam = (team) => {
             currentlyDisplayedTeam = team;
             DOMElements.displayAlphaBtn.classList.toggle('active', team === 'alpha');
@@ -394,7 +465,7 @@
             if (!tabId) return;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
-        
+
             if (tabId === 'comment' && isFirstCommentTabOpen) {
                 if (!myDisplayName) {
                     DOMElements.nameModal.classList.add('is-active');
@@ -422,6 +493,18 @@
             }
         };
 
+        const setupModals = () => {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('is-active');
+                    }
+                });
+            });
+            DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+            DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
+        };
+
         DOMElements.editNameButton.onclick = () => {
             DOMElements.nameInput.value = myDisplayName;
             DOMElements.nameModal.classList.add('is-active');
@@ -434,14 +517,13 @@
                 DOMElements.nameModal.classList.remove('is-active');
             }
         };
-        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
-        DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
 
         window.onresize = updateTeamDisplay;
 
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();
+            setupModals();
         });
     </script>
 </body>

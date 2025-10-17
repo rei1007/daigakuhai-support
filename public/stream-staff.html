@@ -424,6 +424,13 @@
         const updateScriptIndex = (newIndex) => { if (newIndex >= 0 && newIndex < scriptData.length) { sessionDocRef.update({ scriptIndex: newIndex }); } };
         DOMElements.nextScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) + 1); };
         DOMElements.prevScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) - 1); };
+        DOMElements.scriptCardContent.addEventListener('click', (e) => {
+            const target = e.target.closest('.script-paragraph');
+            if (target && target.dataset.index) {
+                const newIndex = parseInt(target.dataset.index, 10);
+                updateScriptIndex(newIndex);
+            }
+        });
 
         const sendComment = () => {
             const text = DOMElements.commentInput.value.trim();
@@ -552,7 +559,19 @@
             }
         };
 
-        // --- Modal & Name Logic ---
+        const setupModals = () => {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('is-active');
+                    }
+                });
+            });
+            DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
+            DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
+            DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
+        };
+
         DOMElements.editNameButton.onclick = () => {
             DOMElements.nameInput.value = myDisplayName;
             DOMElements.nameModal.classList.add('is-active');
@@ -566,15 +585,12 @@
             }
         };
 
-        DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
-        DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
-        DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
-
         window.onresize = updateTeamDisplay;
 
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();
+            setupModals();
         });
     </script>
 </body>
