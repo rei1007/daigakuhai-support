@@ -10,95 +10,143 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* ==========================================================================
+           1. Root Variables & Base Styles
+           ========================================================================== */
         :root {
-            /* New Monochrome Palette */
+            /* Color Palette */
             --primary-color: #000000;
+            --primary-container-color: #E5E5E5;
+            --on-primary-container-color: #000000;
             --surface-container-low-color: #F5F5F5;
             --surface-color: #FFFFFF;
             --on-surface-color: #1C1C1C;
             --on-surface-variant-color: #5A5A5A;
             --outline-color: #E0E0E0;
+
+            /* Mobile-First Typography & Spacing Scale (rem units) */
+            --font-size-xs: 1.2rem;
+            --font-size-sm: 1.4rem;
+            --font-size-base: 1.5rem;
+            --font-size-md: 1.6rem;
+            --font-size-lg: 2.0rem;
+            --font-size-xl: 2.4rem;
+            --font-size-xxl: 3.2rem;
+
+            --space-sm: 0.8rem;
+            --space-md: 1.6rem;
+            --space-lg: 2.4rem;
+            --space-xl: 4.8rem;
+
+            /* Border Radius */
+            --radius-lg: 16px;
+
+            /* Font Family */
             --font-family: 'Noto Sans JP', sans-serif;
-            --border-radius-large: 16px;
+        }
+
+        @media (min-width: 1200px) {
+            :root {
+                /* Desktop Typography & Spacing Scale */
+                --font-size-xs: 1.4rem;
+                --font-size-sm: 1.6rem;
+                --font-size-base: 1.8rem;
+                --font-size-md: 2.0rem;
+                --font-size-lg: 2.8rem;
+                --font-size-xl: 3.6rem;
+                --font-size-xxl: 4.8rem;
+
+                --space-sm: 1.2rem;
+                --space-md: 2.0rem;
+                --space-lg: 3.0rem;
+                --space-xl: 5.2rem;
+            }
+        }
+
+        html {
+            /* Set base font size for rem calculation (1rem = 10px) */
+            font-size: 62.5%;
+            height: 100%;
         }
 
         body {
-            font-family: var(--font-family);
-            background-color: var(--surface-container-low-color);
-            color: var(--on-surface-color);
-            margin: 0;
-            padding: 24px;
-            font-size: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
+            padding: var(--space-lg);
             box-sizing: border-box;
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--on-surface-color);
+            background-color: var(--surface-container-low-color);
         }
 
+        /* ==========================================================================
+           2. Page Layout
+           ========================================================================== */
         .container {
-            max-width: 1500px;
             width: 100%;
+            max-width: 1500px;
             margin: 0 auto;
         }
 
         .header {
+            margin-bottom: var(--space-xl);
             text-align: center;
-            margin-bottom: 48px;
-        }
 
-        .header h1 {
-            font-size: 36px;
-            font-weight: 700;
-            margin: 0;
-        }
+            h1 {
+                margin: 0;
+                font-size: var(--font-size-xxl);
+                font-weight: 700;
+            }
 
-        .header p {
-            font-size: 18px;
-            color: var(--on-surface-variant-color);
-            margin-top: 12px;
+            p {
+                margin-top: var(--space-md);
+                font-size: var(--font-size-lg);
+                color: var(--on-surface-variant-color);
+            }
         }
 
         .link-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 24px;
+            gap: var(--space-lg);
+
+            @media (min-width: 769px) {
+                grid-template-columns: 1fr 1fr 1fr;
+                max-width: 960px;
+                margin: 0 auto;
+            }
         }
 
         .page-link-button {
             display: block;
-            background-color: var(--surface-color);
-            color: var(--on-surface-color);
-            text-decoration: none;
-            padding: 32px;
-            border-radius: var(--border-radius-large);
+            padding: var(--space-lg);
+            font-size: var(--font-size-md);
             font-weight: 700;
-            font-size: 20px;
-            text-align: center;
+            color: var(--on-surface-color);
+            background-color: var(--surface-color);
             border: 1px solid var(--outline-color);
-            transition: all 0.2s ease-in-out;
+            border-radius: var(--radius-lg);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease-in-out;
 
-        .page-link-button:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transform: translateY(-4px);
-        }
+            &:hover {
+                transform: translateY(-4px);
+                border-color: var(--primary-color);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
 
-        .page-link-button span {
-            display: block;
-            font-size: 16px;
-            font-weight: 400;
-            color: var(--on-surface-variant-color);
-            margin-top: 8px;
-        }
-
-        @media (min-width: 769px) {
-            .link-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-                max-width: 960px;
-                margin: 0 auto;
+            span {
+                display: block;
+                margin-top: var(--space-sm);
+                font-size: var(--font-size-sm);
+                font-weight: 400;
+                color: var(--on-surface-variant-color);
             }
         }
     </style>
