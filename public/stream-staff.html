@@ -42,9 +42,11 @@
             <div class="comment-history" id="comment-history"></div>
             <div class="tab-action-bar">
                 <div class="comment-input-group">
-                    <button id="edit-name-button" class="icon-button" title="表示名を設定"><span class="material-icons-outlined">settings</span></button>
+                    <button id="edit-name-button" class="icon-button" title="表示名を設定"><span
+                            class="material-icons-outlined">settings</span></button>
                     <input type="text" id="comment-input" placeholder="コメントを入力">
-                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span class="send-text">送信</span></button>
+                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span
+                            class="send-text">送信</span></button>
                 </div>
             </div>
         </div>
@@ -190,7 +192,7 @@
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
         let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
-        let isViewLocked = false; 
+        let isViewLocked = false;
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
@@ -215,7 +217,7 @@
             const statusText = { connecting: '接続中...', connected: '正常', disconnected: '切断' };
             DOMElements.connectionStatus.textContent = statusText[status];
         };
-        
+
         const checkSyncStatus = () => {
             if (!officialMatchup.alphaTeamId) return;
             const isDesynced = DOMElements.viewAlphaSelect.value !== officialMatchup.alphaTeamId ||
@@ -335,7 +337,7 @@
                 DOMElements.teamAlphaCardWrapper.style.display = 'block';
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
-             checkSyncStatus();
+            checkSyncStatus();
         };
         const renderMatchSettings = (state) => {
             if (document.activeElement !== DOMElements.roundInfoInput) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
@@ -374,7 +376,7 @@
                 scriptData = await scriptRes.json();
                 stagesData = await stagesRes.json();
             } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
-            
+
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
@@ -391,7 +393,7 @@
                     DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
                 }
             }
-            
+
             updateTeamDisplay();
             renderScript();
             renderMatchSettings({});
@@ -402,7 +404,7 @@
         };
         DOMElements.matchupAlphaSelect.onchange = matchupChangeHandler;
         DOMElements.matchupBravoSelect.onchange = matchupChangeHandler;
-        
+
         const viewChangeHandler = () => {
             isViewLocked = true;
             updateTeamDisplay();
@@ -430,7 +432,7 @@
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
                     const newComment = { id: Math.random().toString(36).substr(2, 9), text, senderId: mySessionId, role: MY_ROLE, displayName: myDisplayName, timestamp: new Date() };
-                    const updatedComments = [...currentComments, newComment].slice(-15);
+                    const updatedComments = [...currentComments, newComment].slice(-100);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
                 DOMElements.commentInput.value = '';
@@ -516,13 +518,13 @@
         };
         DOMElements.displayAlphaBtn.onclick = () => setDisplayTeam('alpha');
         DOMElements.displayBravoBtn.onclick = () => setDisplayTeam('bravo');
-        
+
         let isFirstCommentTabOpen = true;
         const switchToTab = (tabId) => {
             if (!tabId) return;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
-            
+
             if (tabId === 'comment' && isFirstCommentTabOpen) {
                 if (!myDisplayName) {
                     DOMElements.nameModal.classList.add('is-active');
@@ -549,7 +551,7 @@
                 switchToTab(firstTab);
             }
         };
-        
+
         // --- Modal & Name Logic ---
         DOMElements.editNameButton.onclick = () => {
             DOMElements.nameInput.value = myDisplayName;

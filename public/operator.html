@@ -42,9 +42,11 @@
             <div class="comment-history" id="comment-history"></div>
             <div class="tab-action-bar">
                 <div class="comment-input-group">
-                    <button id="edit-name-button" class="icon-button" title="表示名を設定"><span class="material-icons-outlined">settings</span></button>
+                    <button id="edit-name-button" class="icon-button" title="設定"><span
+                            class="material-icons-outlined">settings</span></button>
                     <input type="text" id="comment-input" placeholder="コメントを入力">
-                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span class="send-text">送信</span></button>
+                    <button id="send-comment-button"><span class="material-icons-outlined">send</span><span
+                            class="send-text">送信</span></button>
                 </div>
             </div>
         </div>
@@ -55,12 +57,6 @@
                     <h2>台本</h2>
                     <div id="script-card-content" class="script-full-list"></div>
                 </section>
-            </div>
-            <div class="tab-action-bar script-action-bar">
-                <button id="prev-script-button" title="前の段落へ"><span
-                        class="material-icons-outlined">skip_previous</span></button>
-                <button id="next-script-button" title="次の段落へ"><span
-                        class="material-icons-outlined">skip_next</span></button>
             </div>
         </div>
 
@@ -123,7 +119,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <div id="comment-modal" class="modal">
@@ -142,19 +137,27 @@
             <div class="stage-grid" id="stage-grid"></div>
         </div>
     </div>
-    <div id="name-modal" class="modal">
+    <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" id="name-modal-close"><span
+            <button class="modal-close" id="settings-modal-close"><span
                     class="material-icons-outlined">close</span></button>
-            <h2>表示名を設定</h2>
+            <h2>設定</h2>
             <div class="form-group">
-                <label for="name-input">チャットで表示される名前を入力してください。</label>
+                <label for="name-input">表示名</label>
                 <input type="text" id="name-input" placeholder="例: 運営A">
             </div>
-            <button id="save-name-button" class="primary-button">保存</button>
+            <button id="save-name-button" class="primary-button">表示名を保存</button>
+
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--outline-color);">
+
+            <h3>コメント履歴の管理</h3>
+            <p style="font-size: 14px; color: var(--on-surface-variant-color); margin-top: 0; margin-bottom: 12px;">
+                すべてのコメント履歴を削除します。この操作は元に戻せません。</p>
+            <button id="reset-comments-button" class="outline-button"
+                style="border-color: var(--xp-highlight-color); color: var(--xp-highlight-color); width: 100%;">コメントを全消去する</button>
+
         </div>
     </div>
-
 
     <nav class="tab-bar">
         <div class="tab-bar-inner">
@@ -192,16 +195,17 @@
         let currentlyDisplayedTeam = 'alpha';
         const pageLoadTime = Date.now();
         let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
-        let isViewLocked = false; 
+        let isViewLocked = false;
 
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
             connectionIndicator: getEl('connection-indicator'), connectionStatus: getEl('connection-status'),
             commentInput: getEl('comment-input'), sendCommentButton: getEl('send-comment-button'), commentHistory: getEl('comment-history'),
-            scriptCardContent: getEl('script-card-content'), nextScriptButton: getEl('next-script-button'), prevScriptButton: getEl('prev-script-button'),
+            scriptCardContent: getEl('script-card-content'),
             commentModal: getEl('comment-modal'), commentModalHeading: getEl('comment-modal-heading'), commentModalText: getEl('comment-modal-text'), commentModalClose: getEl('comment-modal-close'),
             stageModal: getEl('stage-modal'), stageModalClose: getEl('stage-modal-close'), stageGrid: getEl('stage-grid'),
-            nameModal: getEl('name-modal'), nameModalClose: getEl('name-modal-close'), nameInput: getEl('name-input'), saveNameButton: getEl('save-name-button'), editNameButton: getEl('edit-name-button'),
+            settingsModal: getEl('settings-modal'), settingsModalClose: getEl('settings-modal-close'), nameInput: getEl('name-input'), saveNameButton: getEl('save-name-button'), editNameButton: getEl('edit-name-button'),
+            resetCommentsButton: getEl('reset-comments-button'),
             matchupAlphaSelect: getEl('matchup-alpha-select'), matchupBravoSelect: getEl('matchup-bravo-select'),
             viewAlphaSelect: getEl('view-alpha-select'), viewBravoSelect: getEl('view-bravo-select'),
             syncViewButtonPC: getEl('sync-view-button-pc'),
@@ -231,7 +235,7 @@
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
-            
+
             if (state.matchup && state.matchup.alphaTeamId) {
                 officialMatchup = state.matchup;
                 DOMElements.matchupAlphaSelect.value = officialMatchup.alphaTeamId;
@@ -245,13 +249,13 @@
                     checkSyncStatus();
                 }
             }
-            
+
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchSettings(state);
 
             const lastComment = (state.comments || []).slice(-1)[0];
-            const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]').classList.contains('active');
+            const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
@@ -283,6 +287,7 @@
             DOMElements.commentHistory.scrollTop = DOMElements.commentHistory.scrollHeight;
         };
         const renderScript = (currentIndex = 0) => {
+            if (!scriptData || scriptData.length === 0) return;
             DOMElements.scriptCardContent.innerHTML = scriptData.map((p, i) => {
                 let statusClass = '';
                 if (i < currentIndex) statusClass = 'is-done';
@@ -332,7 +337,7 @@
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
             DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
-            
+
             if (window.innerWidth <= 768) {
                 DOMElements.teamAlphaCardWrapper.style.display = currentlyDisplayedTeam === 'alpha' ? 'block' : 'none';
                 DOMElements.teamBravoCardWrapper.style.display = currentlyDisplayedTeam === 'bravo' ? 'block' : 'none';
@@ -378,7 +383,7 @@
                 scriptData = await scriptRes.json();
                 stagesData = await stagesRes.json();
             } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
-            
+
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
@@ -395,7 +400,7 @@
                     DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
                 }
             }
-            
+
             updateTeamDisplay();
             renderScript();
             renderMatchSettings({});
@@ -411,22 +416,13 @@
         };
         DOMElements.matchupAlphaSelect.onchange = matchupChangeHandler;
         DOMElements.matchupBravoSelect.onchange = matchupChangeHandler;
-        
+
         const viewChangeHandler = () => {
             isViewLocked = true;
             updateTeamDisplay();
         };
         DOMElements.viewAlphaSelect.onchange = viewChangeHandler;
         DOMElements.viewBravoSelect.onchange = viewChangeHandler;
-
-        const updateScriptIndex = (newIndex) => { if (newIndex >= 0 && newIndex < scriptData.length) { sessionDocRef.update({ scriptIndex: newIndex }); } };
-        DOMElements.nextScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) + 1); };
-        DOMElements.prevScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) - 1); };
-        DOMElements.scriptCardContent.onclick = (e) => {
-            const target = e.target.closest('.script-paragraph'); if (!target) return;
-            const clickedIndex = parseInt(target.dataset.index, 10);
-            if (!isNaN(clickedIndex)) updateScriptIndex(clickedIndex);
-        };
 
         const sendComment = () => {
             const text = DOMElements.commentInput.value.trim();
@@ -435,7 +431,7 @@
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
                     const newComment = { id: Math.random().toString(36).substr(2, 9), text, senderId: mySessionId, role: MY_ROLE, displayName: myDisplayName, timestamp: new Date() };
-                    const updatedComments = [...currentComments, newComment].slice(-15);
+                    const updatedComments = [...currentComments, newComment].slice(-100);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
                 DOMElements.commentInput.value = '';
@@ -443,7 +439,6 @@
         };
         DOMElements.sendCommentButton.onclick = sendComment;
         DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); } });
-
 
         const syncViewToMatchup = () => {
             isViewLocked = false;
@@ -511,20 +506,13 @@
         DOMElements.stageGrid.addEventListener('click', async (e) => {
             const target = e.target.closest('.stage-grid-item');
             if (!target) return;
-
             const newStageName = target.dataset.stageName;
             const indexToEdit = DOMElements.stageModal.dataset.editIndex;
-
             const doc = await sessionDocRef.get();
             const currentSettings = doc.data();
             const newStages = currentSettings.stages ? [...currentSettings.stages] : [];
-
-            while (newStages.length <= indexToEdit) {
-                newStages.push({ stage: '未決定', winner: null });
-            }
-
+            while (newStages.length <= indexToEdit) { newStages.push({ stage: '未決定', winner: null }); }
             newStages[indexToEdit].stage = newStageName;
-
             await sessionDocRef.update({ stages: newStages });
             DOMElements.stageModal.classList.remove('is-active');
         });
@@ -543,10 +531,10 @@
             if (!tabId) return;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
-        
+
             if (tabId === 'comment' && isFirstCommentTabOpen) {
                 if (!myDisplayName) {
-                    DOMElements.nameModal.classList.add('is-active');
+                    DOMElements.settingsModal.classList.add('is-active');
                 }
                 isFirstCommentTabOpen = false;
             }
@@ -561,7 +549,6 @@
                     switchToTab(targetTab);
                 });
             });
-
             const initialTabId = location.hash.substring(1) || 'comment';
             const firstTab = document.querySelector('.tab-button')?.dataset.tab;
             if (document.querySelector(`.tab-button[data-tab="${initialTabId}"]`)) {
@@ -571,23 +558,39 @@
             }
         };
 
-        // --- Modal & Name Logic ---
         DOMElements.editNameButton.onclick = () => {
             DOMElements.nameInput.value = myDisplayName;
-            DOMElements.nameModal.classList.add('is-active');
+            DOMElements.settingsModal.classList.add('is-active');
         };
         DOMElements.saveNameButton.onclick = () => {
             const newName = DOMElements.nameInput.value.trim();
             if (newName) {
                 myDisplayName = newName;
                 localStorage.setItem('myDisplayName', myDisplayName);
-                DOMElements.nameModal.classList.remove('is-active');
+                DOMElements.settingsModal.classList.remove('is-active');
+            } else {
+                alert('表示名を入力してください。');
             }
         };
+        const resetComments = () => {
+            if (confirm('本当にすべてのコメント履歴を削除しますか？\nこの操作は取り消せません。')) {
+                sessionDocRef.update({ comments: [] })
+                    .then(() => {
+                        alert('コメント履歴をリセットしました。');
+                        DOMElements.settingsModal.classList.remove('is-active');
+                    })
+                    .catch((error) => {
+                        alert('コメントの削除に失敗しました。');
+                        console.error("Error resetting comments: ", error);
+                    });
+            }
+        };
+        DOMElements.resetCommentsButton.onclick = resetComments;
+
         DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
         DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
-        DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
-        
+        DOMElements.settingsModalClose.onclick = () => DOMElements.settingsModal.classList.remove('is-active');
+
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();
