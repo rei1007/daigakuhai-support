@@ -65,6 +65,11 @@
                 <section id="match-status-section">
                     <div id="match-status-display">
                     </div>
+
+                    <button id="show-stages-modal-button" class="outline-button"
+                        style="width: 100%; max-width: 600px; margin: 16px auto 0 auto; display: block;">
+                        使用ステージを確認
+                    </button>
                 </section>
                 <section id="team-display-section">
                     <div class="team-display-area">
@@ -127,6 +132,20 @@
         </div>
     </div>
 
+    <div id="stage-view-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="stage-view-modal-close"><span
+                    class="material-icons-outlined">close</span></button>
+            <h2>使用ステージ一覧</h2>
+            <p style="font-size: 1.4rem; color: var(--on-surface-variant-color); margin-top: 0; margin-bottom: 1.6rem;">
+                大会設定で使用が許可されているステージの一覧です。（グレーアウト：使用しないステージ）
+            </p>
+            <div class="stage-grid" id="stage-view-grid">
+            </div>
+        </div>
+    </div>
+
+
     <nav class="tab-bar">
         <div class="tab-bar-inner">
             <button class="tab-button" data-tab="comment">
@@ -146,8 +165,12 @@
 
     <script>
         const MY_ROLE = '実況解説';
-        let teamsData = [], scriptData = [];
+        // === 修正 (フェーズ4): stagesData を追加 ===
+        let teamsData = [], scriptData = [], stagesData = [];
         let myDisplayName = '';
+
+        // === 追加 (フェーズ4) ===
+        let unusedStages = []; // 使用しないステージのグローバルリスト
 
         let mySessionId = localStorage.getItem('mySessionId');
         if (!mySessionId || !mySessionId.startsWith('cc-')) {
@@ -189,6 +212,12 @@
             nameInput: getEl('name-input'),
             saveNameButton: getEl('save-name-button'),
             editNameButton: getEl('edit-name-button'),
+
+            // === 追加 (フェーズ4) ===
+            showStagesModalButton: getEl('show-stages-modal-button'),
+            stageViewModal: getEl('stage-view-modal'),
+            stageViewModalClose: getEl('stage-view-modal-close'),
+            stageViewGrid: getEl('stage-view-grid'),
         };
 
         const setConnectionStatus = (status) => {
@@ -210,6 +239,9 @@
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
+
+            // === 追加 (フェーズ4): unusedStagesリストを更新 ===
+            unusedStages = state.unusedStages || [];
 
             if (state.matchup && state.matchup.alphaTeamId) {
                 officialMatchup = state.matchup;
@@ -354,6 +386,7 @@
                     <div class="stage-images">${stageImagesHTML}</div>
                 </div>
             `;
+            // ボタンは静的HTMLにあるため、ここで再生成する必要はありません
         };
 
         const updateTeamDisplay = () => {
@@ -377,14 +410,21 @@
             DOMElements.commentModal.classList.add('is-active');
         };
 
+        // === 修正 (フェーズ4): initializePage (stages.json を fetch) ===
         const initializePage = async () => {
             setConnectionStatus('connecting');
             myDisplayName = localStorage.getItem('myDisplayName') || '';
 
             try {
-                const [teamsRes, scriptRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json')]);
+                // === 修正 (フェーズ4): stages.json を_fetch_ ===
+                const [teamsRes, scriptRes, stagesRes] = await Promise.all([
+                    fetch('./teams.json'),
+                    fetch('./script.json'),
+                    fetch('./stages.json') // <--- 追加
+                ]);
                 teamsData = await teamsRes.json();
                 scriptData = await scriptRes.json();
+                stagesData = await stagesRes.json(); // <--- 追加
             } catch (e) {
                 console.error("Failed to load initial data:", e);
                 alert("データファイルの読み込みに失敗しました。ページをリロードしてください。");
@@ -493,6 +533,39 @@
             }
         };
 
+        // === 追加 (フェーズ4): ステージ表示モーダルを開く関数 ===
+        const openStageViewModal = () => {
+            if (!stagesData || stagesData.length === 0) {
+                DOMElements.stageViewGrid.innerHTML = '<p>ステージ情報が読み込めていません。</p>';
+            }
+
+            // 1. ステージを「使用する」「使用しない」に振り分ける (「未決定」は表示しない)
+            const allStageNames = stagesData; // '未決定' を除外
+            const usedStageItems = [];
+            const unusedStageItems = [];
+
+            allStageNames.forEach(stageName => {
+                const isDisabled = unusedStages.includes(stageName);
+                const itemHTML = `
+                    <div class="stage-grid-item ${isDisabled ? 'is-disabled' : ''}" data-stage-name="${stageName}">
+                        <img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
+                    </div>`;
+
+                if (isDisabled) {
+                    unusedStageItems.push(itemHTML);
+                } else {
+                    usedStageItems.push(itemHTML);
+                }
+            });
+
+            // 2. HTMLを生成
+            DOMElements.stageViewGrid.innerHTML = [...usedStageItems, ...unusedStageItems].join('');
+
+            // 3. モーダルを開く
+            DOMElements.stageViewModal.classList.add('is-active');
+        };
+
+        // === 修正 (フェーズ4): 新しいモーダルのクローズ処理を追加 ===
         const setupModals = () => {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('click', (e) => {
@@ -503,6 +576,11 @@
             });
             DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
             DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
+
+            // === 追加 (フェーズ4) ===
+            if (DOMElements.stageViewModalClose) {
+                DOMElements.stageViewModalClose.onclick = () => DOMElements.stageViewModal.classList.remove('is-active');
+            }
         };
 
         DOMElements.editNameButton.onclick = () => {
@@ -520,10 +598,16 @@
 
         window.onresize = updateTeamDisplay;
 
+        // === 修正 (フェーズ4): ステージ確認ボタンのイベントリスナーを追加 ===
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();
             setupModals();
+
+            // === 追加 (フェーズ4) ===
+            if (DOMElements.showStagesModalButton) {
+                DOMElements.showStagesModalButton.onclick = openStageViewModal;
+            }
         });
     </script>
 </body>

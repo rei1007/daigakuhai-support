@@ -182,6 +182,9 @@
         let teamsData = [], scriptData = [], stagesData = [];
         let myDisplayName = '';
 
+        // === 追加 (フェーズ3) ===
+        let unusedStages = []; // 使用しないステージのグローバルリスト
+
         let mySessionId = localStorage.getItem('mySessionId');
         if (!mySessionId || !mySessionId.startsWith('stream-')) {
             mySessionId = `stream-${Math.random().toString(36).substr(2, 9)}`;
@@ -230,6 +233,10 @@
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
+
+            // === 追加 (フェーズ3): unusedStagesリストを更新 ===
+            unusedStages = state.unusedStages || [];
+
             if (state.matchup && state.matchup.alphaTeamId) {
                 officialMatchup = state.matchup;
                 DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
@@ -464,16 +471,31 @@
             });
         };
 
+        // === 修正 (フェーズ3): openStageModal 関数 ===
         const openStageModal = (index) => {
-            DOMElements.stageGrid.innerHTML = '';
-            const allStages = ['未決定', ...stagesData];
-            allStages.forEach(stageName => {
-                const item = document.createElement('div');
-                item.className = 'stage-grid-item';
-                item.dataset.stageName = stageName;
-                item.innerHTML = `<img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">`;
-                DOMElements.stageGrid.appendChild(item);
+            // 1. ステージを「使用する」「使用しない」に振り分ける
+            const allStageNames = ['未決定', ...stagesData];
+            const usedStageItems = [];
+            const unusedStageItems = [];
+
+            allStageNames.forEach(stageName => {
+                const isDisabled = unusedStages.includes(stageName);
+                const itemHTML = `
+                    <div class="stage-grid-item ${isDisabled ? 'is-disabled' : ''}" data-stage-name="${stageName}">
+                        <img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
+                    </div>`;
+
+                if (isDisabled) {
+                    unusedStageItems.push(itemHTML);
+                } else {
+                    usedStageItems.push(itemHTML);
+                }
             });
+
+            // 2. HTMLを生成 (使用するステージが先、使用しないステージが後)
+            DOMElements.stageGrid.innerHTML = [...usedStageItems, ...unusedStageItems].join('');
+
+            // 3. モーダルを開く
             DOMElements.stageModal.dataset.editIndex = index;
             DOMElements.stageModal.classList.add('is-active');
         };
@@ -501,9 +523,13 @@
             }
         });
 
+        // === 修正 (フェーズ3): stageGrid の 'click' イベントリスナー ===
         DOMElements.stageGrid.addEventListener('click', async (e) => {
             const target = e.target.closest('.stage-grid-item');
-            if (!target) return;
+
+            // === 追加 (フェーズ3): 無効化されたステージはクリック不可 ===
+            if (!target || target.classList.contains('is-disabled')) return;
+
             const newStageName = target.dataset.stageName;
             const indexToEdit = DOMElements.stageModal.dataset.editIndex;
             const doc = await sessionDocRef.get();

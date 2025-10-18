@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         /* ==========================================================================
            1. Root Variables & Base Styles
@@ -64,7 +65,6 @@
         }
 
         html {
-            /* Set base font size for rem calculation (1rem = 10px) */
             font-size: 62.5%;
             height: 100%;
         }
@@ -88,7 +88,7 @@
            ========================================================================== */
         .container {
             width: 100%;
-            max-width: 1500px;
+            max-width: 960px;
             margin: 0 auto;
         }
 
@@ -102,11 +102,55 @@
                 font-weight: 700;
             }
 
+            h2#tournament-name-display {
+                font-size: var(--font-size-lg);
+                color: var(--on-surface-color);
+                font-weight: 700;
+                margin: var(--space-sm) 0 0 0;
+                min-height: var(--font-size-lg);
+            }
+
             p {
                 margin-top: var(--space-md);
-                font-size: var(--font-size-lg);
+                font-size: var(--font-size-md);
                 color: var(--on-surface-variant-color);
             }
+        }
+
+        /* === 修正: margin-bottom を margin-top に変更 === */
+        .settings-section {
+            margin-top: var(--space-lg);
+        }
+
+        .settings-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            font-size: var(--font-size-md);
+            font-weight: 700;
+            color: var(--on-primary-container-color);
+            background-color: var(--primary-container-color);
+            border: 1px solid #C0C0C0;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            text-decoration: none;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .settings-button:hover {
+            transform: translateY(-2px);
+            background-color: #DCDCDC;
+            border-color: #A0A0A0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .settings-button .material-icons-outlined {
+            font-size: var(--font-size-lg);
         }
 
         .link-grid {
@@ -116,7 +160,6 @@
 
             @media (min-width: 769px) {
                 grid-template-columns: 1fr 1fr 1fr;
-                max-width: 960px;
                 margin: 0 auto;
             }
         }
@@ -156,14 +199,70 @@
     <div class="container">
         <header class="header">
             <h1>大学杯 配信サポート</h1>
+            <h2 id="tournament-name-display">...</h2>
             <p>大会配信の運営・実況解説を円滑にするためのサポートツールです。</p>
         </header>
-        <main class="link-grid">
-            <a href="./operator.html" class="page-link-button">運営ページ <span>配信補助の運営員用</span></a>
-            <a href="./stream-staff.html" class="page-link-button">配信担当ページ <span>配信担当の運営員用</span></a>
-            <a href="./commentator.html" class="page-link-button">実況解説ページ <span>実況解説者用</span></a>
+
+        <main>
+            <section class="link-grid">
+                <a href="./operator.html" class="page-link-button">運営ページ <span>配信補助の運営員用</span></a>
+                <a href="./stream-staff.html" class="page-link-button">配信担当ページ <span>配信担当の運営員用</span></a>
+                <a href="./commentator.html" class="page-link-button">実況解説ページ <span>実況解説者用</span></a>
+            </section>
+
+            <section class="settings-section">
+                <a href="./setting.html" class="settings-button">
+                    <span class="material-icons-outlined">settings</span>
+                    大会設定
+                </a>
+            </section>
         </main>
     </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.appspot.com",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
+
+        /**
+         * 大会名をFirestoreから取得して表示
+         */
+        const loadTournamentName = async () => {
+            const nameDisplay = document.getElementById('tournament-name-display');
+            try {
+                const doc = await sessionDocRef.get();
+                if (doc.exists) {
+                    const state = doc.data();
+                    const tournamentName = state.tournamentName;
+
+                    if (tournamentName) {
+                        nameDisplay.textContent = tournamentName;
+                    } else {
+                        nameDisplay.textContent = '大会名未設定';
+                    }
+                } else {
+                    nameDisplay.textContent = '（設定ドキュメントなし）';
+                }
+            } catch (error) {
+                console.error("大会名の取得エラー:", error);
+                nameDisplay.textContent = '（大会名の取得に失敗）';
+            }
+        };
+
+        // ページ読み込み時に大会名を取得
+        document.addEventListener('DOMContentLoaded', loadTournamentName);
+    </script>
 </body>
 
 </html>

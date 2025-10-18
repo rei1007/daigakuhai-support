@@ -949,6 +949,18 @@ main {
     }
 }
 
+.stage-grid-item.is-disabled {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
+
+.stage-grid-item.is-disabled:hover {
+    transform: none;
+    border-color: transparent;
+    box-shadow: none;
+}
+
 /* ==========================================================================
    6. 汎用フォーム要素とボタン
    ========================================================================== */
