@@ -731,14 +731,14 @@ main {
 .stage-image-item {
     position: relative;
     max-width: 20rem;
-    min-width: 12rem;
+    min-width: 10rem;
     background-color: var(--surface-color);
     border: 2px solid transparent;
     border-radius: var(--radius-md);
     overflow: hidden;
 
     @media (max-width: 740px) {
-        width: 12.5rem;
+        width: 10rem;
     }
 
     img {

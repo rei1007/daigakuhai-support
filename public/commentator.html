@@ -79,10 +79,7 @@
                         </button>
                     </div>
                 </section>
-            </div>
-        </div>
-        <div id="tab-content-match-team-info" class="tab-content">
-            <div class="tab-main-content">
+
                 <section id="match-status-section">
                     <div id="match-status-display">
                     </div>
@@ -92,6 +89,11 @@
                         使用ステージを確認
                     </button>
                 </section>
+            </div>
+        </div>
+        <div id="tab-content-match-team-info" class="tab-content">
+            <div class="tab-main-content">
+
                 <section id="team-display-section">
                     <div class="team-display-area">
                         <div id="team-alpha-card-wrapper" class="team-card-wrapper active">
@@ -152,7 +154,6 @@
             <button id="save-name-button" class="primary-button">保存</button>
         </div>
     </div>
-
     <div id="stage-view-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="stage-view-modal-close"><span
@@ -180,11 +181,11 @@
 
             <button class="tab-button" data-tab="stream-view">
                 <span class="material-icons-outlined">smart_display</span>
-                <span class="tab-label">配信画面</span>
+                <span class="tab-label">配信・対戦情報</span>
             </button>
             <button class="tab-button" data-tab="match-team-info">
                 <span class="material-icons-outlined">people</span>
-                <span class="tab-label">対戦・チーム情報</span>
+                <span class="tab-label">チーム情報</span>
             </button>
         </div>
     </nav>
@@ -239,13 +240,10 @@
             stageViewModal: getEl('stage-view-modal'),
             stageViewModalClose: getEl('stage-view-modal-close'),
             stageViewGrid: getEl('stage-view-grid'),
-
-            // === ▼▼▼ 新規追加 ▼▼▼ ===
             streamViewSelector: getEl('stream-view-selector'),
             streamViewMatchInfo: getEl('stream-view-matchInfo'),
             streamViewStageList: getEl('stream-view-stageList'),
             streamViewReplay: getEl('stream-view-replay'),
-            // === ▲▲▲ 新規追加 ▲▲▲ ===
         };
 
         const setConnectionStatus = (status) => {
@@ -284,10 +282,7 @@
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchStatus(state);
-
-            // === ▼▼▼ 新規追加 ▼▼▼ ===
             renderStreamViewSelector(state.currentStreamView);
-            // === ▲▲▲ 新規追加 ▲▲▲ ===
 
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
@@ -404,17 +399,12 @@
             `;
         };
 
-        // === ▼▼▼ 新規追加 ▼▼▼ ===
-        /**
-         * 配信画面セレクターの表示を更新
-         */
         const renderStreamViewSelector = (currentView) => {
             const view = currentView || 'matchInfo'; // デフォルトは 'matchInfo'
             DOMElements.streamViewMatchInfo.classList.toggle('active', view === 'matchInfo');
             DOMElements.streamViewStageList.classList.toggle('active', view === 'stageList');
             DOMElements.streamViewReplay.classList.toggle('active', view === 'replay');
         };
-        // === ▲▲▲ 新規追加 ▲▲▲ ===
 
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
@@ -497,6 +487,8 @@
             updateTeamDisplay();
         };
         DOMElements.viewAlphaSelect.onchange = viewChangeHandler;
+        DOMElements.viewBravoSelect.onchange = viewChangeHandler;
+
         DOMElements.viewBravoSelect.onchange = viewChangeHandler;
 
         const syncViewToMatchup = () => {
@@ -607,7 +599,6 @@
                 DOMElements.showStagesModalButton.onclick = openStageViewModal;
             }
 
-            // === ▼▼▼ 新規追加 ▼▼▼ ===
             // 配信画面セレクターのクリックイベント
             DOMElements.streamViewSelector.addEventListener('click', (e) => {
                 const target = e.target.closest('button');
@@ -615,7 +606,6 @@
                     sessionDocRef.update({ currentStreamView: target.dataset.view });
                 }
             });
-            // === ▲▲▲ 新規追加 ▲▲▲ ===
         });
     </script>
 </body>
