@@ -64,7 +64,8 @@
     --radius-lg: 16px;
 
     /* フォントファミリー */
-    --font-family: 'Noto Sans JP', sans-serif;
+    /* --font-family: 'Noto Sans JP', sans-serif; */
+    --font-family: "M PLUS Rounded 1c", sans-serif;
 }
 
 @media (min-width: 1200px) {
