@@ -68,6 +68,24 @@
 
         <div id="tab-content-match-settings" class="tab-content">
             <div class="tab-main-content">
+
+                <section id="stream-view-section">
+                    <h2>配信画面</h2>
+                    <div class="stream-view-selector" id="stream-view-selector">
+                        <button id="stream-view-matchInfo" data-view="matchInfo">
+                            <span class="material-icons-outlined">scoreboard</span>
+                            対戦情報
+                        </button>
+                        <button id="stream-view-stageList" data-view="stageList">
+                            <span class="material-icons-outlined">map</span>
+                            ステージ一覧
+                        </button>
+                        <button id="stream-view-replay" data-view="replay">
+                            <span class="material-icons-outlined">replay</span>
+                            リプレイ映像
+                        </button>
+                    </div>
+                </section>
                 <section class="card" id="match-settings-card">
                     <h2>対戦設定</h2>
                     <div class="form-group"><label for="round-info-input">ラウンド情報</label><input type="text"
@@ -166,10 +184,10 @@
                 <span class="material-icons-outlined">description</span>
                 <span class="tab-label">台本</span>
             </button>
+
             <button class="tab-button" data-tab="match-settings">
                 <span class="material-icons-outlined">tune</span>
-                <span class="tab-label">対戦設定</span>
-            </button>
+                <span class="tab-label">配信・対戦設定</span> </button>
             <button class="tab-button" data-tab="team-display">
                 <span class="material-icons-outlined">people</span>
                 <span class="tab-label">チーム情報</span>
@@ -182,7 +200,6 @@
         let teamsData = [], scriptData = [], stagesData = [];
         let myDisplayName = '';
 
-        // === 追加 (フェーズ3) ===
         let unusedStages = []; // 使用しないステージのグローバルリスト
 
         let mySessionId = localStorage.getItem('mySessionId');
@@ -212,6 +229,13 @@
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
             roundInfoInput: getEl('round-info-input'), bo3Btn: getEl('bo3-btn'), bo5Btn: getEl('bo5-btn'), stageWinnerRows: getEl('stage-winner-rows'),
             resetStagesButton: getEl('reset-stages-button'),
+
+            // === ▼▼▼ 新規追加 ▼▼▼ ===
+            streamViewSelector: getEl('stream-view-selector'),
+            streamViewMatchInfo: getEl('stream-view-matchInfo'),
+            streamViewStageList: getEl('stream-view-stageList'),
+            streamViewReplay: getEl('stream-view-replay'),
+            // === ▲▲▲ 新規追加 ▲▲▲ ===
         };
 
         const setConnectionStatus = (status) => {
@@ -234,7 +258,6 @@
             const state = doc.data();
             setConnectionStatus('connected');
 
-            // === 追加 (フェーズ3): unusedStagesリストを更新 ===
             unusedStages = state.unusedStages || [];
 
             if (state.matchup && state.matchup.alphaTeamId) {
@@ -254,6 +277,10 @@
             renderComments(state.comments || []);
             renderMatchSettings(state);
 
+            // === ▼▼▼ 新規追加 ▼▼▼ ===
+            renderStreamViewSelector(state.currentStreamView);
+            // === ▲▲▲ 新規追加 ▲▲▲ ===
+
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
@@ -269,14 +296,11 @@
             DOMElements.commentHistory.innerHTML = comments.map(c => {
                 const isMe = c.senderId === mySessionId;
                 let badgeClass = 'is-other'; let badgeText = c.role;
-                if (isMe) {
-                    badgeClass = 'is-me'; badgeText = 'Me';
-                } else if (c.role === '運営') { badgeClass = 'is-operator'; }
+                if (isMe) { badgeClass = 'is-me'; badgeText = 'Me'; }
+                else if (c.role === '運営') { badgeClass = 'is-operator'; }
                 else if (c.role === '実況解説') { badgeClass = 'is-commentator'; }
                 else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
-
                 const displayNameHTML = c.displayName ? `<span class="display-name">${c.displayName}</span>` : '';
-
                 return `<div class="comment-item-wrapper ${isMe ? 'is-me' : ''}">
                            <div class="comment-item" id="comment-${c.id}">
                              <div class="comment-header">${displayNameHTML}<span class="badge ${badgeClass}">${badgeText}</span></div>
@@ -286,6 +310,7 @@
             }).join('');
             DOMElements.commentHistory.scrollTop = DOMElements.commentHistory.scrollHeight;
         };
+
         const renderScript = (currentIndex = 0) => {
             if (!scriptData || scriptData.length === 0) return;
             DOMElements.scriptCardContent.innerHTML = scriptData.map((p, i) => {
@@ -294,10 +319,10 @@
                 if (i === currentIndex) statusClass = 'is-current';
                 return `<div class="script-paragraph ${statusClass}" data-index="${i}" id="script-item-${i}"><b>${p.speaker}:</b> ${p.line}</div>`
             }).join('');
-
             const currentEl = getEl(`script-item-${currentIndex}`);
             if (currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
+
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
             if (!team) return '<h3>チーム情報を読み込み中...</h3>';
@@ -316,7 +341,6 @@
                     <div class="player-tile-bottom">${(p.weapon || '').replace(/\//g, ' / ')}</div>
                 </div>`
             ).join('');
-
             return `<div class="team-card-header">
                         <p class="university-name">${team.university} / ${team.circle}</p>
                         <h2 class="team-name">${team.teamName}</h2>
@@ -328,12 +352,14 @@
                     <div class="info-tile"><h3>実績</h3><p>${team.records}</p></div>
                     <div class="info-tile"><h3>サークルからのメッセージ</h3><p>${team.message}</p></div>`;
         };
+
         const showCommentModal = (text, role = '不明', displayName = '') => {
             const sender = displayName ? `${displayName} (${role})` : role;
             DOMElements.commentModalHeading.textContent = `【${sender}】からのコメント`;
             DOMElements.commentModalText.textContent = text;
             DOMElements.commentModal.classList.add('is-active');
         };
+
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
             DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
@@ -346,6 +372,7 @@
             }
             checkSyncStatus();
         };
+
         const renderMatchSettings = (state) => {
             if (document.activeElement !== DOMElements.roundInfoInput) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
             const bestOf = state.bestOf || 'BO3';
@@ -372,6 +399,18 @@
                 DOMElements.stageWinnerRows.appendChild(row);
             }
         };
+
+        // === ▼▼▼ 新規追加 ▼▼▼ ===
+        /**
+         * 配信画面セレクターの表示を更新
+         */
+        const renderStreamViewSelector = (currentView) => {
+            const view = currentView || 'matchInfo'; // デフォルトは 'matchInfo'
+            DOMElements.streamViewMatchInfo.classList.toggle('active', view === 'matchInfo');
+            DOMElements.streamViewStageList.classList.toggle('active', view === 'stageList');
+            DOMElements.streamViewReplay.classList.toggle('active', view === 'replay');
+        };
+        // === ▲▲▲ 新規追加 ▲▲▲ ===
 
         const initializePage = async () => {
             setConnectionStatus('connecting');
@@ -400,7 +439,6 @@
                     DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
                 }
             }
-
             updateTeamDisplay();
             renderScript();
             renderMatchSettings({});
@@ -471,31 +509,20 @@
             });
         };
 
-        // === 修正 (フェーズ3): openStageModal 関数 ===
         const openStageModal = (index) => {
-            // 1. ステージを「使用する」「使用しない」に振り分ける
             const allStageNames = ['未決定', ...stagesData];
             const usedStageItems = [];
             const unusedStageItems = [];
-
             allStageNames.forEach(stageName => {
                 const isDisabled = unusedStages.includes(stageName);
                 const itemHTML = `
                     <div class="stage-grid-item ${isDisabled ? 'is-disabled' : ''}" data-stage-name="${stageName}">
                         <img src="./stage-image/${encodeURIComponent(stageName)}.png" alt="${stageName}" onerror="this.onerror=null;this.src='./stage-image/未決定.png';">
                     </div>`;
-
-                if (isDisabled) {
-                    unusedStageItems.push(itemHTML);
-                } else {
-                    usedStageItems.push(itemHTML);
-                }
+                if (isDisabled) { unusedStageItems.push(itemHTML); }
+                else { usedStageItems.push(itemHTML); }
             });
-
-            // 2. HTMLを生成 (使用するステージが先、使用しないステージが後)
             DOMElements.stageGrid.innerHTML = [...usedStageItems, ...unusedStageItems].join('');
-
-            // 3. モーダルを開く
             DOMElements.stageModal.dataset.editIndex = index;
             DOMElements.stageModal.classList.add('is-active');
         };
@@ -523,13 +550,9 @@
             }
         });
 
-        // === 修正 (フェーズ3): stageGrid の 'click' イベントリスナー ===
         DOMElements.stageGrid.addEventListener('click', async (e) => {
             const target = e.target.closest('.stage-grid-item');
-
-            // === 追加 (フェーズ3): 無効化されたステージはクリック不可 ===
             if (!target || target.classList.contains('is-disabled')) return;
-
             const newStageName = target.dataset.stageName;
             const indexToEdit = DOMElements.stageModal.dataset.editIndex;
             const doc = await sessionDocRef.get();
@@ -557,7 +580,6 @@
             if (!tabId) return;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
-
             if (tabId === 'comment' && isFirstCommentTabOpen) {
                 if (!myDisplayName) {
                     DOMElements.nameModal.classList.add('is-active');
@@ -575,7 +597,6 @@
                     switchToTab(targetTab);
                 });
             });
-
             const initialTabId = location.hash.substring(1) || 'comment';
             const firstTab = document.querySelector('.tab-button')?.dataset.tab;
             if (document.querySelector(`.tab-button[data-tab="${initialTabId}"]`)) {
@@ -617,6 +638,16 @@
             initializePage();
             setupTabs();
             setupModals();
+
+            // === ▼▼▼ 新規追加 ▼▼▼ ===
+            // 配信画面セレクターのクリックイベント
+            DOMElements.streamViewSelector.addEventListener('click', (e) => {
+                const target = e.target.closest('button');
+                if (target && target.dataset.view) {
+                    sessionDocRef.update({ currentStreamView: target.dataset.view });
+                }
+            });
+            // === ▲▲▲ 新規追加 ▲▲▲ ===
         });
     </script>
 </body>

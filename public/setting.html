@@ -28,8 +28,8 @@
 
     <style>
         /* ==========================================================================
-           1. Root Variables & Base Styles
-           ========================================================================== */
+        1. Root Variables & Base Styles
+        ========================================================================== */
         :root {
             --primary-color: #000000;
             --primary-container-color: #E5E5E5;
@@ -81,8 +81,8 @@
         }
 
         /* ==========================================================================
-           2. Page Layout
-           ========================================================================== */
+        2. Page Layout
+        ========================================================================== */
         .container {
             width: 100%;
             max-width: 960px;
@@ -121,8 +121,8 @@
         }
 
         /* ==========================================================================
-           3. Form Elements
-           ========================================================================== */
+        3. Form Elements
+        ========================================================================== */
         .form-group {
             margin-bottom: var(--space-lg);
         }
@@ -186,8 +186,8 @@
         }
 
         /* ==========================================================================
-           4. Stage Checklist (修正)
-           ========================================================================== */
+        4. Stage Checklist
+        ========================================================================== */
 
         .bulk-action-buttons {
             display: flex;
@@ -202,32 +202,26 @@
             margin-bottom: var(--space-lg);
         }
 
-        /* === 修正: ステージアイテムのスタイル (チェックボックス削除) === */
         .stage-check-item {
             display: flex;
             align-items: center;
             justify-content: center;
-            /* テキストを中央揃え */
             padding: var(--space-md) var(--space-sm);
-            /* 上下のpaddingを増やす */
             background-color: var(--surface-container-low-color);
-            /* 非アクティブ色 */
             border: 1px solid var(--outline-color);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: background-color 0.2s, border-color 0.2s, color 0.2s;
             user-select: none;
-            /* テキスト選択を無効化 */
         }
 
         .stage-check-item:hover {
             background-color: #EAEAEA;
         }
 
-        /* === 追加: ステージアイテムのアクティブ状態 === */
         .stage-check-item.is-active {
             background-color: var(--primary-container-color);
-            border-color: #A0A0A0;
+            border-color: var(--primary-color);
             color: var(--on-primary-container-color);
         }
 
@@ -242,8 +236,8 @@
         }
 
         /* ==========================================================================
-           5. Navigation (修正)
-           ========================================================================== */
+        5. Navigation
+        ========================================================================== */
         .home-button {
             display: block;
             width: 100%;
