@@ -130,6 +130,11 @@
             margin-bottom: var(--space-lg);
         }
 
+        /* 大会名セクションはマージンなしに */
+        .form-group.no-margin {
+            margin-bottom: 0;
+        }
+
         .form-group label {
             display: block;
             margin-bottom: var(--space-xs);
@@ -154,6 +159,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: var(--space-md);
+        }
+
+        .form-group-header .header-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
         }
 
         .form-group-header h2 {
@@ -188,9 +199,78 @@
             background-color: #F0F0F0;
         }
 
+        /* === ▼▼▼ 新規追加: 実況解説者情報 ▼▼▼ === */
+        .commentator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* Mobile first */
+            gap: var(--space-md);
+        }
+
+        @media (min-width: 600px) {
+            .commentator-grid {
+                grid-template-columns: 1fr 1fr;
+                /* Desktop 2-col */
+            }
+        }
+
+        .commentator-group {
+            background: var(--surface-container-low-color);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--outline-color);
+        }
+
+        .commentator-group label {
+            font-size: var(--font-size-md);
+            /* Use label as heading */
+            font-weight: 700;
+            color: var(--on-surface-color);
+            margin-bottom: var(--space-sm);
+        }
+
+        .commentator-group input[type="text"] {
+            width: 100%;
+            margin-bottom: var(--space-sm);
+        }
+
+        .commentator-group input[type="text"]:last-child {
+            margin-bottom: 0;
+        }
+
+        /* === ▲▲▲ 新規追加 === */
+
         /* ==========================================================================
         4. Stage Checklist
         ========================================================================== */
+
+        /* === ▼▼▼ 新規追加: 折りたたみボタン ▼▼▼ === */
+        .toggle-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xs);
+            background-color: var(--primary-container-color);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-button .material-icons-outlined {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+        }
+
+        .toggle-button.is-collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content.is-collapsed {
+            display: none;
+        }
+
+        /* === ▲▲▲ 新規追加 === */
 
         .bulk-action-buttons {
             display: flex;
@@ -248,11 +328,8 @@
             font-size: var(--font-size-base);
             font-weight: 700;
             color: white;
-            /* === 修正: 白文字 === */
             background-color: var(--primary-color);
-            /* === 修正: 濃い色 === */
             border: 1px solid var(--primary-color);
-            /* === 修正: 濃い色 === */
             border-radius: var(--radius-lg);
             text-align: center;
             text-decoration: none;
@@ -262,7 +339,6 @@
 
         .home-button:hover {
             background-color: #333333;
-            /* === 修正: ホバー色 === */
             border-color: #333333;
         }
     </style>
@@ -276,7 +352,7 @@
 
         <main>
             <div class="card">
-                <section class="form-group">
+                <section class="form-group no-margin">
                     <div class="form-group-header">
                         <h2>大会名</h2>
                         <span id="name-save-status" class="status-indicator"></span>
@@ -286,19 +362,46 @@
 
                 <hr>
 
+                <section class="form-group no-margin">
+                    <div class="form-group-header">
+                        <h2>実況解説者情報設定</h2>
+                        <span id="commentator-save-status" class="status-indicator"></span>
+                    </div>
+                    <div class="commentator-grid">
+                        <div class="commentator-group">
+                            <label>実況者</label>
+                            <input type="text" id="caster-name-input" placeholder="名前">
+                            <input type="text" id="caster-icon-input" placeholder="アイコンURL (https://...)">
+                        </div>
+                        <div class="commentator-group">
+                            <label>解説者</label>
+                            <input type="text" id="analyst-name-input" placeholder="名前">
+                            <input type="text" id="analyst-icon-input" placeholder="アイコンURL (https://...)">
+                        </div>
+                    </div>
+                </section>
+                <hr>
+
                 <section>
                     <div class="form-group-header">
                         <h2>使用ステージ設定</h2>
-                        <span id="stage-save-status" class="status-indicator"></span>
+                        <div class="header-controls">
+                            <span id="stage-save-status" class="status-indicator"></span>
+                            <button id="stage-toggle-btn" class="toggle-button is-collapsed" title="折りたたむ">
+                                <span class="material-icons-outlined">expand_more</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="bulk-action-buttons">
-                        <button id="select-all-stages" class="outline-button">すべて選択</button>
-                        <button id="deselect-all-stages" class="outline-button">すべて解除</button>
-                    </div>
+                    <div id="stage-settings-content" class="collapsible-content is-collapsed">
+                        <div class="bulk-action-buttons">
+                            <button id="select-all-stages" class="outline-button">すべて選択</button>
+                            <button id="deselect-all-stages" class="outline-button">すべて解除</button>
+                        </div>
 
-                    <div id="stage-checklist-container" class="stage-checklist">
-                        <p>ステージ情報を読み込み中です...</p>
+                        <div id="stage-checklist-container" class="stage-checklist">
+                            <p>ステージ情報を読み込み中です...</p>
+                        </div>
                     </div>
                 </section>
 
@@ -314,16 +417,32 @@
 
         const DOMElements = {
             nameInput: getEl('tournament-name-input'),
+            nameSaveStatus: getEl('name-save-status'),
+
+            // === ▼▼▼ 新規追加: 実況解説者 ▼▼▼ ===
+            casterNameInput: getEl('caster-name-input'),
+            casterIconInput: getEl('caster-icon-input'),
+            analystNameInput: getEl('analyst-name-input'),
+            analystIconInput: getEl('analyst-icon-input'),
+            commentatorSaveStatus: getEl('commentator-save-status'),
+            // === ▲▲▲ 新規追加 ===
+
+            // === ▼▼▼ 修正: ステージ設定 ▼▼▼ ===
             stageChecklistContainer: getEl('stage-checklist-container'),
             selectAllButton: getEl('select-all-stages'),
             deselectAllButton: getEl('deselect-all-stages'),
-            nameSaveStatus: getEl('name-save-status'),
-            stageSaveStatus: getEl('stage-save-status')
+            stageSaveStatus: getEl('stage-save-status'),
+            stageToggleBtn: getEl('stage-toggle-btn'),
+            stageSettingsContent: getEl('stage-settings-content')
+            // === ▲▲▲ 修正 ===
         };
 
         let allStagesData = []; // stages.jsonから読み込んだ全ステージ名
-        let nameSaveTimer = null; // 大会名保存ステータス用タイマー
-        let stageSaveTimer = null; // ステージ保存ステータス用タイマー
+        let nameSaveTimer = null;
+        let stageSaveTimer = null;
+        // === ▼▼▼ 新規追加 ▼▼▼ ===
+        let commentatorSaveTimer = null;
+        // === ▲▲▲ 新規追加 ===
 
         /**
          * ページの読み込みと初期化
@@ -342,14 +461,19 @@
 
                 allStagesData = await stagesRes.json();
                 const state = doc.data() || {};
-                const currentName = state.tournamentName || '';
-                const unusedStages = state.unusedStages || []; // 使用しないステージの配列
 
                 // 2. 大会名フォームに値を設定
-                DOMElements.nameInput.value = currentName;
+                DOMElements.nameInput.value = state.tournamentName || '';
+
+                // === ▼▼▼ 新規追加: 実況解説者情報の読み込み ▼▼▼ ===
+                DOMElements.casterNameInput.value = state.casterName || '';
+                DOMElements.casterIconInput.value = state.casterIconUrl || '';
+                DOMElements.analystNameInput.value = state.analystName || '';
+                DOMElements.analystIconInput.value = state.analystIconUrl || '';
+                // === ▲▲▲ 新規追加 ===
 
                 // 3. ステージチェックリストを生成
-                renderStageChecklist(unusedStages);
+                renderStageChecklist(state.unusedStages || []);
 
             } catch (error) {
                 console.error("初期化エラー:", error);
@@ -359,14 +483,11 @@
 
         /**
          * ステージチェックリストを描画し、イベントリスナーを設定
-         * (=== 修正: チェックボックスを削除し、is-active クラスを適用 ===)
          */
         const renderStageChecklist = (unusedStages = []) => {
             let checklistHTML = '';
             allStagesData.forEach(stageName => {
-                // unusedStagesに含まれて *いない* -> 使用する (is-active)
                 const isUsed = !unusedStages.includes(stageName);
-
                 checklistHTML += `
                     <div class="stage-check-item ${isUsed ? 'is-active' : ''}" 
                          data-stage-name="${stageName}">
@@ -375,24 +496,18 @@
                 `;
             });
             DOMElements.stageChecklistContainer.innerHTML = checklistHTML;
-
-            // クリックイベントリスナーを設定
             setupChecklistBehavior();
         };
 
         /**
          * チェックリストの挙動をセットアップ
-         * (=== 修正: アイテムクリックでトグルと保存 ===)
          */
         const setupChecklistBehavior = () => {
             DOMElements.stageChecklistContainer.querySelectorAll('.stage-check-item').forEach(item => {
-
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // 1. クラスをトグル
                     item.classList.toggle('is-active');
-                    // 2. 自動保存
-                    saveStageSettings();
+                    saveStageSettings(); // 自動保存
                 });
             });
         };
@@ -413,24 +528,38 @@
             }
         };
 
+        // === ▼▼▼ 新規追加: 実況解説者情報の保存 ▼▼▼ ===
+        /**
+         * 実況解説者情報をFirestoreに保存
+         */
+        const saveCommentatorInfo = async () => {
+            try {
+                await sessionDocRef.update({
+                    casterName: DOMElements.casterNameInput.value,
+                    casterIconUrl: DOMElements.casterIconInput.value,
+                    analystName: DOMElements.analystNameInput.value,
+                    analystIconUrl: DOMElements.analystIconInput.value
+                });
+                showSaveStatus(DOMElements.commentatorSaveStatus, "保存しました", commentatorSaveTimer);
+            } catch (error) {
+                console.error("実況解説者情報の保存エラー:", error);
+                showSaveStatus(DOMElements.commentatorSaveStatus, "保存失敗", commentatorSaveTimer);
+            }
+        };
+        // === ▲▲▲ 新規追加 ===
+
         /**
          * ステージ設定をFirestoreに保存
-         * (=== 修正: .is-active クラスを見て 'unusedStages' を構築 ===)
          */
         const saveStageSettings = async () => {
             try {
-                // 「使用しないステージ」の配列を構築
                 const unusedStages = [];
                 const items = DOMElements.stageChecklistContainer.querySelectorAll('.stage-check-item');
-
                 items.forEach(item => {
-                    // 'is-active' クラスを *持っていない* ものが「使用しない」ステージ
                     if (!item.classList.contains('is-active')) {
                         unusedStages.push(item.dataset.stageName);
                     }
                 });
-
-                // Firestoreに更新をかける
                 await sessionDocRef.update({
                     unusedStages: unusedStages
                 });
@@ -442,7 +571,7 @@
         };
 
         /**
-         * 保存ステータスを表示 (3秒後に非表示)
+         * 保存ステータスを表示 (2秒後に非表示)
          */
         const showSaveStatus = (element, message, timer) => {
             if (timer) clearTimeout(timer);
@@ -455,16 +584,13 @@
 
         /**
          * ステージ一括操作
-         * (=== 修正: setAllCheckboxes を setAllStagesActive にリネーム ===)
          */
         const setAllStagesActive = (isActive) => {
             const items = DOMElements.stageChecklistContainer.querySelectorAll('.stage-check-item');
             items.forEach(item => {
-                // classList.toggle(className, force) を使って状態を強制
                 item.classList.toggle('is-active', isActive);
             });
-            // 変更が終わってから一度だけ保存処理を呼ぶ
-            saveStageSettings();
+            saveStageSettings(); // 自動保存
         };
 
         // --- イベントリスナーの設定 ---
@@ -475,9 +601,24 @@
         // 大会名入力欄 (フォーカスが外れたら保存)
         DOMElements.nameInput.addEventListener('change', saveTournamentName);
 
-        // ステージ一括操作ボタン (=== 修正: 呼び出す関数名を変更 ===)
+        // === ▼▼▼ 新規追加: 実況解説者情報の保存イベント ▼▼▼ ===
+        DOMElements.casterNameInput.addEventListener('change', saveCommentatorInfo);
+        DOMElements.casterIconInput.addEventListener('change', saveCommentatorInfo);
+        DOMElements.analystNameInput.addEventListener('change', saveCommentatorInfo);
+        DOMElements.analystIconInput.addEventListener('change', saveCommentatorInfo);
+        // === ▲▲▲ 新規追加 ===
+
+        // ステージ一括操作ボタン
         DOMElements.selectAllButton.addEventListener('click', () => setAllStagesActive(true));
         DOMElements.deselectAllButton.addEventListener('click', () => setAllStagesActive(false));
+
+        // === ▼▼▼ 新規追加: 折りたたみボタンのイベント ▼▼▼ ===
+        DOMElements.stageToggleBtn.addEventListener('click', () => {
+            const isCollapsed = DOMElements.stageSettingsContent.classList.toggle('is-collapsed');
+            DOMElements.stageToggleBtn.classList.toggle('is-collapsed', isCollapsed);
+            DOMElements.stageToggleBtn.title = isCollapsed ? "展開する" : "折りたたむ";
+        });
+        // === ▲▲▲ 新規追加 ===
 
     </script>
 </body>
