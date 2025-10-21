@@ -12,7 +12,9 @@
     --outline-color: #E0E0E0;
     --greyed-out-color: #757575;
     --xp-highlight-color: #B3261E;
+    /* Trouble color? */
     --xp-highlight-bg: #F9DEDC;
+    /* Trouble bg? */
     --badge-operator-bg: #E3F2FD;
     --badge-operator-text: #0D47A1;
     --badge-commentator-bg: #E8F5E9;
@@ -23,7 +25,9 @@
     --badge-me-text: #E65100;
     --status-connected: #34A853;
     --status-connecting: #d6b34a;
+    /* Waiting color */
     --status-disconnected: #a73f35;
+    /* Lag color */
     --winner-alpha-color: #d0be08;
     --winner-bravo-color: #3a0ccd;
 
@@ -243,11 +247,16 @@ main {
 }
 
 .tab-action-bar {
-    /* ボックスモデル */
+    display: flex;
+    flex-direction: column;
+    /* 子要素を縦に並べる */
+    /* align-items: center;  中央揃えが不要ならコメントアウトまたは削除 */
+    align-items: stretch;
+    /* 子要素を横幅いっぱいに広げる場合 */
+    /* justify-content: center; ← 縦方向の中央揃えにはなりません */
     flex-shrink: 0;
     padding: var(--space-md);
     border-top: 1px solid var(--outline-color);
-    /* 装飾 */
     background-color: #F7F7F7;
 
     h2 {
@@ -255,6 +264,7 @@ main {
         margin-bottom: var(--space-sm);
         /* タイポグラフィ */
         font-size: var(--font-size-base);
+
 
         @media (max-width: 600px) {
             /* タイポグラフィ */
@@ -383,6 +393,7 @@ main {
     display: flex;
     align-items: stretch;
     gap: var(--space-sm);
+    width: 100%;
 
     input {
         /* ボックスモデル */
@@ -455,6 +466,26 @@ main {
             background-color: var(--badge-me-bg);
         }
     }
+
+    /* システムメッセージ用 */
+    &.is-system-message {
+        justify-content: center;
+
+        .comment-item {
+            background-color: #e0e0e0;
+            border-color: #bdbdbd;
+            max-width: 90%;
+
+            .comment-header {
+                justify-content: center;
+            }
+
+            .text {
+                text-align: center;
+                font-style: italic;
+            }
+        }
+    }
 }
 
 .comment-item {
@@ -521,6 +552,12 @@ main {
             color: var(--badge-me-text) !important;
             /* 装飾 */
             background-color: transparent !important;
+        }
+
+        &.is-system {
+            /* システム用 */
+            color: #616161 !important;
+            background-color: #f5f5f5 !important;
         }
     }
 
@@ -595,29 +632,58 @@ main {
     display: flex;
     justify-content: center;
     gap: var(--space-md);
+}
 
-    button {
-        /* ボックスモデル */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 7.2rem;
-        height: 5.6rem;
-        border: 1px solid var(--outline-color);
-        /* タイポグラフィ */
-        color: var(--primary-color);
-        /* 装飾 */
-        background-color: var(--surface-color);
-        border-radius: var(--radius-lg);
-        /* その他 */
-        cursor: pointer;
+/* 台本アクションバー内のボタン共通スタイル */
+.script-action-bar button,
+.modal-button-bar button {
+    /* ボックスモデル */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 7.2rem;
+    height: 5.6rem;
+    padding: 0 var(--space-md);
+    /* 横パディング追加 */
+    border: 1px solid var(--outline-color);
+    /* タイポグラフィ */
+    font-size: var(--font-size-base);
+    /* 文字サイズ */
+    font-weight: 500;
+    color: var(--primary-color);
+    /* 装飾 */
+    background-color: var(--surface-color);
+    border-radius: var(--radius-lg);
+    /* その他 */
+    cursor: pointer;
+    transition: background-color 0.2s;
 
-        @media (max-width: 600px) {
-            /* ボックスモデル */
-            width: 6.4rem;
-            height: 4.8rem;
-        }
+    &:hover {
+        background-color: #f0f0f0;
     }
+
+    .material-symbols-rounded {
+        margin-right: var(--space-xs);
+        /* アイコンとテキストの間隔 */
+    }
+
+    @media (max-width: 600px) {
+        /* ボックスモデル */
+        min-width: 6.4rem;
+        height: 4.8rem;
+        padding: 0 var(--space-sm);
+        /* タイポグラフィ */
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* 話題表・用語集ボタン用コンテナ */
+.modal-button-bar {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    width: 100%;
+    /* アクションバー全体に広がるように */
 }
 
 .team-display-area {
@@ -1047,22 +1113,47 @@ main {
     /* 配置 */
     position: relative;
     /* ボックスモデル */
+    display: flex;
+    /* Flexboxに変更 */
+    flex-direction: column;
+    /* 縦並び */
     width: 90%;
     max-width: 80rem;
     max-height: 90vh;
     padding: var(--space-lg);
-    overflow-y: auto;
+    /* overflow-y: auto; スクロールバーは子要素に任せる */
     /* 装飾 */
     background: var(--surface-container-low-color);
     border-radius: var(--radius-lg);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    flex-shrink: 0;
+    /* ヘッダーは縮まない */
+}
+
+.modal-body {
+    flex-grow: 1;
+    /* 内容が伸びる */
+    overflow-y: auto;
+    /* 内容が多い場合にスクロール */
+    padding-right: var(--space-sm);
+    /* スクロールバーとの間隔 */
+}
+
+
 .modal-close {
     /* 配置 */
     position: sticky;
-    top: calc(var(--space-lg) * -1);
-    float: right;
+    /* ヘッダー内に留まる */
+    top: 0;
+    /* 上端に固定 */
+    /* float: right; 廃止 */
     z-index: 10;
     /* ボックスモデル */
     display: flex;
@@ -1070,7 +1161,7 @@ main {
     justify-content: center;
     width: 4rem;
     height: 4rem;
-    margin: calc(var(--space-lg) * -1) calc(var(--space-lg) * -1) 0 0;
+    /* margin: calc(var(--space-lg) * -1) calc(var(--space-lg) * -1) 0 0; 廃止 */
     border: 1px solid var(--outline-color);
     /* 装飾 */
     background: #EAEAEA;
@@ -1079,9 +1170,12 @@ main {
     cursor: pointer;
 }
 
-#comment-modal-heading {
+#comment-modal-heading,
+#topic-modal h2,
+#glossary-modal h2 {
+    /* モーダルタイトル共通 */
     /* タイポグラフィ */
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--on-surface-variant-color);
 }
@@ -1094,6 +1188,34 @@ main {
     font-weight: 600;
     color: var(--on-surface-color);
 }
+
+/* 話題表・用語集モーダルのリストスタイル */
+#topic-modal ul,
+#glossary-modal dl {
+    margin: 0;
+    padding-left: var(--space-lg);
+    /* 字下げ */
+}
+
+#topic-modal li {
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-md);
+    line-height: 1.6;
+}
+
+#glossary-modal dt {
+    font-weight: 700;
+    margin-top: var(--space-md);
+    font-size: var(--font-size-md);
+}
+
+#glossary-modal dd {
+    margin-left: var(--space-md);
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+}
+
 
 .stage-grid {
     /* ボックスモデル */
@@ -1191,6 +1313,23 @@ main {
         border-radius: var(--radius-md);
     }
 }
+
+.match-settings-header {
+    /* 対戦設定カードのヘッダー */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.reset-match-settings-button {
+    /* 対戦設定リセットボタン */
+    padding: var(--space-xs) var(--space-sm);
+    border-color: var(--xp-highlight-color);
+    color: var(--xp-highlight-color);
+    font-size: var(--font-size-xs);
+}
+
 
 .team-selector {
     /* ボックスモデル */
@@ -1443,6 +1582,11 @@ main {
 }
 
 /* 7. ユーティリティとアニメーション */
+.hidden {
+    /* JSで表示/非表示を切り替える用 */
+    display: none !important;
+}
+
 .pc-only {
     @media (max-width: 740px) {
         /* ボックスモデル */
@@ -1492,7 +1636,8 @@ main {
 .stream-view-selector {
     /* ボックスモデル */
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(6, 1fr);
+    /* 6列に変更 */
     gap: var(--space-sm);
     margin-bottom: var(--space-lg);
 }
@@ -1547,17 +1692,30 @@ main {
 /* 9. 配信ステータスセレクター */
 .stream-status-selector {
     /* ボックスモデル */
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: var(--space-sm);
+    display: flex;
+    /* Flexboxに変更 */
+    flex-wrap: wrap;
+    /* 折り返し */
+    gap: var(--space-md);
+    /* グループ間の間隔 */
     margin-bottom: var(--space-lg);
 }
 
-.stream-status-selector button {
-    /* ボックスモデル */
+/* グループ共通 */
+.status-group-1,
+.status-group-2 {
+    display: flex;
+    gap: var(--space-sm);
+    flex-grow: 1;
+    /* グループが均等に伸びる */
+}
+
+/* グループ1ボタン (対戦外/待機中/対戦中) */
+.status-group-1 button {
+    flex: 1;
+    /* ボタンが均等に広がる */
     display: flex;
     flex-direction: row;
-    /* (row + 少ないpaddingで高さを抑える) */
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
@@ -1575,83 +1733,166 @@ main {
     transition: all 0.2s;
 }
 
-.stream-status-selector button .material-symbols-rounded {
-    /* タイポグラフィ */
+.status-group-1 button .material-symbols-rounded {
     font-size: var(--font-size-lg);
 }
 
-.stream-status-selector button:hover {
-    /* 装飾 */
+.status-group-1 button:hover {
     background-color: var(--primary-container-color);
 }
 
-.stream-status-selector button.active {
-    /* ボックスモデル */
+.status-group-1 button.active {
     border-color: var(--primary-color);
-    /* タイポグラフィ */
     font-weight: 700;
     color: white;
-    /* 装飾 */
     background-color: var(--primary-color);
+}
+
+/* グループ2ボタン (ラグ/トラブル) - トグル式 */
+.status-group-2 button {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--outline-color);
+    /* 通常時は枠線 */
+    /* タイポグラフィ */
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--on-surface-variant-color);
+    /* 通常時の文字色 */
+    /* 装飾 */
+    background-color: transparent;
+    /* 通常時は背景なし */
+    border-radius: var(--radius-lg);
+    /* その他 */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.status-group-2 button .material-symbols-rounded {
+    font-size: var(--font-size-lg);
+}
+
+.status-group-2 button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    /* 少し暗く */
+}
+
+.status-group-2 button.active.is-lag {
+    /* ラグ対応中 */
+    border-color: var(--status-disconnected);
+    font-weight: 700;
+    color: white;
+    background-color: var(--status-disconnected);
+}
+
+.status-group-2 button.active.is-trouble {
+    /* トラブル発生中 */
+    border-color: var(--xp-highlight-color);
+    font-weight: 700;
+    color: white;
+    background-color: var(--xp-highlight-color);
 }
 
 /* 実況解説ページ用 (表示専用) - スタイル変更 */
 .stream-status-display-only {
     /* ボックスモデル */
-    display: grid;
-    /* 1列に変更して横幅いっぱいを使う */
-    grid-template-columns: 1fr;
+    display: flex;
+    /* Flexboxに変更 */
     gap: var(--space-sm);
     margin-bottom: var(--space-lg);
+    min-height: 5rem;
+    /* 最小高さを確保 */
+}
+
+/* 2アイテム表示時のコンテナスタイル */
+.stream-status-display-only.two-items {
+    justify-content: space-between;
+    /* 均等配置 */
 }
 
 .stream-status-display-only .status-tile {
     /* ボックスモデル */
     display: none;
-    /* (JSが .is-visible を付与して表示) */
+    /* デフォルト非表示 */
+    flex-grow: 1;
+    /* 横幅いっぱいに伸びる */
+    flex-basis: 100%;
+    /* 基本は100%幅 */
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
-    /* paddingを大きくして目立たせる */
     padding: var(--space-sm);
     border: 2px solid transparent;
-    /* 枠線を少し太く */
     /* タイポグラフィ */
     font-size: var(--font-size-md);
-    /* フォントサイズを大きく */
     font-weight: 700;
     /* 装飾 */
     border-radius: var(--radius-lg);
 }
 
+/* 2アイテム表示時のタイルスタイル */
+.stream-status-display-only.two-items .status-tile {
+    flex-basis: 48%;
+    /* 2分割時の幅 (gap考慮) */
+    flex-grow: 0;
+    /* 伸びない */
+}
+
 .stream-status-display-only .status-tile.is-visible {
-    /* ボックスモデル */
     display: flex;
 }
 
-.stream-status-display-only .status-tile.is-lag {
-    /* タイポグラフィ */
-    color: white;
-    /* 白文字に変更 */
-    /* 装飾 */
-    background-color: var(--status-disconnected);
-    /* より強い赤色に変更 */
-    border-color: var(--status-disconnected);
-}
-
 .stream-status-display-only .status-tile.is-waiting {
-    /* タイポグラフィ */
     color: var(--on-surface-color);
-    /* 黒文字に変更 */
-    /* 装飾 */
     background-color: var(--status-connecting);
-    /* より強い黄色に変更 */
     border-color: var(--status-connecting);
 }
+
+.stream-status-display-only .status-tile.is-ingame {
+    /* 対戦中 */
+    color: white;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.stream-status-display-only .status-tile.is-lag {
+    color: white;
+    background-color: var(--status-disconnected);
+    border-color: var(--status-disconnected);
+    animation: pulse-danger 1.5s infinite;
+    /* ラグのみ */
+}
+
+.stream-status-display-only .status-tile.is-trouble {
+    /* トラブル */
+    color: white;
+    background-color: var(--xp-highlight-color);
+    border-color: var(--xp-highlight-color);
+}
+
 
 .stream-status-display-only .status-tile .material-symbols-rounded {
     /* タイポグラフィ */
     font-size: var(--font-size-xl);
-    /* アイコンサイズを大きく */
+}
+
+/* ラグ対応用の点滅アニメーション (既存のpulseとは別で定義) */
+@keyframes pulse-danger {
+    0% {
+        box-shadow: 0 0 0 0 rgba(167, 63, 53, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 1rem 1.5rem rgba(167, 63, 53, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(167, 63, 53, 0);
+    }
 }

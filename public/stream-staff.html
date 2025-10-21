@@ -76,9 +76,21 @@
                 <section id="stream-view-section">
                     <h2>配信画面</h2>
                     <div class="stream-view-selector" id="stream-view-selector">
+                        <button id="stream-view-logo" data-view="logo">
+                            <span class="material-symbols-rounded">photo_camera</span>
+                            ロゴ
+                        </button>
                         <button id="stream-view-matchInfo" data-view="matchInfo">
                             <span class="material-symbols-rounded">scoreboard</span>
                             対戦情報
+                        </button>
+                        <button id="stream-view-alphaDetail" data-view="alphaDetail">
+                            <span class="material-symbols-rounded">person</span>
+                            アルファ詳細
+                        </button>
+                        <button id="stream-view-bravoDetail" data-view="bravoDetail">
+                            <span class="material-symbols-rounded">person</span>
+                            ブラボー詳細
                         </button>
                         <button id="stream-view-stageList" data-view="stageList">
                             <span class="material-symbols-rounded">distance</span>
@@ -89,24 +101,42 @@
                             リプレイ映像
                         </button>
                     </div>
-
+                    <h2>配信状態</h2>
                     <div class="stream-status-selector" id="stream-status-selector">
-                        <button id="status-btn-normal" data-status="normal" class="active">
-                            <span class="material-symbols-rounded">check_circle</span>
-                            通常
-                        </button>
-                        <button id="status-btn-lag" data-status="lag">
-                            <span class="material-symbols-rounded">error</span>
-                            ラグ対応中
-                        </button>
-                        <button id="status-btn-waiting" data-status="waiting">
-                            <span class="material-symbols-rounded">hourglass_empty</span>
-                            試合待機中
-                        </button>
+                        <div class="status-group-1">
+                            <button id="status-match-outside" data-match-status="outside">
+                                <span class="material-symbols-rounded">cancel</span>
+                                対戦外
+                            </button>
+                            <button id="status-match-waiting" data-match-status="waiting">
+                                <span class="material-symbols-rounded">hourglass_empty</span>
+                                対戦待機中
+                            </button>
+                            <button id="status-match-ingame" data-match-status="ingame">
+                                <span class="material-symbols-rounded">swords</span>
+                                対戦中
+                            </button>
+                        </div>
+                        <div class="status-group-2">
+                            <button id="status-incident-lag" data-incident-status="lag" class="incident-status-btn">
+                                <span class="material-symbols-rounded">error</span>
+                                ラグ対応
+                            </button>
+                            <button id="status-incident-trouble" data-incident-status="trouble"
+                                class="incident-status-btn">
+                                <span class="material-symbols-rounded">warning</span>
+                                トラブル発生
+                            </button>
+                        </div>
                     </div>
                 </section>
                 <section class="card" id="match-settings-card">
-                    <h2>対戦設定</h2>
+                    <div class="match-settings-header">
+                        <h2>対戦設定</h2>
+                        <button id="reset-match-settings-button" class="outline-button reset-match-settings-button">
+                            <span class="material-symbols-rounded">restart_alt</span> リセット
+                        </button>
+                    </div>
                     <div class="form-group"><label for="round-info-input">ラウンド情報</label><input type="text"
                             id="round-info-input" placeholder="例: 決勝トーナメント 第1試合"></div>
                     <div class="form-group"><label>試合形式</label>
@@ -116,7 +146,6 @@
                     <div class="form-group">
                         <div class="label-with-button">
                             <label>ステージ & 勝敗</label>
-                            <button id="reset-stages-button" class="outline-button small-button">リセット</button>
                         </div>
                         <div class="stage-winner-rows" id="stage-winner-rows"></div>
                     </div>
@@ -166,30 +195,42 @@
 
     <div id="comment-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" id="comment-modal-close"><span
-                    class="material-symbols-rounded">close</span></button>
-            <h2 id="comment-modal-heading">新着コメント</h2>
-            <p id="comment-modal-text"></p>
+            <div class="modal-header">
+                <h2 id="comment-modal-heading">新着コメント</h2>
+                <button class="modal-close" id="comment-modal-close"><span
+                        class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="modal-body">
+                <p id="comment-modal-text"></p>
+            </div>
         </div>
     </div>
     <div id="stage-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" id="stage-modal-close"><span
-                    class="material-symbols-rounded">close</span></button>
-            <h2>ステージを選択</h2>
-            <div class="stage-grid" id="stage-grid"></div>
+            <div class="modal-header">
+                <h2>ステージを選択</h2>
+                <button class="modal-close" id="stage-modal-close"><span
+                        class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="stage-grid" id="stage-grid"></div>
+            </div>
         </div>
     </div>
     <div id="name-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" id="name-modal-close"><span
-                    class="material-symbols-rounded">close</span></button>
-            <h2>表示名を設定</h2>
-            <div class="form-group">
-                <label for="name-input">チャットで表示される名前を入力してください。</label>
-                <input type="text" id="name-input" placeholder="例: 配信担当A">
+            <div class="modal-header">
+                <h2>表示名を設定</h2>
+                <button class="modal-close" id="name-modal-close"><span
+                        class="material-symbols-rounded">close</span></button>
             </div>
-            <button id="save-name-button" class="primary-button">保存</button>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name-input">チャットで表示される名前を入力してください。</label>
+                    <input type="text" id="name-input" placeholder="例: 配信担当A">
+                </div>
+                <button id="save-name-button" class="primary-button">保存</button>
+            </div>
         </div>
     </div>
 
@@ -219,25 +260,24 @@
         // グローバル変数 (静的データ)
         let teamsData = [], scriptData = [], stagesData = [];
         let myDisplayName = '';
+        let unusedStages = [];
+        let currentStreamState = { match: 'outside', incident: 'none' }; // 修正: streamStateをオブジェクトで管理
 
-        let unusedStages = []; // 使用しないステージのグローバルリスト
-        let currentStreamStatus = 'normal'; // ▼▼▼ 新規追加: 現在のステータスを追跡 ▼▼▼
-
-        // 自分のセッションIDをlocalStorageから取得、なければ生成
+        // 自分のセッションID
         let mySessionId = localStorage.getItem('mySessionId');
         if (!mySessionId || !mySessionId.startsWith('stream-')) {
             mySessionId = `stream-${Math.random().toString(36).substr(2, 9)}`;
             localStorage.setItem('mySessionId', mySessionId);
         }
 
-        // 監視対象のFirestoreドキュメント
+        // Firestore
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
         let currentlyDisplayedTeam = 'alpha'; // モバイル表示用
         const pageLoadTime = Date.now();
         let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
-        let isViewLocked = false; // ユーザーが手動でチーム表示を変更したか
+        let isViewLocked = false;
 
-        // DOM要素のキャッシュ
+        // DOM要素
         const getEl = (id) => document.getElementById(id);
         const DOMElements = {
             connectionIndicator: getEl('connection-indicator'), connectionStatus: getEl('connection-status'),
@@ -252,20 +292,25 @@
             teamAlphaCard: getEl('team-alpha-card'), teamBravoCard: getEl('team-bravo-card'), teamAlphaCardWrapper: getEl('team-alpha-card-wrapper'), teamBravoCardWrapper: getEl('team-bravo-card-wrapper'),
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
             roundInfoInput: getEl('round-info-input'), bo3Btn: getEl('bo3-btn'), bo5Btn: getEl('bo5-btn'), stageWinnerRows: getEl('stage-winner-rows'),
-            resetStagesButton: getEl('reset-stages-button'),
+            resetMatchSettingsButton: getEl('reset-match-settings-button'), // 修正: 新しいリセットボタン
             streamViewSelector: getEl('stream-view-selector'),
+            // ▼▼▼ 配信画面ボタン ▼▼▼
+            streamViewLogo: getEl('stream-view-logo'),
             streamViewMatchInfo: getEl('stream-view-matchInfo'),
+            streamViewAlphaDetail: getEl('stream-view-alphaDetail'),
+            streamViewBravoDetail: getEl('stream-view-bravoDetail'),
             streamViewStageList: getEl('stream-view-stageList'),
             streamViewReplay: getEl('stream-view-replay'),
-            // ▼▼▼ 新規追加 ▼▼▼
-            streamStatusSelector: getEl('stream-status-selector'),
-            statusBtnNormal: getEl('status-btn-normal'),
-            statusBtnLag: getEl('status-btn-lag'),
-            statusBtnWaiting: getEl('status-btn-waiting'),
-            // ▲▲▲ 新規追加 ▲▲▲
+            // ▼▼▼ 配信状態ボタン ▼▼▼
+            streamStatusSelector: getEl('stream-status-selector'), // コンテナ
+            statusMatchOutside: getEl('status-match-outside'),
+            statusMatchWaiting: getEl('status-match-waiting'),
+            statusMatchIngame: getEl('status-match-ingame'),
+            statusIncidentLag: getEl('status-incident-lag'),
+            statusIncidentTrouble: getEl('status-incident-trouble'),
         };
 
-        // 接続ステータスをUIに反映
+        // 接続ステータス表示
         const setConnectionStatus = (status) => {
             DOMElements.connectionIndicator.classList.remove('is-connected', 'is-connecting', 'is-disconnected');
             DOMElements.connectionIndicator.classList.add(`is-${status}`);
@@ -273,92 +318,77 @@
             DOMElements.connectionStatus.textContent = statusText[status];
         };
 
-        // 表示中のチームがFirestoreの対戦チームと同期しているか確認
+        // 表示チームの同期ズレ確認
         const checkSyncStatus = () => {
             if (!officialMatchup.alphaTeamId) return;
             const isDesynced = DOMElements.viewAlphaSelect.value !== officialMatchup.alphaTeamId ||
                 DOMElements.viewBravoSelect.value !== officialMatchup.bravoTeamId;
-            // 同期ズレがあれば同期ボタンをハイライト
             if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
             if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
         };
 
-        // ▼▼▼ 新規追加: システムコメント送信 ▼▼▼
+        // システムコメント送信
         const sendSystemComment = (text) => {
             if (!text) return;
             db.runTransaction(async (transaction) => {
                 const doc = await transaction.get(sessionDocRef);
                 const currentComments = doc.data().comments || [];
                 const newComment = {
-                    id: Math.random().toString(36).substr(2, 9),
-                    text,
-                    senderId: 'system', // システムとして送信
-                    role: 'システム',
-                    displayName: 'システム',
-                    timestamp: new Date()
+                    id: Math.random().toString(36).substr(2, 9), text, senderId: 'system',
+                    role: 'システム', displayName: 'システム', timestamp: new Date()
                 };
                 const updatedComments = [...currentComments, newComment].slice(-100);
                 transaction.update(sessionDocRef, { comments: updatedComments });
             });
         };
-        // ▲▲▲ 新規追加 ▲▲▲
 
-
-        // Firestoreのセッション情報を監視
+        // Firestore 監視
         sessionDocRef.onSnapshot((doc) => {
             if (!doc.exists) { setConnectionStatus('disconnected'); return; }
             const state = doc.data();
             setConnectionStatus('connected');
-
             unusedStages = state.unusedStages || [];
 
-            // 対戦カードの更新
+            // 対戦カード更新
             if (state.matchup && state.matchup.alphaTeamId) {
                 officialMatchup = state.matchup;
                 DOMElements.matchupAlphaSelect.value = state.matchup.alphaTeamId;
                 DOMElements.matchupBravoSelect.value = state.matchup.bravoTeamId;
-
                 if (!isViewLocked) {
-                    // 表示がロックされていなければ、セレクトボックスを自動更新
                     DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
                     DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
                     updateTeamDisplay();
                 } else {
-                    // ロックされている場合は同期ズレをチェック
                     checkSyncStatus();
                 }
             }
 
-            // ▼▼▼ 新規追加: 配信ステータス変更監視 & システムコメント送信 ▼▼▼
-            const newStatus = state.streamStatus || 'normal';
-            if (newStatus !== currentStreamStatus) {
-                // ラグ対応開始
-                if (newStatus === 'lag') {
-                    sendSystemComment('【システム】ラグ対応を開始しました。');
-                }
-                // ラグ対応終了 (他のステータスに変わった)
-                else if (currentStreamStatus === 'lag') {
-                    sendSystemComment('【システム】ラグ対応が終了しました。');
-                }
-                currentStreamStatus = newStatus; // グローバル変数を更新
+            // 配信状態変更監視 & システムコメント
+            const newStreamState = state.streamState || { match: 'outside', incident: 'none' };
+            const oldIncident = currentStreamState.incident;
+            const newIncident = newStreamState.incident;
+
+            if (newIncident !== oldIncident) {
+                if (newIncident === 'lag') sendSystemComment('【システム】ラグ対応を開始しました。');
+                else if (oldIncident === 'lag') sendSystemComment('【システム】ラグ対応が終了しました。');
+
+                if (newIncident === 'trouble') sendSystemComment('【システム】トラブル対応を開始しました。');
+                else if (oldIncident === 'trouble') sendSystemComment('【システム】トラブル対応が終了しました。');
             }
-            renderStreamStatus(newStatus); // UIのレンダリング
-            // ▲▲▲ 新規追加 ▲▲▲
+            currentStreamState = newStreamState; // グローバル変数を更新
+            renderStreamStatus(currentStreamState); // UIのレンダリング
 
-
-            // 各コンポーネントを描画
+            // 各コンポーネント描画
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchSettings(state);
             renderStreamViewSelector(state.currentStreamView);
 
-            // 新着コメントモーダルの表示判定
+            // 新着コメントモーダル表示判定 (修正：システムメッセージも表示)
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
-
-                // ↑↑↑ 「if (lastComment.role === 'システム') return;」の行を削除しました ↑↑↑
-
+                // --- 「if (lastComment.role === 'システム') return;」 は削除済み ---
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role, lastComment.displayName);
@@ -367,21 +397,18 @@
             }
         }, (error) => { setConnectionStatus('disconnected'); });
 
-        // コメント履歴を描画
+        // コメント履歴描画
         const renderComments = (comments = []) => {
             DOMElements.commentHistory.innerHTML = comments.map(c => {
                 const isMe = c.senderId === mySessionId;
-                let badgeClass = 'is-other'; let badgeText = c.role;
+                let badgeClass = ''; let badgeText = c.role;
                 if (isMe) { badgeClass = 'is-me'; badgeText = 'Me'; }
                 else if (c.role === '運営') { badgeClass = 'is-operator'; }
                 else if (c.role === '実況解説') { badgeClass = 'is-commentator'; }
                 else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
-                // ▼▼▼ 新規追加: システムメッセージ用 ▼▼▼
                 else if (c.role === 'システム') { badgeClass = 'is-system'; badgeText = 'システム'; }
 
                 const displayNameHTML = c.displayName ? `<span class="display-name">${c.displayName}</span>` : '';
-
-                // ▼▼▼ 修正: システムメッセージ用のラッパーlassを追加 ▼▼▼
                 let wrapperClass = isMe ? 'is-me' : '';
                 if (c.role === 'システム') wrapperClass = 'is-system-message';
 
@@ -392,11 +419,10 @@
                            </div>
                          </div>`;
             }).join('');
-            // 自動で一番下にスクロール
             DOMElements.commentHistory.scrollTop = DOMElements.commentHistory.scrollHeight;
         };
 
-        // 台本を描画 (現在の進行状況をハイライト)
+        // 台本描画
         const renderScript = (currentIndex = 0) => {
             if (!scriptData || scriptData.length === 0) return;
             DOMElements.scriptCardContent.innerHTML = scriptData.map((p, i) => {
@@ -405,28 +431,29 @@
                 if (i === currentIndex) statusClass = 'is-current';
                 return `<div class="script-paragraph ${statusClass}" data-index="${i}" id="script-item-${i}"><b>${p.speaker}:</b> ${p.line}</div>`
             }).join('');
-            // 現在の台本まで自動スクロール
             const currentEl = getEl(`script-item-${currentIndex}`);
             if (currentEl) currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
-        // チーム情報カードのHTMLを生成
+        // チーム情報カードHTML生成
         const createTeamCardHTML = (teamId) => {
             const team = teamsData.find(t => t.id === teamId);
             if (!team) return '<h3>チーム情報を読み込み中...</h3>';
+            // チームデータからプレイヤー情報を抽出（XPを数値に変換）
             const players = [
-                { name: team.p1_name, xp: team.p1_xp, weapon: team.p1_weapon },
-                { name: team.p2_name, xp: team.p2_xp, weapon: team.p2_weapon },
-                { name: team.p3_name, xp: team.p3_xp, weapon: team.p3_weapon },
-                { name: team.p4_name, xp: team.p4_xp, weapon: team.p4_weapon }
+                { name: team.p1_name, xp: parseInt(team.p1_xp, 10) || 0, weapon: team.p1_weapon },
+                { name: team.p2_name, xp: parseInt(team.p2_xp, 10) || 0, weapon: team.p2_weapon },
+                { name: team.p3_name, xp: parseInt(team.p3_xp, 10) || 0, weapon: team.p3_weapon },
+                { name: team.p4_name, xp: parseInt(team.p4_xp, 10) || 0, weapon: team.p4_weapon }
             ];
+
             const playerListHTML = players.filter(p => p.name).map(p =>
                 `<div class="player-tile">
                     <div class="player-tile-top">
                         <span class="player-name">${p.name}</span>
-                        <span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp}</span>
+                        <span class="xp-badge ${p.xp >= 3200 ? 'is-highlight' : ''}">XP: ${p.xp || '----'}</span>
                     </div>
-                    <div class="player-tile-bottom">${(p.weapon || '').replace(/\//g, ' / ')}</div>
+                     <div class="player-tile-bottom">${(p.weapon || '').replace(/\//g, ' / ')}</div>
                 </div>`
             ).join('');
             return `<div class="team-card-header">
@@ -434,14 +461,15 @@
                         <h2 class="team-name">${team.teamName}</h2>
                     </div>
                     <h3>プレイヤー情報</h3>
-                    <div class="player-tiles-container">${playerListHTML}</div>
-                    <div class="info-tile"><h3>チームコメント</h3><p>${team.comment}</p></div>
-                    <div class="info-tile"><h3>戦略</h3><p>${team.tactics}</p></div>
-                    <div class="info-tile"><h3>実績</h3><p>${team.records}</p></div>
-                    <div class="info-tile"><h3>サークルからのメッセージ</h3><p>${team.message}</p></div>`;
+                    <div class="player-tiles-container">${playerListHTML || '<p>プレイヤー情報なし</p>'}</div>
+                    <div class="info-tile"><h3>チームコメント</h3><p>${team.comment || '-'}</p></div>
+                    <div class="info-tile"><h3>戦略</h3><p>${team.tactics || '-'}</p></div>
+                    <div class="info-tile"><h3>実績</h3><p>${team.records || '-'}</p></div>
+                    <div class="info-tile"><h3>サークルからのメッセージ</h3><p>${team.message || '-'}</p></div>`;
         };
 
-        // 新着コメントモーダルを表示
+
+        // 新着コメントモーダル表示
         const showCommentModal = (text, role = '不明', displayName = '') => {
             const sender = displayName ? `${displayName} (${role})` : role;
             DOMElements.commentModalHeading.textContent = `【${sender}】からのコメント`;
@@ -449,31 +477,26 @@
             DOMElements.commentModal.classList.add('is-active');
         };
 
-        // チーム情報タブの表示を更新 (PC/モバイル切り替え含む)
+        // チーム情報タブ表示更新
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
             DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
-            // モバイル表示の切り替え
             if (window.innerWidth <= 768) {
                 DOMElements.teamAlphaCardWrapper.style.display = currentlyDisplayedTeam === 'alpha' ? 'block' : 'none';
                 DOMElements.teamBravoCardWrapper.style.display = currentlyDisplayedTeam === 'bravo' ? 'block' : 'none';
             } else {
-                // PC表示
                 DOMElements.teamAlphaCardWrapper.style.display = 'block';
                 DOMElements.teamBravoCardWrapper.style.display = 'block';
             }
             checkSyncStatus();
         };
 
-        // 対戦設定タブの表示を更新
+        // 対戦設定タブ表示更新
         const renderMatchSettings = (state) => {
-            // ラウンド情報 (入力中は更新しない)
             if (document.activeElement !== DOMElements.roundInfoInput) { DOMElements.roundInfoInput.value = state.roundInfo || ''; }
-            // BO3/BO5
             const bestOf = state.bestOf || 'BO3';
             DOMElements.bo3Btn.classList.toggle('active', bestOf === 'BO3');
             DOMElements.bo5Btn.classList.toggle('active', bestOf === 'BO5');
-            // ステージと勝敗
             const numStages = bestOf === 'BO5' ? 5 : 3;
             const stages = state.stages || [];
             DOMElements.stageWinnerRows.innerHTML = '';
@@ -496,36 +519,53 @@
             }
         };
 
-        // 配信画面セレクターの表示を更新
+        // 配信画面セレクター表示更新
         const renderStreamViewSelector = (currentView) => {
-            const view = currentView || 'matchInfo'; // デフォルトは 'matchInfo'
-            DOMElements.streamViewMatchInfo.classList.toggle('active', view === 'matchInfo');
-            DOMElements.streamViewStageList.classList.toggle('active', view === 'stageList');
-            DOMElements.streamViewReplay.classList.toggle('active', view === 'replay');
+            const view = currentView || 'matchInfo'; // デフォルト
+            const buttons = [
+                DOMElements.streamViewLogo, DOMElements.streamViewMatchInfo,
+                DOMElements.streamViewAlphaDetail, DOMElements.streamViewBravoDetail,
+                DOMElements.streamViewStageList, DOMElements.streamViewReplay
+            ];
+            buttons.forEach(button => {
+                if (button) {
+                    button.classList.toggle('active', button.dataset.view === view);
+                }
+            });
         };
 
-        // ▼▼▼ 新規追加: 配信ステータスセレクターの表示を更新 ▼▼▼
-        const renderStreamStatus = (status) => {
-            DOMElements.statusBtnNormal.classList.toggle('active', status === 'normal');
-            DOMElements.statusBtnLag.classList.toggle('active', status === 'lag');
-            DOMElements.statusBtnWaiting.classList.toggle('active', status === 'waiting');
-        };
-        // ▲▲▲ 新規追加 ▲▲▲
+        // 配信状態セレクター表示更新 (修正)
+        const renderStreamStatus = (streamState) => {
+            const matchStatus = streamState.match || 'outside';
+            const incidentStatus = streamState.incident || 'none';
 
-        // ページ初期化 (静的JSON読み込み、UIセットアップ)
+            // グループ1 (Match Status)
+            DOMElements.statusMatchOutside?.classList.toggle('active', matchStatus === 'outside');
+            DOMElements.statusMatchWaiting?.classList.toggle('active', matchStatus === 'waiting');
+            DOMElements.statusMatchIngame?.classList.toggle('active', matchStatus === 'ingame');
+
+            // グループ2 (Incident Status)
+            const lagActive = incidentStatus === 'lag';
+            const troubleActive = incidentStatus === 'trouble';
+            DOMElements.statusIncidentLag?.classList.toggle('active', lagActive);
+            DOMElements.statusIncidentLag?.classList.toggle('is-lag', lagActive); // CSS用クラス
+            DOMElements.statusIncidentTrouble?.classList.toggle('active', troubleActive);
+            DOMElements.statusIncidentTrouble?.classList.toggle('is-trouble', troubleActive); // CSS用クラス
+        };
+
+        // ページ初期化
         const initializePage = async () => {
             setConnectionStatus('connecting');
             myDisplayName = localStorage.getItem('myDisplayName') || '';
 
             try {
-                // 静的データを読み込み
                 const [teamsRes, scriptRes, stagesRes] = await Promise.all([fetch('./teams.json'), fetch('./script.json'), fetch('./stages.json')]);
+                if (!teamsRes.ok || !scriptRes.ok || !stagesRes.ok) throw new Error('Data fetch failed');
                 teamsData = await teamsRes.json();
                 scriptData = await scriptRes.json();
                 stagesData = await stagesRes.json();
             } catch (e) { return alert("データファイルの読み込みに失敗しました。"); }
 
-            // チーム選択セレクトボックスに全チームを追加
             document.querySelectorAll('select').forEach(select => {
                 teamsData.forEach(team => {
                     const option = document.createElement('option');
@@ -534,39 +574,39 @@
                 });
             });
 
-            // チームデータの読み込みが完了したら、デフォルト表示を設定
             if (teamsData.length > 0) {
-                officialMatchup.alphaTeamId = teamsData[0].id;
-                officialMatchup.bravoTeamId = teamsData[0].id;
+                const defaultTeamId = teamsData.find(t => t.id === 'team_001') ? 'team_001' : teamsData[0].id;
+                officialMatchup = { alphaTeamId: defaultTeamId, bravoTeamId: defaultTeamId };
                 if (!isViewLocked) {
                     DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
                     DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
                 }
             }
-            // 初期描画
             updateTeamDisplay();
             renderScript();
             renderMatchSettings({});
         };
 
-        // 対戦チーム変更 (Firestore更新)
+        // --- イベントハンドラー ---
+
+        // 対戦チーム変更
         const matchupChangeHandler = () => {
             sessionDocRef.update({ matchup: { alphaTeamId: DOMElements.matchupAlphaSelect.value, bravoTeamId: DOMElements.matchupBravoSelect.value } });
         };
         DOMElements.matchupAlphaSelect.onchange = matchupChangeHandler;
         DOMElements.matchupBravoSelect.onchange = matchupChangeHandler;
 
-        // チーム表示セレクトボックス変更時の処理
+        // 表示チーム変更
         const viewChangeHandler = () => {
-            isViewLocked = true; // ユーザーが手動で変更したフラグ
+            isViewLocked = true;
             updateTeamDisplay();
         };
         DOMElements.viewAlphaSelect.onchange = viewChangeHandler;
         DOMElements.viewBravoSelect.onchange = viewChangeHandler;
 
-        // 表示チームを現在の対戦カードに同期
+        // 表示チーム同期
         const syncViewToMatchup = () => {
-            isViewLocked = false; // ロックを解除
+            isViewLocked = false;
             DOMElements.viewAlphaSelect.value = officialMatchup.alphaTeamId;
             DOMElements.viewBravoSelect.value = officialMatchup.bravoTeamId;
             updateTeamDisplay();
@@ -574,71 +614,70 @@
         if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.onclick = syncViewToMatchup;
         if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.onclick = syncViewToMatchup;
 
-        // 台本進行 (Firestore更新)
+        // 台本進行
         const updateScriptIndex = (newIndex) => { if (newIndex >= 0 && newIndex < scriptData.length) { sessionDocRef.update({ scriptIndex: newIndex }); } };
         DOMElements.nextScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) + 1); };
         DOMElements.prevScriptButton.onclick = async () => { const doc = await sessionDocRef.get(); updateScriptIndex((doc.data().scriptIndex || 0) - 1); };
         DOMElements.scriptCardContent.addEventListener('click', (e) => {
-            // 台本クリックでも進行
             const target = e.target.closest('.script-paragraph');
-            if (target && target.dataset.index) {
-                const newIndex = parseInt(target.dataset.index, 10);
-                updateScriptIndex(newIndex);
-            }
+            if (target && target.dataset.index) updateScriptIndex(parseInt(target.dataset.index, 10));
         });
 
-        // コメントをFirestoreに送信
+        // コメント送信
         const sendComment = () => {
             const text = DOMElements.commentInput.value.trim();
             if (text) {
-                // ▼▼▼ 修正: システムロールでの送信を防ぐ ▼▼▼
-                const roleToSend = (MY_ROLE === 'システム') ? '配信担当' : MY_ROLE;
-
+                const roleToSend = (MY_ROLE === 'システム') ? '配信担当' : MY_ROLE; // 念のため
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
-                    const newComment = {
-                        id: Math.random().toString(36).substr(2, 9),
-                        text,
-                        senderId: mySessionId,
-                        role: roleToSend, // 修正
-                        displayName: myDisplayName,
-                        timestamp: new Date()
-                    };
-                    // コメントは最新100件のみ保持
+                    const newComment = { id: `c-${Date.now()}`, text, senderId: mySessionId, role: roleToSend, displayName: myDisplayName, timestamp: new Date() };
                     const updatedComments = [...currentComments, newComment].slice(-100);
                     transaction.update(sessionDocRef, { comments: updatedComments });
                 });
                 DOMElements.commentInput.value = '';
             }
         };
-        // コメント送信イベント
         DOMElements.sendCommentButton.onclick = sendComment;
         DOMElements.commentInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendComment(); } });
 
-        // 勝敗設定 (Firestore更新)
-        const updateMatchSettings = async () => {
+        // 勝敗設定更新
+        const updateMatchSettingsFirestore = async () => {
             const doc = await sessionDocRef.get();
-            const currentSettings = doc.data();
-            const newStages = Array.from(DOMElements.stageWinnerRows.querySelectorAll('.stage-winner-row')).map((row, i) => {
+            const currentState = doc.data() || {};
+            const numStages = (currentState.bestOf === 'BO5' ? 5 : 3);
+            const newStages = Array.from(DOMElements.stageWinnerRows.querySelectorAll('.stage-winner-row')).slice(0, numStages).map((row, i) => {
                 const winnerBtn = row.querySelector('.winner-selector button.active');
+                // ステージ名ボタンから現在のステージ名を取得
+                const stageNameButton = row.querySelector('.stage-select-button .stage-name');
+                const currentStageName = stageNameButton ? stageNameButton.textContent : (currentState.stages?.[i]?.stage || '未決定');
                 return {
-                    stage: currentSettings.stages?.[i]?.stage || '未決定',
+                    stage: currentStageName,
                     winner: winnerBtn ? winnerBtn.dataset.winner : null
                 };
             });
+            // roundInfoはinput要素から直接値を取得
+            const newRoundInfo = DOMElements.roundInfoInput.value;
+
+            // Firestoreに更新
             sessionDocRef.update({
-                roundInfo: DOMElements.roundInfoInput.value,
+                roundInfo: newRoundInfo,
                 stages: newStages
-            });
+            }).catch(error => console.error("Error updating match settings:", error));
         };
+
 
         // ステージ選択モーダルを開く
         const openStageModal = (index) => {
+            if (!stagesData || stagesData.length === 0) {
+                DOMElements.stageGrid.innerHTML = '<p>ステージ情報が読み込めていません。</p>';
+                DOMElements.stageModal.classList.add('is-active');
+                return;
+            }
             const allStageNames = ['未決定', ...stagesData];
             const usedStageItems = [];
             const unusedStageItems = [];
-            // 使用ステージと使用不可ステージ (unused) を分けて表示
+
             allStageNames.forEach(stageName => {
                 const isDisabled = unusedStages.includes(stageName);
                 const itemHTML = `
@@ -648,61 +687,57 @@
                 if (isDisabled) { unusedStageItems.push(itemHTML); }
                 else { usedStageItems.push(itemHTML); }
             });
-            // 使用可能ステージを先に、使用不可ステージを後に表示
             DOMElements.stageGrid.innerHTML = [...usedStageItems, ...unusedStageItems].join('');
             DOMElements.stageModal.dataset.editIndex = index;
             DOMElements.stageModal.classList.add('is-active');
         };
 
-        // 対戦設定の各種イベント (Firestore更新)
-        DOMElements.roundInfoInput.onchange = () => sessionDocRef.update({ roundInfo: DOMElements.roundInfoInput.value });
-        DOMElements.bo3Btn.onclick = () => sessionDocRef.update({ bestOf: 'BO3', stages: [] });
-        DOMElements.bo5Btn.onclick = () => sessionDocRef.update({ bestOf: 'BO5', stages: [] });
-        DOMElements.resetStagesButton.onclick = () => {
-            if (confirm('ステージと勝敗の情報をすべてリセットしますか？')) {
-                sessionDocRef.update({ stages: [] });
-            }
-        };
+        // 対戦設定イベント
+        DOMElements.roundInfoInput.onchange = updateMatchSettingsFirestore; // 修正: Firestore更新関数を呼ぶ
+        DOMElements.bo3Btn.onclick = () => sessionDocRef.update({ bestOf: 'BO3', stages: [] }); // BO変更時はstagesもリセット
+        DOMElements.bo5Btn.onclick = () => sessionDocRef.update({ bestOf: 'BO5', stages: [] }); // BO変更時はstagesもリセット
 
-        // ステージ選択ボタン・勝敗ボタンのクリックイベント
+        // ステージ選択/勝敗ボタン イベント委譲
         DOMElements.stageWinnerRows.addEventListener('click', (e) => {
             const target = e.target;
-            // ステージ選択ボタン
             if (target.closest('.stage-select-button')) {
                 openStageModal(target.closest('.stage-select-button').dataset.index);
-            }
-            // 勝敗ボタン (A/B)
-            if (target.tagName === 'BUTTON' && target.closest('.winner-selector')) {
+            } else if (target.tagName === 'BUTTON' && target.closest('.winner-selector')) {
                 const parent = target.parentElement;
                 const currentlyActive = parent.querySelector('.active');
-                // トグル (A -> off, off -> A, B -> A)
                 if (currentlyActive === target) { target.classList.remove('active'); }
                 else { if (currentlyActive) currentlyActive.classList.remove('active'); target.classList.add('active'); }
-                updateMatchSettings();
+                updateMatchSettingsFirestore(); // 修正: Firestore更新関数を呼ぶ
             }
         });
 
-        // ステージモーダルでステージを選択 (Firestore更新)
+        // ステージモーダル選択
         DOMElements.stageGrid.addEventListener('click', async (e) => {
             const target = e.target.closest('.stage-grid-item');
-            if (!target || target.classList.contains('is-disabled')) return; // 使用不可ステージはクリック不可
+            if (!target || target.classList.contains('is-disabled')) return;
             const newStageName = target.dataset.stageName;
-            const indexToEdit = DOMElements.stageModal.dataset.editIndex;
+            const indexToEdit = parseInt(DOMElements.stageModal.dataset.editIndex, 10); // 数値に変換
 
             const doc = await sessionDocRef.get();
             const currentSettings = doc.data();
-            const newStages = currentSettings.stages ? [...currentSettings.stages] : [];
-            // 配列が足りなければ拡張
-            while (newStages.length <= indexToEdit) {
-                newStages.push({ stage: '未決定', winner: null });
+            const currentStages = currentSettings.stages || [];
+            const numStagesNeeded = (currentSettings.bestOf === 'BO5' ? 5 : 3);
+
+            // 必要に応じて配列を拡張または初期化
+            const newStages = Array.from({ length: numStagesNeeded }, (_, i) => {
+                return currentStages[i] || { stage: '未決定', winner: null };
+            });
+
+            // 特定のインデックスのステージ名を更新
+            if (indexToEdit >= 0 && indexToEdit < numStagesNeeded) {
+                newStages[indexToEdit].stage = newStageName;
             }
-            newStages[indexToEdit].stage = newStageName;
 
             await sessionDocRef.update({ stages: newStages });
             DOMElements.stageModal.classList.remove('is-active');
         });
 
-        // [モバイル用] 表示するチーム (Alpha/Bravo) を切り替え
+        // モバイル用チーム表示切り替え
         const setDisplayTeam = (team) => {
             currentlyDisplayedTeam = team;
             DOMElements.displayAlphaBtn.classList.toggle('active', team === 'alpha');
@@ -713,61 +748,43 @@
         DOMElements.displayBravoBtn.onclick = () => setDisplayTeam('bravo');
 
         let isFirstCommentTabOpen = true;
-        // 表示タブを切り替え
+        // タブ切り替え
         const switchToTab = (tabId) => {
             if (!tabId) return;
-            // タブボタンのアクティブ状態を切り替え
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
-            // タブコンテンツの表示状態を切り替え
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
-
-            // 初めてコメントタブを開いたとき、名前が未設定ならモーダルを表示
             if (tabId === 'comment' && isFirstCommentTabOpen) {
-                if (!myDisplayName) {
-                    DOMElements.nameModal.classList.add('is-active');
-                }
+                if (!myDisplayName) { DOMElements.nameModal.classList.add('is-active'); }
                 isFirstCommentTabOpen = false;
             }
         };
 
-        // タブ切り替えのロジックをセットアップ
+        // タブ設定
         const setupTabs = () => {
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     const targetTab = button.dataset.tab;
-                    location.hash = targetTab; // URLハッシュにタブIDを設定
+                    location.hash = targetTab;
                     switchToTab(targetTab);
                 });
             });
-            // URLハッシュに基づいて初期タブを決定
             const initialTabId = location.hash.substring(1) || 'comment';
             const firstTab = document.querySelector('.tab-button')?.dataset.tab;
-            if (document.querySelector(`.tab-button[data-tab="${initialTabId}"]`)) {
-                switchToTab(initialTabId);
-            } else if (firstTab) {
-                // デフォルトのタブ (comment) にフォールバック
-                switchToTab(firstTab);
-            }
+            switchToTab(document.querySelector(`.tab-button[data-tab="${initialTabId}"]`) ? initialTabId : firstTab);
         };
 
-        // モーダル共通の閉じる動作をセットアップ
+        // モーダル設定
         const setupModals = () => {
             document.querySelectorAll('.modal').forEach(modal => {
-                // 背景クリックで閉じる
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('is-active');
-                    }
-                });
+                modal.addEventListener('click', (e) => { if (e.target === modal) { modal.classList.remove('is-active'); } });
             });
-            // 閉じるボタン
             DOMElements.commentModalClose.onclick = () => DOMElements.commentModal.classList.remove('is-active');
             DOMElements.stageModalClose.onclick = () => DOMElements.stageModal.classList.remove('is-active');
             DOMElements.nameModalClose.onclick = () => DOMElements.nameModal.classList.remove('is-active');
         };
 
-        // 表示名設定モーダル
+        // 表示名設定
         DOMElements.editNameButton.onclick = () => {
             DOMElements.nameInput.value = myDisplayName;
             DOMElements.nameModal.classList.add('is-active');
@@ -781,37 +798,80 @@
             }
         };
 
-        // ウィンドウリサイズ時にチーム表示を再計算
+        // 対戦設定リセット (修正)
+        const resetMatchSettings = async () => {
+            if (confirm('対戦設定（ラウンド情報、ステージ、勝敗、対戦チーム）をリセットしますか？\n試合形式と配信画面は保持されます。\n配信状態は「対戦待機中」になります。')) {
+                const defaultTeamId = teamsData.find(t => t.id === 'team_001') ? 'team_001' : (teamsData[0]?.id || null); // デフォルトチームID取得
+                if (!defaultTeamId) {
+                    alert("デフォルトチーム(team_001)が見つかりません。リセットできませんでした。");
+                    return;
+                }
+                try {
+                    await sessionDocRef.update({
+                        roundInfo: '',
+                        stages: [],
+                        matchup: { alphaTeamId: defaultTeamId, bravoTeamId: defaultTeamId },
+                        streamState: { match: 'waiting', incident: 'none' } // 状態を待機中に
+                        // bestOf は更新しない
+                    });
+                    alert('対戦設定をリセットしました。');
+                } catch (error) {
+                    console.error("Error resetting match settings:", error);
+                    alert('リセット中にエラーが発生しました。');
+                }
+            }
+        };
+        DOMElements.resetMatchSettingsButton.onclick = resetMatchSettings; // イベントリスナー設定
+
+
+        // ウィンドウリサイズ
         window.onresize = updateTeamDisplay;
 
-        // DOM読み込み完了後に初期化処理を実行
+        // --- 初期化実行 ---
         document.addEventListener("DOMContentLoaded", () => {
             initializePage();
             setupTabs();
             setupModals();
 
-            // 配信画面セレクターのクリックイベント
+            // 配信画面セレクター クリックイベント
             DOMElements.streamViewSelector.addEventListener('click', (e) => {
                 const target = e.target.closest('button');
                 if (target && target.dataset.view) {
-                    // クリックしたらFirestoreの`currentStreamView`を更新
                     sessionDocRef.update({ currentStreamView: target.dataset.view });
                 }
             });
 
-            // ▼▼▼ 新規追加: 配信ステータスセレクターのクリックイベント ▼▼▼
+            // 配信状態セレクター クリックイベント (修正)
             DOMElements.streamStatusSelector.addEventListener('click', (e) => {
                 const target = e.target.closest('button');
-                if (target && target.dataset.status) {
-                    const newStatus = target.dataset.status;
-                    // 現在のステータスと異なる場合のみFirestoreを更新
-                    // onSnapshotが変更を検知してシステムコメント送信とUI更新を行う
-                    if (newStatus !== currentStreamStatus) {
-                        sessionDocRef.update({ streamStatus: newStatus });
+                if (!target) return;
+
+                const newMatchStatus = target.dataset.matchStatus;
+                const newIncidentStatus = target.dataset.incidentStatus;
+                let updateData = {};
+
+                // グループ1 (Match)
+                if (newMatchStatus && newMatchStatus !== currentStreamState.match) {
+                    updateData['streamState.match'] = newMatchStatus;
+                }
+
+                // グループ2 (Incident) - トグル
+                if (newIncidentStatus) {
+                    // 現在アクティブなインシデントと同じボタンが押されたら解除、違うならそれに変更
+                    const finalIncidentStatus = (newIncidentStatus === currentStreamState.incident) ? 'none' : newIncidentStatus;
+                    // 変更がある場合のみ更新データに追加
+                    if (finalIncidentStatus !== currentStreamState.incident) {
+                        updateData['streamState.incident'] = finalIncidentStatus;
                     }
                 }
+
+                // 更新データがあればFirestoreに書き込み
+                if (Object.keys(updateData).length > 0) {
+                    sessionDocRef.update(updateData).catch(error => {
+                        console.error("Error updating stream state:", error);
+                    });
+                }
             });
-            // ▲▲▲ 新規追加 ▲▲▲
         });
     </script>
 </body>
