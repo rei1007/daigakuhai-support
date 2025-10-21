@@ -232,6 +232,7 @@
 
         /* 5. Match Info Tab (#match-info) */
         #match-info {
+
             /* チームデータラッパー */
             #team-data-wrap {
                 /* ボックスモデル */
@@ -314,6 +315,7 @@
                     font-weight: 700;
 
                     .player-name {
+
                         /* 最高XPプレイヤー */
                         &.highest-xp::after {
                             /* ボックスモデル */
@@ -435,7 +437,8 @@
                 #previous-stage-img,
                 #next-stage-img {
                     /* ボックスモデル */
-                    display: none; /* HTMLから移動 (JSで制御) */
+                    display: none;
+                    /* HTMLから移動 (JSで制御) */
                     width: var(--stage-img-width-lg);
                     height: var(--stage-img-height-lg);
                     margin: var(--space-md) 0 0;
@@ -462,7 +465,8 @@
                 /* "NEXT" インジケーター */
                 .next-indicator {
                     /* ボックスモデル */
-                    display: none; /* HTMLから移動 (JSで制御) */
+                    display: none;
+                    /* HTMLから移動 (JSで制御) */
                     width: 100%;
                     height: 60px;
                     margin: var(--space-md) 0 0;
@@ -486,6 +490,7 @@
 
         /* 6. Stage List Tab (#stage-list) */
         #stage-list {
+
             /* 選択済み/プレイ中ステージエリア */
             #selected-stages {
                 /* ボックスモデル */
@@ -681,7 +686,7 @@
 <body>
     <main id="screen">
         <div id="background"></div>
-        
+
         <div id="tab-menu">
             <div id="menu-matchInfo" class="menu-item active-menu">
                 <span class="material-symbols-rounded">scoreboard</span>
@@ -818,12 +823,12 @@
             // テキストを設定し、必要に応じてアニメーションクラスを付与
             const setText = (element, text, animationClass = null) => {
                 if (!element) return;
-                
+
                 const newText = (text || text === 0) ? String(text) : '-';
-                
+
                 if (element.textContent !== newText) {
                     element.textContent = newText;
-                    
+
                     if (animationClass) {
                         element.classList.add(animationClass);
                         // アニメーション時間(300ms)が経過したらクラスを削除
@@ -902,8 +907,8 @@
                     if (player.xp >= 3200) {
                         nameSpan.classList.add('xp-highlight');
                     }
-                    
-                    const delay = index * 50; 
+
+                    const delay = index * 50;
                     playerDiv.style.transitionDelay = `${delay}ms`;
 
                     playerDiv.appendChild(nameSpan);
@@ -915,7 +920,7 @@
 
                 playerListElement.innerHTML = '';
                 playerListElement.appendChild(fragment);
-                
+
                 // プレイヤーリストのアニメーション（フェードイン）
                 setTimeout(() => {
                     Array.from(playerListElement.children).forEach(child => {
@@ -933,12 +938,12 @@
                 const winCondition = bestOf === 'BO5' ? 3 : 2;
                 const alphaWins = stages.filter(s => s && s.winner === 'alpha').length;
                 const bravoWins = stages.filter(s => s && s.winner === 'bravo').length;
-                const isGameOver = alphaWins >= winCondition || bravoWins >= winCondition; 
+                const isGameOver = alphaWins >= winCondition || bravoWins >= winCondition;
 
                 const prevImg = DOMElements.previousStageImg;
                 const nextIndicator = DOMElements.nextIndicator;
                 const nextImg = DOMElements.nextStageImg;
-                const nextLabel = DOMElements.nextLabel; 
+                const nextLabel = DOMElements.nextLabel;
 
                 // ステージ画像を設定する内部関数
                 const setImgSrc = (element, folder, stageName) => {
@@ -951,9 +956,9 @@
                     }
                     element.src = `../${folder}/${encodeURIComponent(stageName)}.png`;
                     // 画像読み込み失敗時は「未決定」画像を表示
-                    element.onerror = () => { 
-                        element.src = '../stage-image/未決定.png'; 
-                        element.style.display = 'block'; 
+                    element.onerror = () => {
+                        element.src = '../stage-image/未決定.png';
+                        element.style.display = 'block';
                     };
                     element.style.display = 'block';
                 };
@@ -962,7 +967,7 @@
 
                 // 1. 直前の試合 (previous-stage-img) の表示
                 if (currentGameIndex > 0) {
-                    const previousStage = stages[currentGameIndex - 1]; 
+                    const previousStage = stages[currentGameIndex - 1];
                     setImgSrc(prevImg, previousStage.winner === 'alpha' ? 'stage-alpha' : 'stage-bravo', previousStage.stage);
                 } else {
                     if (prevImg) prevImg.style.display = 'none';
@@ -976,7 +981,7 @@
                 } else {
                     // 試合中は表示
                     if (nextIndicator) nextIndicator.style.display = 'block';
-                    
+
                     const nextStageToPlay = stages[currentGameIndex];
                     const nextStageName = nextStageToPlay ? nextStageToPlay.stage : '未決定';
                     setImgSrc(nextImg, 'stage-image', nextStageName);
@@ -1031,7 +1036,7 @@
                         DOMElements.alphaTeamData.classList.add('is-loser');
                     }
                 }
-                
+
                 // ステージ画像更新
                 updateStageDisplay(stages, state.bestOf);
             };
@@ -1051,17 +1056,17 @@
 
             // 「ステージ」タブの更新
             const updateStageListTab = (state) => {
-                if (!state.matchup || !teamsData.length) return; 
-                
+                if (!state.matchup || !teamsData.length) return;
+
                 if (!allStagesData || allStagesData.length === 0) {
                     console.warn("Stage list data (allStagesData) is empty or not loaded. Cannot render stage list.");
-                    DOMElements.activeStageList.innerHTML = ''; 
-                    return; 
+                    DOMElements.activeStageList.innerHTML = '';
+                    return;
                 }
 
                 const stages = state.stages || [];
                 const unusedStages = state.unusedStages || [];
-                
+
                 // スコア計算
                 const alphaWins = stages.filter(s => s && s.winner === 'alpha').length;
                 const bravoWins = stages.filter(s => s && s.winner === 'bravo').length;
@@ -1079,11 +1084,11 @@
                 }
 
                 // 既存のステージ画像をクリア (スコア表示を除く)
-                while (DOMElements.selectedStages.children.length > 1) { 
-                    DOMElements.selectedStages.removeChild(DOMElements.selectedStages.lastChild); 
+                while (DOMElements.selectedStages.children.length > 1) {
+                    DOMElements.selectedStages.removeChild(DOMElements.selectedStages.lastChild);
                 }
                 DOMElements.activeStageList.innerHTML = '';
-                
+
                 const displayedStages = new Set();
 
                 // 1. 勝利/敗北が決定したステージを #selected-stages に追加
@@ -1103,7 +1108,7 @@
 
                 // 3. 残りの全ステージを #active-stage-list に追加
                 const allRemainingStages = allStagesData.filter(stageName => stageName !== '未決定' && !displayedStages.has(stageName));
-                
+
                 // 3a. 使用可能なステージ
                 const availableStages = allRemainingStages.filter(stageName => !unusedStages.includes(stageName));
                 // 3b. 使用不可 (BAN) されたステージ
@@ -1116,8 +1121,8 @@
                 setTimeout(() => {
                     Array.from(DOMElements.activeStageList.children).forEach((child, index) => {
                         if (child.classList.contains('stage')) {
-                            child.style.transitionDelay = `${index * 30}ms`; 
-                            child.style.opacity = child.classList.contains('is-unused') ? '0.4' : '1'; 
+                            child.style.transitionDelay = `${index * 30}ms`;
+                            child.style.opacity = child.classList.contains('is-unused') ? '0.4' : '1';
                             child.style.transform = 'scale(1)';
                         }
                     });
@@ -1127,12 +1132,12 @@
             // Firestoreのデータ変更時に呼び出されるメインの更新関数
             const updateDisplay = (state) => {
                 if (!state) return;
-                
+
                 lastKnownState = state; // 最新の状態をグローバルに保持
                 switchView(state.currentStreamView);
                 updateMatchTitle(state.roundInfo, state.bestOf);
                 updateCasters(state);
-                
+
                 // チームデータ(teams.json)が読み込まれていれば、タブ内容を更新
                 if (teamsData.length > 0 && state.matchup) {
                     updateMatchInfoTab(state);
@@ -1150,10 +1155,10 @@
                     const alphaTeam = teamsData.find(t => t.id === lastKnownState.matchup.alphaTeamId);
                     const bravoTeam = teamsData.find(t => t.id === lastKnownState.matchup.bravoTeamId);
                     if (!alphaTeam || !bravoTeam) return;
-                    
+
                     const elements = [DOMElements.alphaTeamAffiliation, DOMElements.bravoTeamAffiliation];
                     elements.forEach(el => el?.classList.add('is-fading')); // フェードアウト
-                    
+
                     setTimeout(() => {
                         // テキスト切り替え
                         setText(DOMElements.alphaTeamAffiliation, showUniversity ? alphaTeam.university : alphaTeam.circle);
@@ -1170,7 +1175,7 @@
                     if (alphaTeam) setText(DOMElements.alphaTeamAffiliation, alphaTeam.university);
                     if (bravoTeam) setText(DOMElements.bravoTeamAffiliation, bravoTeam.university);
                 }
-                
+
                 // 5秒ごとに実行
                 affiliationInterval = setInterval(switchText, 5000);
             };
@@ -1207,9 +1212,9 @@
                     ]);
                     if (!teamsRes.ok) throw new Error(`Failed to fetch teams.json: ${teamsRes.statusText}`);
                     if (!stagesRes.ok) throw new Error(`Failed to fetch stages.json: ${stagesRes.statusText}`);
-                    
+
                     const rawTeamsData = await teamsRes.json();
-                    
+
                     // チームデータに平均XPを計算して追加
                     console.log("--- Calculating Team XP Averages ---");
                     teamsData = rawTeamsData.map(team => {
@@ -1243,13 +1248,13 @@
                     });
                     console.log("--- XP Calculation Complete ---");
 
-                    allStagesData = (await stagesRes.json()).map(stageName => stageName.trim()); 
+                    allStagesData = (await stagesRes.json()).map(stageName => stageName.trim());
                     console.log("Static data loaded successfully.");
-                    
+
                     // 静的データ読み込み後、最新のFirestoreデータで画面を再描画
                     if (lastKnownState) {
                         console.log("Re-rendering with loaded static data.");
-                        updateDisplay(lastKnownState); 
+                        updateDisplay(lastKnownState);
                         if (!affiliationInterval) startAffiliationSwitcher();
                     }
                 } catch (error) {

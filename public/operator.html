@@ -11,7 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -234,7 +236,7 @@
         let myDisplayName = '';
 
         // 使用しないステージのグローバルリスト
-        let unusedStages = []; 
+        let unusedStages = [];
         let currentStreamStatus = 'normal'; // ▼▼▼ 新規追加: 現在のステータスを追跡 ▼▼▼
 
         // 自分のセッションIDをlocalStorageから取得、なければ生成
@@ -294,7 +296,7 @@
             if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
             if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
         };
-        
+
         // ▼▼▼ 新規追加: システムコメント送信 ▼▼▼
         const sendSystemComment = (text) => {
             if (!text) return;
@@ -340,14 +342,14 @@
                     checkSyncStatus();
                 }
             }
-            
+
             // ▼▼▼ 新規追加: 配信ステータス変更監視 & システムコメント送信 ▼▼▼
             const newStatus = state.streamStatus || 'normal';
             if (newStatus !== currentStreamStatus) {
                 // ラグ対応開始
                 if (newStatus === 'lag') {
                     sendSystemComment('【システム】ラグ対応を開始しました。');
-                } 
+                }
                 // ラグ対応終了 (他のステータスに変わった)
                 else if (currentStreamStatus === 'lag') {
                     sendSystemComment('【システム】ラグ対応が終了しました。');
@@ -366,7 +368,7 @@
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
-                
+
                 // ↑↑↑ 「if (lastComment.role === 'システム') return;」の行を削除しました ↑↑↑
 
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
@@ -391,7 +393,7 @@
                 else if (c.role === 'システム') { badgeClass = 'is-system'; badgeText = 'システム'; }
 
                 const displayNameHTML = c.displayName ? `<span class="display-name">${c.displayName}</span>` : '';
-                
+
                 // ▼▼▼ 修正: システムメッセージ用のラッパーlassを追加 ▼▼▼
                 let wrapperClass = isMe ? 'is-me' : '';
                 if (c.role === 'システム') wrapperClass = 'is-system-message';
@@ -504,7 +506,7 @@
                 DOMElements.stageWinnerRows.appendChild(row);
             }
         };
-        
+
         // ▼▼▼ 新規追加: 配信ステータスセレクターの表示を更新 ▼▼▼
         const renderStreamStatus = (status) => {
             DOMElements.statusBtnNormal.classList.toggle('active', status === 'normal');
@@ -580,13 +582,13 @@
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
-                    const newComment = { 
-                        id: Math.random().toString(36).substr(2, 9), 
-                        text, 
-                        senderId: mySessionId, 
+                    const newComment = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        text,
+                        senderId: mySessionId,
                         role: roleToSend, // 修正
-                        displayName: myDisplayName, 
-                        timestamp: new Date() 
+                        displayName: myDisplayName,
+                        timestamp: new Date()
                     };
                     // コメントは最新100件のみ保持
                     const updatedComments = [...currentComments, newComment].slice(-100);
@@ -782,7 +784,7 @@
                 alert('表示名を入力してください。');
             }
         };
-        
+
         // ▼▼▼ 修正: 設定モーダル (コメントリセット) ▼▼▼
         const resetComments = () => {
             if (confirm('本当にすべてのコメント履歴を削除しますか？\nこの操作は取り消せません。')) {
@@ -799,14 +801,14 @@
                     // comments配列を、新しいシステムコメントのみを含む配列で上書きする
                     transaction.update(sessionDocRef, { comments: [newSystemComment] });
                 })
-                .then(() => {
-                    alert('コメント履歴をリセットしました。');
-                    DOMElements.settingsModal.classList.remove('is-active');
-                })
-                .catch((error) => {
-                    alert('コメントの削除に失敗しました。');
-                    console.error("Error resetting comments: ", error);
-                });
+                    .then(() => {
+                        alert('コメント履歴をリセットしました。');
+                        DOMElements.settingsModal.classList.remove('is-active');
+                    })
+                    .catch((error) => {
+                        alert('コメントの削除に失敗しました。');
+                        console.error("Error resetting comments: ", error);
+                    });
             }
         };
         // ▲▲▲ 修正 ▲▲▲
@@ -817,7 +819,7 @@
             initializePage();
             setupTabs();
             setupModals();
-            
+
             // ▼▼▼ 新規追加: 配信ステータスセレクターのクリックイベント ▼▼▼
             DOMElements.streamStatusSelector.addEventListener('click', (e) => {
                 const target = e.target.closest('button');

@@ -239,13 +239,15 @@
         .commentator-grid {
             /* ボックスモデル */
             display: grid;
-            grid-template-columns: 1fr; /* Mobile first */
+            grid-template-columns: 1fr;
+            /* Mobile first */
             gap: var(--space-md);
         }
 
         @media (min-width: 600px) {
             .commentator-grid {
-                grid-template-columns: 1fr 1fr; /* Desktop 2-col */
+                grid-template-columns: 1fr 1fr;
+                /* Desktop 2-col */
             }
         }
 
@@ -262,7 +264,8 @@
             /* ボックスモデル */
             margin-bottom: var(--space-sm);
             /* タイポグラフィ */
-            font-size: var(--font-size-md); /* Use label as heading */
+            font-size: var(--font-size-md);
+            /* Use label as heading */
             font-weight: 700;
             color: var(--on-surface-color);
         }

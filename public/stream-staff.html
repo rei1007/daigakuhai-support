@@ -11,7 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -102,7 +104,7 @@
                             試合待機中
                         </button>
                     </div>
-                    </section>
+                </section>
                 <section class="card" id="match-settings-card">
                     <h2>対戦設定</h2>
                     <div class="form-group"><label for="round-info-input">ラウンド情報</label><input type="text"
@@ -280,7 +282,7 @@
             if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
             if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
         };
-        
+
         // ▼▼▼ 新規追加: システムコメント送信 ▼▼▼
         const sendSystemComment = (text) => {
             if (!text) return;
@@ -333,7 +335,7 @@
                 // ラグ対応開始
                 if (newStatus === 'lag') {
                     sendSystemComment('【システム】ラグ対応を開始しました。');
-                } 
+                }
                 // ラグ対応終了 (他のステータスに変わった)
                 else if (currentStreamStatus === 'lag') {
                     sendSystemComment('【システム】ラグ対応が終了しました。');
@@ -354,7 +356,7 @@
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
-                
+
                 // ↑↑↑ 「if (lastComment.role === 'システム') return;」の行を削除しました ↑↑↑
 
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
@@ -501,7 +503,7 @@
             DOMElements.streamViewStageList.classList.toggle('active', view === 'stageList');
             DOMElements.streamViewReplay.classList.toggle('active', view === 'replay');
         };
-        
+
         // ▼▼▼ 新規追加: 配信ステータスセレクターの表示を更新 ▼▼▼
         const renderStreamStatus = (status) => {
             DOMElements.statusBtnNormal.classList.toggle('active', status === 'normal');
@@ -595,13 +597,13 @@
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
-                    const newComment = { 
-                        id: Math.random().toString(36).substr(2, 9), 
-                        text, 
-                        senderId: mySessionId, 
+                    const newComment = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        text,
+                        senderId: mySessionId,
                         role: roleToSend, // 修正
-                        displayName: myDisplayName, 
-                        timestamp: new Date() 
+                        displayName: myDisplayName,
+                        timestamp: new Date()
                     };
                     // コメントは最新100件のみ保持
                     const updatedComments = [...currentComments, newComment].slice(-100);
@@ -686,7 +688,7 @@
             if (!target || target.classList.contains('is-disabled')) return; // 使用不可ステージはクリック不可
             const newStageName = target.dataset.stageName;
             const indexToEdit = DOMElements.stageModal.dataset.editIndex;
-            
+
             const doc = await sessionDocRef.get();
             const currentSettings = doc.data();
             const newStages = currentSettings.stages ? [...currentSettings.stages] : [];
@@ -695,7 +697,7 @@
                 newStages.push({ stage: '未決定', winner: null });
             }
             newStages[indexToEdit].stage = newStageName;
-            
+
             await sessionDocRef.update({ stages: newStages });
             DOMElements.stageModal.classList.remove('is-active');
         });
@@ -718,7 +720,7 @@
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
             // タブコンテンツの表示状態を切り替え
             document.querySelectorAll('.tab-content').forEach(content => content.classList.toggle('active', content.id === `tab-content-${tabId}`));
-            
+
             // 初めてコメントタブを開いたとき、名前が未設定ならモーダルを表示
             if (tabId === 'comment' && isFirstCommentTabOpen) {
                 if (!myDisplayName) {
