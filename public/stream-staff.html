@@ -354,8 +354,8 @@
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
-                // ▼▼▼ 修正: システムメッセージはモーダルを表示しない ▼▼▼
-                if (lastComment.role === 'システム') return;
+                
+                // ↑↑↑ 「if (lastComment.role === 'システム') return;」の行を削除しました ↑↑↑
 
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {

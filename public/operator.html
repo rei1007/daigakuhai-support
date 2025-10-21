@@ -366,9 +366,9 @@
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
             if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
-                // ▼▼▼ 修正: システムメッセージはモーダルを表示しない ▼▼▼
-                if (lastComment.role === 'システム') return;
                 
+                // ↑↑↑ 「if (lastComment.role === 'システム') return;」の行を削除しました ↑↑↑
+
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role, lastComment.displayName);
@@ -782,20 +782,34 @@
                 alert('表示名を入力してください。');
             }
         };
-        // 設定モーダル (コメントリセット)
+        
+        // ▼▼▼ 修正: 設定モーダル (コメントリセット) ▼▼▼
         const resetComments = () => {
             if (confirm('本当にすべてのコメント履歴を削除しますか？\nこの操作は取り消せません。')) {
-                sessionDocRef.update({ comments: [] })
-                    .then(() => {
-                        alert('コメント履歴をリセットしました。');
-                        DOMElements.settingsModal.classList.remove('is-active');
-                    })
-                    .catch((error) => {
-                        alert('コメントの削除に失敗しました。');
-                        console.error("Error resetting comments: ", error);
-                    });
+                // トランザクションを使用して、リセットと同時にシステムメッセージを送信する
+                db.runTransaction(async (transaction) => {
+                    const newSystemComment = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        text: '【システム】コメント履歴がリセットされました。',
+                        senderId: 'system',
+                        role: 'システム',
+                        displayName: 'システム',
+                        timestamp: new Date()
+                    };
+                    // comments配列を、新しいシステムコメントのみを含む配列で上書きする
+                    transaction.update(sessionDocRef, { comments: [newSystemComment] });
+                })
+                .then(() => {
+                    alert('コメント履歴をリセットしました。');
+                    DOMElements.settingsModal.classList.remove('is-active');
+                })
+                .catch((error) => {
+                    alert('コメントの削除に失敗しました。');
+                    console.error("Error resetting comments: ", error);
+                });
             }
         };
+        // ▲▲▲ 修正 ▲▲▲
         DOMElements.resetCommentsButton.onclick = resetComments;
 
         // DOM読み込み完了後に初期化処理を実行
