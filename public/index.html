@@ -11,10 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    
     <style>
-        /* ==========================================================================
-        1. Root Variables & Base Styles
-        ========================================================================== */
+        /* 1. Root Variables & Base Styles */
         :root {
             /* Color Palette */
             --primary-color: #000000;
@@ -44,10 +43,10 @@
             --radius-lg: 16px;
 
             /* Font Family */
-            /* --font-family: 'Noto Sans JP', sans-serif; */
             --font-family: "M PLUS Rounded 1c", sans-serif;
         }
 
+        /* デスクトップ用スケール */
         @media (min-width: 1200px) {
             :root {
                 /* Desktop Typography & Spacing Scale */
@@ -66,12 +65,16 @@
             }
         }
 
+        /* 基礎スタイル */
         html {
-            font-size: 62.5%;
+            /* ボックスモデル */
             height: 100%;
+            /* タイポグラフィ */
+            font-size: 62.5%;
         }
 
         body {
+            /* ボックスモデル */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -79,116 +82,149 @@
             margin: 0;
             padding: var(--space-lg);
             box-sizing: border-box;
+            /* タイポグラフィ */
             font-family: var(--font-family);
             font-size: var(--font-size-base);
             color: var(--on-surface-color);
+            /* 装飾 */
             background-color: var(--surface-container-low-color);
         }
 
-        /* ==========================================================================
-        2. Page Layout
-        ========================================================================== */
+        /* 2. Page Layout */
         .container {
+            /* ボックスモデル */
             width: 100%;
             max-width: 960px;
             margin: 0 auto;
         }
 
         .header {
+            /* ボックスモデル */
             margin-bottom: var(--space-xl);
+            /* タイポグラフィ */
             text-align: center;
 
             h1 {
+                /* ボックスモデル */
                 margin: 0;
+                /* タイポグラフィ */
                 font-size: var(--font-size-xxl);
                 font-weight: 700;
             }
 
             h2#tournament-name-display {
+                /* ボックスモデル */
+                min-height: var(--font-size-lg);
+                margin: var(--space-sm) 0 0 0;
+                /* タイポグラフィ */
                 font-size: var(--font-size-lg);
                 color: var(--on-surface-color);
                 font-weight: 700;
-                margin: var(--space-sm) 0 0 0;
-                min-height: var(--font-size-lg);
             }
 
             p {
+                /* ボックスモデル */
                 margin-top: var(--space-md);
+                /* タイポグラフィ */
                 font-size: var(--font-size-md);
                 color: var(--on-surface-variant-color);
             }
         }
 
-        /* === 修正: margin-bottom を margin-top に変更 === */
         .settings-section {
+            /* ボックスモデル */
             margin-top: var(--space-lg);
         }
 
+        /* 設定ボタン */
         .settings-button {
+            /* ボックスモデル */
             display: flex;
             align-items: center;
             justify-content: center;
             gap: var(--space-sm);
             width: 100%;
             padding: var(--space-md) var(--space-lg);
+            border: 1px solid #C0C0C0;
+            box-sizing: border-box;
+            /* タイポグラフィ */
             font-size: var(--font-size-md);
             font-weight: 700;
             color: var(--on-primary-container-color);
-            background-color: var(--primary-container-color);
-            border: 1px solid #C0C0C0;
-            border-radius: var(--radius-lg);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             text-align: center;
             text-decoration: none;
-            box-sizing: border-box;
+            /* 装飾 */
+            background-color: var(--primary-container-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* その他 */
             transition: all 0.2s ease-in-out;
         }
 
         .settings-button:hover {
-            transform: translateY(-2px);
-            background-color: #DCDCDC;
+            /* ボックスモデル */
             border-color: #A0A0A0;
+            /* 装飾 */
+            background-color: #DCDCDC;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            /* その他 */
+            transform: translateY(-2px);
         }
 
         .settings-button .material-icons-outlined {
+            /* タイポグラフィ */
             font-size: var(--font-size-lg);
         }
 
+        /* ページリンクグリッド */
         .link-grid {
+            /* ボックスモデル */
             display: grid;
             grid-template-columns: 1fr;
             gap: var(--space-lg);
 
+            /* デスクトップ */
             @media (min-width: 769px) {
+                /* ボックスモデル */
                 grid-template-columns: 1fr 1fr 1fr;
                 margin: 0 auto;
             }
         }
 
+        /* ページリンクボタン */
         .page-link-button {
+            /* ボックスモデル */
             display: block;
             padding: var(--space-lg);
+            border: 1px solid var(--outline-color);
+            /* タイポグラフィ */
             font-size: var(--font-size-md);
             font-weight: 700;
             color: var(--on-surface-color);
-            background-color: var(--surface-color);
-            border: 1px solid var(--outline-color);
-            border-radius: var(--radius-lg);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             text-align: center;
             text-decoration: none;
+            /* 装飾 */
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* その他 */
             transition: all 0.2s ease-in-out;
 
             &:hover {
-                transform: translateY(-4px);
+                /* ボックスモデル */
                 border-color: var(--primary-color);
+                /* 装飾 */
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                /* その他 */
+                transform: translateY(-4px);
             }
 
+            /* 補助テキスト */
             span {
+                /* ボックスモデル */
                 display: block;
                 margin-top: var(--space-sm);
+                /* タイポグラフィ */
                 font-size: var(--font-size-sm);
                 font-weight: 400;
                 color: var(--on-surface-variant-color);
@@ -237,9 +273,7 @@
         const db = firebase.firestore();
         const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
 
-        /**
-         * 大会名をFirestoreから取得して表示
-         */
+        // 大会名をFirestoreから取得して表示
         const loadTournamentName = async () => {
             const nameDisplay = document.getElementById('tournament-name-display');
             try {

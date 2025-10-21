@@ -29,10 +29,9 @@
     </script>
 
     <style>
-        /* ==========================================================================
-        1. Root Variables & Base Styles
-        ========================================================================== */
+        /* 1. Root Variables & Base Styles */
         :root {
+            /* Colors */
             --primary-color: #000000;
             --primary-container-color: #E5E5E5;
             --on-primary-container-color: #000000;
@@ -42,6 +41,7 @@
             --on-surface-variant-color: #5A5A5A;
             --outline-color: #E0E0E0;
 
+            /* Typography */
             --font-size-xs: 1.2rem;
             --font-size-sm: 1.4rem;
             --font-size-base: 1.5rem;
@@ -50,26 +50,32 @@
             --font-size-xl: 2.4rem;
             --font-size-xxl: 3.2rem;
 
+            /* Spacing */
             --space-xs: 0.4rem;
             --space-sm: 0.8rem;
             --space-md: 1.6rem;
             --space-lg: 2.4rem;
             --space-xl: 4.8rem;
 
+            /* Sizing */
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
 
-            /* --font-family: 'Noto Sans JP', sans-serif; */
+            /* Font Family */
             --font-family: "M PLUS Rounded 1c", sans-serif;
         }
 
+        /* 基礎スタイル */
         html {
-            font-size: 62.5%;
+            /* ボックスモデル */
             height: 100%;
+            /* タイポグラフィ */
+            font-size: 62.5%;
         }
 
         body {
+            /* ボックスモデル */
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -77,84 +83,101 @@
             margin: 0;
             padding: var(--space-lg);
             box-sizing: border-box;
+            /* タイポグラフィ */
             font-family: var(--font-family);
             font-size: var(--font-size-base);
             color: var(--on-surface-color);
+            /* 装飾 */
             background-color: var(--surface-container-low-color);
         }
 
-        /* ==========================================================================
-        2. Page Layout
-        ========================================================================== */
+        /* 2. Page Layout */
         .container {
+            /* ボックスモデル */
             width: 100%;
             max-width: 960px;
             margin: 0 auto;
         }
 
         .header {
+            /* ボックスモデル */
             margin-bottom: var(--space-xl);
+            /* タイポグラフィ */
             text-align: center;
         }
 
         .header h1 {
+            /* ボックスモデル */
             margin: 0;
+            /* タイポグラフィ */
             font-size: var(--font-size-xxl);
             font-weight: 700;
         }
 
+        /* 共通カードスタイル */
         .card {
+            /* ボックスモデル */
             padding: var(--space-lg);
-            background-color: var(--surface-color);
             border: 1px solid var(--outline-color);
+            /* 装飾 */
+            background-color: var(--surface-color);
             border-radius: var(--radius-lg);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         h2 {
-            font-size: var(--font-size-lg);
+            /* ボックスモデル */
             margin-top: 0;
             margin-bottom: var(--space-md);
+            /* タイポグラフィ */
+            font-size: var(--font-size-lg);
         }
 
         hr {
+            /* ボックスモデル */
             margin: var(--space-lg) 0;
             border: none;
             border-top: 1px solid var(--outline-color);
         }
 
-        /* ==========================================================================
-        3. Form Elements
-        ========================================================================== */
+        /* 3. Form Elements */
         .form-group {
+            /* ボックスモデル */
             margin-bottom: var(--space-lg);
         }
 
         /* 大会名セクションはマージンなしに */
         .form-group.no-margin {
+            /* ボックスモデル */
             margin-bottom: 0;
         }
 
         .form-group label {
+            /* ボックスモデル */
             display: block;
             margin-bottom: var(--space-xs);
+            /* タイポグラフィ */
             font-size: var(--font-size-sm);
             font-weight: 600;
             color: var(--on-surface-variant-color);
         }
 
         .form-group input[type="text"] {
+            /* ボックスモデル */
             width: 100%;
             padding: var(--space-sm) var(--space-md);
+            box-sizing: border-box;
+            border: 1px solid var(--outline-color);
+            /* タイポグラフィ */
             font-size: var(--font-size-base);
             font-family: var(--font-family);
-            box-sizing: border-box;
+            /* 装飾 */
             background-color: var(--surface-color);
-            border: 1px solid var(--outline-color);
             border-radius: var(--radius-md);
         }
 
         .form-group-header {
+            /* ボックスモデル */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -162,123 +185,143 @@
         }
 
         .form-group-header .header-controls {
+            /* ボックスモデル */
             display: flex;
             align-items: center;
             gap: var(--space-sm);
         }
 
         .form-group-header h2 {
+            /* ボックスモデル */
             margin-bottom: 0;
         }
 
+        /* 保存ステータス表示 */
         .status-indicator {
+            /* タイポグラフィ */
             font-size: var(--font-size-sm);
-            color: var(--on-surface-variant-color);
             font-weight: 500;
+            color: var(--on-surface-variant-color);
+            /* 装飾 */
             opacity: 0;
+            /* その他 */
             transition: opacity 0.3s ease;
         }
 
         .status-indicator.is-visible {
+            /* 装飾 */
             opacity: 1;
         }
 
+        /* 枠線ボタン */
         .outline-button {
+            /* ボックスモデル */
             padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--outline-color);
+            /* タイポグラフィ */
             font-size: var(--font-size-sm);
             font-weight: 500;
             font-family: var(--font-family);
             color: var(--primary-color);
+            /* 装飾 */
             background: none;
-            border: 1px solid var(--outline-color);
             border-radius: var(--radius-md);
+            /* その他 */
             cursor: pointer;
         }
 
         .outline-button:hover {
+            /* 装飾 */
             background-color: #F0F0F0;
         }
 
-        /* === ▼▼▼ 新規追加: 実況解説者情報 ▼▼▼ === */
+        /* 実況解説者情報 */
         .commentator-grid {
+            /* ボックスモデル */
             display: grid;
-            grid-template-columns: 1fr;
-            /* Mobile first */
+            grid-template-columns: 1fr; /* Mobile first */
             gap: var(--space-md);
         }
 
         @media (min-width: 600px) {
             .commentator-grid {
-                grid-template-columns: 1fr 1fr;
-                /* Desktop 2-col */
+                grid-template-columns: 1fr 1fr; /* Desktop 2-col */
             }
         }
 
         .commentator-group {
-            background: var(--surface-container-low-color);
+            /* ボックスモデル */
             padding: var(--space-md);
-            border-radius: var(--radius-md);
             border: 1px solid var(--outline-color);
+            /* 装飾 */
+            background: var(--surface-container-low-color);
+            border-radius: var(--radius-md);
         }
 
         .commentator-group label {
-            font-size: var(--font-size-md);
-            /* Use label as heading */
+            /* ボックスモデル */
+            margin-bottom: var(--space-sm);
+            /* タイポグラフィ */
+            font-size: var(--font-size-md); /* Use label as heading */
             font-weight: 700;
             color: var(--on-surface-color);
-            margin-bottom: var(--space-sm);
         }
 
         .commentator-group input[type="text"] {
+            /* ボックスモデル */
             width: 100%;
             margin-bottom: var(--space-sm);
         }
 
         .commentator-group input[type="text"]:last-child {
+            /* ボックスモデル */
             margin-bottom: 0;
         }
 
-        /* === ▲▲▲ 新規追加 === */
-
-        /* ==========================================================================
-        4. Stage Checklist
-        ========================================================================== */
-
-        /* === ▼▼▼ 新規追加: 折りたたみボタン ▼▼▼ === */
+        /* 4. Stage Checklist */
+        /* 折りたたみボタン */
         .toggle-button {
+            /* ボックスモデル */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: var(--space-xs);
-            background-color: var(--primary-container-color);
             border: none;
+            /* 装飾 */
+            background-color: var(--primary-container-color);
             border-radius: 50%;
+            /* その他 */
             cursor: pointer;
             transition: transform 0.3s ease;
         }
 
         .toggle-button .material-icons-outlined {
+            /* タイポグラフィ */
             font-size: var(--font-size-lg);
             font-weight: 700;
         }
 
         .toggle-button.is-collapsed {
+            /* その他 */
             transform: rotate(-90deg);
         }
 
         .collapsible-content.is-collapsed {
+            /* ボックスモデル */
             display: none;
         }
 
-        /* === ▲▲▲ 新規追加 === */
-
+        /* 一括操作ボタン */
         .bulk-action-buttons {
+            /* ボックスモデル */
             display: flex;
             gap: var(--space-sm);
             margin-bottom: var(--space-md);
         }
 
+        /* ステージチェックリスト */
         .stage-checklist {
+            /* ボックスモデル */
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: var(--space-sm);
@@ -286,60 +329,81 @@
         }
 
         .stage-check-item {
+            /* ボックスモデル */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: var(--space-md) var(--space-sm);
-            background-color: var(--surface-container-low-color);
             border: 1px solid var(--outline-color);
+            /* 装飾 */
+            background-color: var(--surface-container-low-color);
             border-radius: var(--radius-md);
+            /* その他 */
             cursor: pointer;
             transition: background-color 0.2s, border-color 0.2s, color 0.2s;
             user-select: none;
         }
 
         .stage-check-item:hover {
+            /* 装飾 */
             background-color: #EAEAEA;
         }
 
         .stage-check-item.is-active {
-            background-color: var(--primary-container-color);
+            /* ボックスモデル */
             border-color: var(--primary-color);
+            /* タイポグラフィ */
             color: var(--on-primary-container-color);
+            /* 装飾 */
+            background-color: var(--primary-container-color);
         }
 
         .stage-check-item.is-active label {
+            /* タイポグラフィ */
             font-weight: 700;
         }
 
         .stage-check-item label {
+            /* タイポグラフィ */
             font-size: var(--font-size-sm);
             font-weight: 500;
+            /* その他 */
             cursor: pointer;
         }
 
-        /* ==========================================================================
-        5. Navigation
-        ========================================================================== */
+        /* 5. Navigation */
         .home-button {
+            /* ボックスモデル */
             display: block;
             width: 100%;
             padding: var(--space-md) var(--space-lg);
+            border: 1px solid var(--primary-color);
+            box-sizing: border-box;
+            /* タイポグラフィ */
             font-size: var(--font-size-base);
             font-weight: 700;
             color: white;
-            background-color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            border-radius: var(--radius-lg);
             text-align: center;
             text-decoration: none;
-            box-sizing: border-box;
+            /* 装飾 */
+            background-color: var(--primary-color);
+            border-radius: var(--radius-lg);
+            /* その他 */
             transition: all 0.2s ease-in-out;
         }
 
         .home-button:hover {
-            background-color: #333333;
+            /* ボックスモデル */
             border-color: #333333;
+            /* 装飾 */
+            background-color: #333333;
+        }
+
+        /* 6. Utility (HTMLから移動) */
+        /* ヘッダーのリンクスタイル */
+        .header a {
+            color: inherit;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -347,7 +411,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1><a href="index.html" style="color: inherit; text-decoration: none;">大学杯 配信サポート</a></h1>
+            <h1><a href="index.html">大学杯 配信サポート</a></h1>
         </header>
 
         <main>
@@ -415,38 +479,29 @@
     <script>
         const getEl = (id) => document.getElementById(id);
 
+        // DOM要素のキャッシュ
         const DOMElements = {
             nameInput: getEl('tournament-name-input'),
             nameSaveStatus: getEl('name-save-status'),
-
-            // === ▼▼▼ 新規追加: 実況解説者 ▼▼▼ ===
             casterNameInput: getEl('caster-name-input'),
             casterIconInput: getEl('caster-icon-input'),
             analystNameInput: getEl('analyst-name-input'),
             analystIconInput: getEl('analyst-icon-input'),
             commentatorSaveStatus: getEl('commentator-save-status'),
-            // === ▲▲▲ 新規追加 ===
-
-            // === ▼▼▼ 修正: ステージ設定 ▼▼▼ ===
             stageChecklistContainer: getEl('stage-checklist-container'),
             selectAllButton: getEl('select-all-stages'),
             deselectAllButton: getEl('deselect-all-stages'),
             stageSaveStatus: getEl('stage-save-status'),
             stageToggleBtn: getEl('stage-toggle-btn'),
             stageSettingsContent: getEl('stage-settings-content')
-            // === ▲▲▲ 修正 ===
         };
 
         let allStagesData = []; // stages.jsonから読み込んだ全ステージ名
         let nameSaveTimer = null;
         let stageSaveTimer = null;
-        // === ▼▼▼ 新規追加 ▼▼▼ ===
-        let commentatorSaveTimer = null;
-        // === ▲▲▲ 新規追加 ===
+        let commentatorSaveTimer = null; // 実況解説者情報用タイマー
 
-        /**
-         * ページの読み込みと初期化
-         */
+        // ページの読み込みと初期化
         const initializeSettingsPage = async () => {
             DOMElements.stageChecklistContainer.innerHTML = '<p>ステージ情報と設定を読み込んでいます...</p>';
 
@@ -465,14 +520,13 @@
                 // 2. 大会名フォームに値を設定
                 DOMElements.nameInput.value = state.tournamentName || '';
 
-                // === ▼▼▼ 新規追加: 実況解説者情報の読み込み ▼▼▼ ===
+                // 3. 実況解説者情報の読み込み
                 DOMElements.casterNameInput.value = state.casterName || '';
                 DOMElements.casterIconInput.value = state.casterIconUrl || '';
                 DOMElements.analystNameInput.value = state.analystName || '';
                 DOMElements.analystIconInput.value = state.analystIconUrl || '';
-                // === ▲▲▲ 新規追加 ===
 
-                // 3. ステージチェックリストを生成
+                // 4. ステージチェックリストを生成
                 renderStageChecklist(state.unusedStages || []);
 
             } catch (error) {
@@ -481,13 +535,12 @@
             }
         };
 
-        /**
-         * ステージチェックリストを描画し、イベントリスナーを設定
-         */
+        // ステージチェックリストを描画し、イベントリスナーを設定
         const renderStageChecklist = (unusedStages = []) => {
             let checklistHTML = '';
             allStagesData.forEach(stageName => {
                 const isUsed = !unusedStages.includes(stageName);
+                // `is-active`クラスで使用/不使用を管理
                 checklistHTML += `
                     <div class="stage-check-item ${isUsed ? 'is-active' : ''}" 
                          data-stage-name="${stageName}">
@@ -499,22 +552,18 @@
             setupChecklistBehavior();
         };
 
-        /**
-         * チェックリストの挙動をセットアップ
-         */
+        // チェックリストのクリック挙動をセットアップ
         const setupChecklistBehavior = () => {
             DOMElements.stageChecklistContainer.querySelectorAll('.stage-check-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
                     item.classList.toggle('is-active');
-                    saveStageSettings(); // 自動保存
+                    saveStageSettings(); // クリック時に自動保存
                 });
             });
         };
 
-        /**
-         * 大会名をFirestoreに保存
-         */
+        // 大会名をFirestoreに保存
         const saveTournamentName = async () => {
             try {
                 const tournamentName = DOMElements.nameInput.value;
@@ -528,10 +577,7 @@
             }
         };
 
-        // === ▼▼▼ 新規追加: 実況解説者情報の保存 ▼▼▼ ===
-        /**
-         * 実況解説者情報をFirestoreに保存
-         */
+        // 実況解説者情報をFirestoreに保存
         const saveCommentatorInfo = async () => {
             try {
                 await sessionDocRef.update({
@@ -546,15 +592,13 @@
                 showSaveStatus(DOMElements.commentatorSaveStatus, "保存失敗", commentatorSaveTimer);
             }
         };
-        // === ▲▲▲ 新規追加 ===
 
-        /**
-         * ステージ設定をFirestoreに保存
-         */
+        // ステージ設定 (unusedStages) をFirestoreに保存
         const saveStageSettings = async () => {
             try {
                 const unusedStages = [];
                 const items = DOMElements.stageChecklistContainer.querySelectorAll('.stage-check-item');
+                // `is-active` でないもの (チェックが外れているもの) を `unusedStages` リストに追加
                 items.forEach(item => {
                     if (!item.classList.contains('is-active')) {
                         unusedStages.push(item.dataset.stageName);
@@ -570,9 +614,7 @@
             }
         };
 
-        /**
-         * 保存ステータスを表示 (2秒後に非表示)
-         */
+        // 保存ステータスを表示 (2秒後に非表示)
         const showSaveStatus = (element, message, timer) => {
             if (timer) clearTimeout(timer);
             element.textContent = message;
@@ -582,15 +624,13 @@
             }, 2000);
         };
 
-        /**
-         * ステージ一括操作
-         */
+        // ステージ一括操作 (すべて選択 / すべて解除)
         const setAllStagesActive = (isActive) => {
             const items = DOMElements.stageChecklistContainer.querySelectorAll('.stage-check-item');
             items.forEach(item => {
                 item.classList.toggle('is-active', isActive);
             });
-            saveStageSettings(); // 自動保存
+            saveStageSettings(); // 操作後に自動保存
         };
 
         // --- イベントリスナーの設定 ---
@@ -601,24 +641,22 @@
         // 大会名入力欄 (フォーカスが外れたら保存)
         DOMElements.nameInput.addEventListener('change', saveTournamentName);
 
-        // === ▼▼▼ 新規追加: 実況解説者情報の保存イベント ▼▼▼ ===
+        // 実況解説者情報の入力欄 (フォーカスが外れたら保存)
         DOMElements.casterNameInput.addEventListener('change', saveCommentatorInfo);
         DOMElements.casterIconInput.addEventListener('change', saveCommentatorInfo);
         DOMElements.analystNameInput.addEventListener('change', saveCommentatorInfo);
         DOMElements.analystIconInput.addEventListener('change', saveCommentatorInfo);
-        // === ▲▲▲ 新規追加 ===
 
         // ステージ一括操作ボタン
         DOMElements.selectAllButton.addEventListener('click', () => setAllStagesActive(true));
         DOMElements.deselectAllButton.addEventListener('click', () => setAllStagesActive(false));
 
-        // === ▼▼▼ 新規追加: 折りたたみボタンのイベント ▼▼▼ ===
+        // ステージ設定の折りたたみボタン
         DOMElements.stageToggleBtn.addEventListener('click', () => {
             const isCollapsed = DOMElements.stageSettingsContent.classList.toggle('is-collapsed');
             DOMElements.stageToggleBtn.classList.toggle('is-collapsed', isCollapsed);
             DOMElements.stageToggleBtn.title = isCollapsed ? "展開する" : "折りたたむ";
         });
-        // === ▲▲▲ 新規追加 ===
 
     </script>
 </body>
