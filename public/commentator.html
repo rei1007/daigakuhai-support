@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -65,9 +65,9 @@
             <div class="tab-action-bar">
                 <div class="comment-input-group">
                     <button id="edit-name-button" class="icon-button" title="表示名を設定"><span
-                            class="material-symbols-outlined">settings</span></button>
+                            class="material-symbols-rounded">settings</span></button>
                     <input type="text" id="comment-input" placeholder="コメントを入力">
-                    <button id="send-comment-button"><span class="material-symbols-outlined">send</span><span
+                    <button id="send-comment-button"><span class="material-symbols-rounded">send</span><span
                             class="send-text">送信</span></button>
                 </div>
             </div>
@@ -88,28 +88,30 @@
                     <h2>配信画面</h2>
                     <div class="stream-view-selector" id="stream-view-selector">
                         <button id="stream-view-matchInfo" data-view="matchInfo">
-                            <span class="material-symbols-outlined">scoreboard</span>
+                            <span class="material-symbols-rounded">scoreboard</span>
                             対戦情報
                         </button>
                         <button id="stream-view-stageList" data-view="stageList">
-                            <span class="material-symbols-outlined">distance</span>
+                            <span class="material-symbols-rounded">distance</span>
                             ステージ
                         </button>
                         <button id="stream-view-replay" data-view="replay">
-                            <span class="material-symbols-outlined">autoplay</span>
+                            <span class="material-symbols-rounded">autoplay</span>
                             リプレイ
                         </button>
                     </div>
-                    
-                    <div class="stream-status-display" id="stream-status-display-area" style="display: none;">
-                        <div class="status-tile" id="status-tile-lag" style="display: none;">
-                            <span class="material-symbols-outlined">network_check</span> ラグ対応中
+
+                    <div class="stream-status-display-only" id="stream-status-display-only">
+                        <div id="status-display-lag" class="status-tile is-lag">
+                            <span class="material-symbols-rounded">error</span>
+                            ラグ対応中
                         </div>
-                        <div class="status-tile" id="status-tile-waiting" style="display: none;">
-                            <span class="material-symbols-outlined">hourglass_top</span> 試合待機中
+                        <div id="status-display-waiting" class="status-tile is-waiting">
+                            <span class="material-symbols-rounded">hourglass_empty</span>
+                            試合待機中
                         </div>
                     </div>
-                </section>
+                    </section>
 
                 <section id="match-status-section">
                     <div id="match-status-display">
@@ -145,7 +147,7 @@
                         </div>
                         <div class="sync-button-pc pc-only">
                             <button id="sync-view-button-pc" class="sync-button" title="表示チームを対戦チームに同期">
-                                <span class="material-symbols-outlined">arrow_downward</span>
+                                <span class="material-symbols-rounded">arrow_downward</span>
                             </button>
                         </div>
                     </div>
@@ -156,7 +158,7 @@
                         <button id="display-bravo-btn">ブラボー</button>
                     </div>
                     <button id="sync-view-button-mobile" class="sync-button" title="表示チームを対戦チームに同期">
-                        <span class="material-symbols-outlined">arrow_downward</span>
+                        <span class="material-symbols-rounded">arrow_downward</span>
                     </button>
                 </div>
             </div>
@@ -166,7 +168,7 @@
     <div id="comment-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="comment-modal-close"><span
-                    class="material-symbols-outlined">close</span></button>
+                    class="material-symbols-rounded">close</span></button>
             <h2 id="comment-modal-heading">新着コメント</h2>
             <p id="comment-modal-text"></p>
         </div>
@@ -174,7 +176,7 @@
     <div id="name-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="name-modal-close"><span
-                    class="material-symbols-outlined">close</span></button>
+                    class="material-symbols-rounded">close</span></button>
             <h2>表示名を設定</h2>
             <div class="form-group">
                 <label for="name-input">チャットで表示される名前を入力してください。</label>
@@ -186,7 +188,7 @@
     <div id="stage-view-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="stage-view-modal-close"><span
-                    class="material-symbols-outlined">close</span></button>
+                    class="material-symbols-rounded">close</span></button>
             <h2>使用ステージ一覧</h2>
             <p>
                 大会設定で使用が許可されているステージの一覧です。（グレーアウト：使用しないステージ）
@@ -200,19 +202,19 @@
     <nav class="tab-bar">
         <div class="tab-bar-inner">
             <button class="tab-button" data-tab="comment">
-                <span class="material-symbols-outlined">chat</span>
+                <span class="material-symbols-rounded">chat</span>
                 <span class="tab-label">コメント</span>
             </button>
             <button class="tab-button" data-tab="script">
-                <span class="material-symbols-outlined">description</span>
+                <span class="material-symbols-rounded">description</span>
                 <span class="tab-label">台本</span>
             </button>
             <button class="tab-button" data-tab="stream-view">
-                <span class="material-symbols-outlined">smart_display</span>
+                <span class="material-symbols-rounded">smart_display</span>
                 <span class="tab-label">配信・対戦情報</span>
             </button>
             <button class="tab-button" data-tab="match-team-info">
-                <span class="material-symbols-outlined">people</span>
+                <span class="material-symbols-rounded">people</span>
                 <span class="tab-label">チーム情報</span>
             </button>
         </div>
@@ -276,10 +278,9 @@
             streamViewMatchInfo: getEl('stream-view-matchInfo'),
             streamViewStageList: getEl('stream-view-stageList'),
             streamViewReplay: getEl('stream-view-replay'),
-            // 配信ステータス表示(閲覧用)
-            streamStatusDisplayArea: getEl('stream-status-display-area'),
-            statusTileLag: getEl('status-tile-lag'),
-            statusTileWaiting: getEl('status-tile-waiting'),
+            streamStatusDisplayOnly: getEl('stream-status-display-only'),
+            statusDisplayLag: getEl('status-display-lag'),
+            statusDisplayWaiting: getEl('status-display-waiting'),
         };
 
         // 接続ステータスをUIに反映
@@ -327,12 +328,19 @@
             renderComments(state.comments || []);
             renderMatchStatus(state);
             renderStreamViewSelector(state.currentStreamView);
-            renderStreamStatusDisplay(state.streamStatus); // 配信ステータス表示を更新
+
+            // ▼▼▼ 新規追加 ▼▼▼
+            // 配信ステータスの表示を更新
+            renderStreamStatus(state.streamStatus || 'normal');
+            // ▲▲▲ 新規追加 ▲▲▲
 
             // 新着コメントモーダルの表示判定
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
-            if (lastComment && lastComment.senderId !== mySessionId && lastComment.senderId !== 'system' && !isCommentTabActive) { // システムコメント除外
+            if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
+                // システムメッセージはモーダルを表示しない
+                if (lastComment.role === 'システム') return;
+
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role, lastComment.displayName);
@@ -350,9 +358,16 @@
                 else if (c.role === '運営') { badgeClass = 'is-operator'; }
                 else if (c.role === '実況解説') { badgeClass = 'is-commentator'; }
                 else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
-                else if (c.role === 'システム') { badgeClass = 'is-system'; } // システムバッジ
+                // ▼▼▼ システムメッセージ用のスタイルを追加 ▼▼▼
+                else if (c.role === 'システム') { badgeClass = 'is-system'; badgeText = 'システム'; }
+
                 const displayNameHTML = c.displayName ? `<span class="display-name">${c.displayName}</span>` : '';
-                return `<div class="comment-item-wrapper ${isMe ? 'is-me' : ''}">
+                
+                // システムメッセージ用のラッパーlassを追加
+                let wrapperClass = isMe ? 'is-me' : '';
+                if (c.role === 'システム') wrapperClass = 'is-system-message';
+
+                return `<div class="comment-item-wrapper ${wrapperClass}">
                            <div class="comment-item" id="comment-${c.id}">
                              <div class="comment-header">${displayNameHTML}<span class="badge ${badgeClass}">${badgeText}</span></div>
                              <span class="text">${c.text}</span>
@@ -459,26 +474,19 @@
             DOMElements.streamViewStageList.classList.toggle('active', view === 'stageList');
             DOMElements.streamViewReplay.classList.toggle('active', view === 'replay');
         };
-
-        // (閲覧用) 配信ステータス表示を更新
-        const renderStreamStatusDisplay = (currentStatus) => {
-            const status = currentStatus || 'normal';
+        
+        // ▼▼▼ 新規追加 ▼▼▼
+        // 配信ステータス表示（実況解説ページ専用）を更新
+        const renderStreamStatus = (status) => {
+            if (!DOMElements.statusDisplayLag || !DOMElements.statusDisplayWaiting) return;
             
-            if (status === 'normal') {
-                DOMElements.streamStatusDisplayArea.style.display = 'none';
-                DOMElements.statusTileLag.style.display = 'none';
-                DOMElements.statusTileWaiting.style.display = 'none';
-            } else if (status === 'lag') {
-                DOMElements.streamStatusDisplayArea.style.display = 'block';
-                DOMElements.statusTileLag.style.display = 'flex'; // アイコンとテキストを並べる
-                DOMElements.statusTileWaiting.style.display = 'none';
-            } else if (status === 'waiting') {
-                DOMElements.streamStatusDisplayArea.style.display = 'block';
-                DOMElements.statusTileLag.style.display = 'none';
-                DOMElements.statusTileWaiting.style.display = 'flex'; // アイコンとテキストを並べる
-            }
+            // 'lag' の場合
+            DOMElements.statusDisplayLag.classList.toggle('is-visible', status === 'lag');
+            
+            // 'waiting' の場合
+            DOMElements.statusDisplayWaiting.classList.toggle('is-visible', status === 'waiting');
         };
-
+        // ▲▲▲ 新規追加 ▲▲▲
 
         // チーム情報タブの表示を更新 (PC/モバイル切り替え含む)
         const updateTeamDisplay = () => {
@@ -549,12 +557,15 @@
         const sendComment = () => {
             const text = DOMElements.commentInput.value.trim();
             if (text) {
+                // ▼▼▼ システムロールでの送信を防ぐ ▼▼▼
+                const roleToSend = (MY_ROLE === 'システム') ? '実況解説' : MY_ROLE;
+
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
                     const newComment = {
                         id: Math.random().toString(36).substr(2, 9),
-                        text, senderId: mySessionId, role: MY_ROLE,
+                        text, senderId: mySessionId, role: roleToSend, // 修正
                         displayName: myDisplayName, timestamp: new Date()
                     };
                     // コメントは最新100件のみ保持
@@ -704,10 +715,11 @@
                 DOMElements.showStagesModalButton.onclick = openStageViewModal;
             }
 
-            // 配信画面セレクターのクリックイベント (Firestore更新)
+            // 配信画面セレクターのクリックイベント
             DOMElements.streamViewSelector.addEventListener('click', (e) => {
                 const target = e.target.closest('button');
                 if (target && target.dataset.view) {
+                    // クリックしたらFirestoreの`currentStreamView`を更新
                     sessionDocRef.update({ currentStreamView: target.dataset.view });
                 }
             });

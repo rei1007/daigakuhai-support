@@ -22,8 +22,8 @@
     --badge-me-bg: #FFF3E0;
     --badge-me-text: #E65100;
     --status-connected: #34A853;
-    --status-connecting: #FBBC05;
-    --status-disconnected: #EA4335;
+    --status-connecting: #d6b34a;
+    --status-disconnected: #a73f35;
     --winner-alpha-color: #d0be08;
     --winner-bravo-color: #3a0ccd;
 
@@ -1595,11 +1595,12 @@ main {
     background-color: var(--primary-color);
 }
 
-/* 実況解説ページ用 (表示専用) */
+/* 実況解説ページ用 (表示専用) - スタイル変更 */
 .stream-status-display-only {
     /* ボックスモデル */
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* 1列に変更して横幅いっぱいを使う */
+    grid-template-columns: 1fr;
     gap: var(--space-sm);
     margin-bottom: var(--space-lg);
 }
@@ -1612,10 +1613,13 @@ main {
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid transparent;
+    /* paddingを大きくして目立たせる */
+    padding: var(--space-sm);
+    border: 2px solid transparent;
+    /* 枠線を少し太く */
     /* タイポグラフィ */
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
+    /* フォントサイズを大きく */
     font-weight: 700;
     /* 装飾 */
     border-radius: var(--radius-lg);
@@ -1628,21 +1632,26 @@ main {
 
 .stream-status-display-only .status-tile.is-lag {
     /* タイポグラフィ */
-    color: var(--xp-highlight-color);
+    color: white;
+    /* 白文字に変更 */
     /* 装飾 */
-    background-color: var(--xp-highlight-bg);
-    border-color: var(--xp-highlight-color);
+    background-color: var(--status-disconnected);
+    /* より強い赤色に変更 */
+    border-color: var(--status-disconnected);
 }
 
 .stream-status-display-only .status-tile.is-waiting {
-    /* タイポグラgフィ */
-    color: var(--badge-me-text);
+    /* タイポグラフィ */
+    color: var(--on-surface-color);
+    /* 黒文字に変更 */
     /* 装飾 */
-    background-color: var(--badge-me-bg);
+    background-color: var(--status-connecting);
+    /* より強い黄色に変更 */
     border-color: var(--status-connecting);
 }
 
 .stream-status-display-only .status-tile .material-symbols-rounded {
     /* タイポグラフィ */
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
+    /* アイコンサイズを大きく */
 }

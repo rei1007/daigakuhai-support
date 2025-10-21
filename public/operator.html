@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -74,9 +74,9 @@
             <div class="tab-action-bar">
                 <div class="comment-input-group">
                     <button id="edit-name-button" class="icon-button" title="設定"><span
-                            class="material-symbols-outlined">settings</span></button>
+                            class="material-symbols-rounded">settings</span></button>
                     <input type="text" id="comment-input" placeholder="コメントを入力">
-                    <button id="send-comment-button"><span class="material-symbols-outlined">send</span><span
+                    <button id="send-comment-button"><span class="material-symbols-rounded">send</span><span
                             class="send-text">送信</span></button>
                 </div>
             </div>
@@ -93,21 +93,23 @@
 
         <div id="tab-content-match-settings" class="tab-content">
             <div class="tab-main-content">
-                <section id="stream-status-section">
-                    <h2>配信画面</h2>
+                <section id="stream-view-section">
+                    <h2>配信ステータス</h2>
                     <div class="stream-status-selector" id="stream-status-selector">
-                        <button id="status-normal-btn" data-status="normal" class="active">
+                        <button id="status-btn-normal" data-status="normal" class="active">
+                            <span class="material-symbols-rounded">check_circle</span>
                             通常
                         </button>
-                        <button id="status-lag-btn" data-status="lag">
+                        <button id="status-btn-lag" data-status="lag">
+                            <span class="material-symbols-rounded">error</span>
                             ラグ対応中
                         </button>
-                        <button id="status-waiting-btn" data-status="waiting">
+                        <button id="status-btn-waiting" data-status="waiting">
+                            <span class="material-symbols-rounded">hourglass_empty</span>
                             試合待機中
                         </button>
                     </div>
                 </section>
-                
                 <section class="card" id="match-settings-card">
                     <h2>対戦設定</h2>
                     <div class="form-group"><label for="round-info-input">ラウンド情報</label><input type="text"
@@ -153,7 +155,7 @@
                                 class="vs-text">VS</span><select id="view-bravo-select"></select></div>
                         <div class="sync-button-pc pc-only"><button id="sync-view-button-pc" class="sync-button"
                                 title="表示チームを対戦チームに同期"><span
-                                    class="material-symbols-outlined">arrow_downward</span></button>
+                                    class="material-symbols-rounded">arrow_downward</span></button>
                         </div>
                     </div>
                 </div>
@@ -161,7 +163,7 @@
                     <div class="segmented-control"><button id="display-alpha-btn" class="active">アルファ</button><button
                             id="display-bravo-btn">ブラボー</button></div>
                     <button id="sync-view-button-mobile" class="sync-button" title="表示チームを対戦チームに同期"><span
-                            class="material-symbols-outlined">arrow_downward</span></button>
+                            class="material-symbols-rounded">arrow_downward</span></button>
                 </div>
             </div>
         </div>
@@ -170,7 +172,7 @@
     <div id="comment-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="comment-modal-close"><span
-                    class="material-symbols-outlined">close</span></button>
+                    class="material-symbols-rounded">close</span></button>
             <h2 id="comment-modal-heading">新着コメント</h2>
             <p id="comment-modal-text"></p>
         </div>
@@ -178,7 +180,7 @@
     <div id="stage-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="stage-modal-close"><span
-                    class="material-symbols-outlined">close</span></button>
+                    class="material-symbols-rounded">close</span></button>
             <h2>ステージを選択</h2>
             <div class="stage-grid" id="stage-grid"></div>
         </div>
@@ -186,7 +188,7 @@
     <div id="settings-modal" class="modal">
         <div class="modal-content">
             <button class="modal-close" id="settings-modal-close"><span
-                    class="material-symbols-outlined">close</span></button>
+                    class="material-symbols-rounded">close</span></button>
             <h2>設定</h2>
             <div class="form-group">
                 <label for="name-input">表示名</label>
@@ -207,19 +209,19 @@
     <nav class="tab-bar">
         <div class="tab-bar-inner">
             <button class="tab-button" data-tab="comment">
-                <span class="material-symbols-outlined">chat</span>
+                <span class="material-symbols-rounded">chat</span>
                 <span class="tab-label">コメント</span>
             </button>
             <button class="tab-button" data-tab="script">
-                <span class="material-symbols-outlined">description</span>
+                <span class="material-symbols-rounded">description</span>
                 <span class="tab-label">台本</span>
             </button>
             <button class="tab-button" data-tab="match-settings">
-                <span class="material-symbols-outlined">tune</span>
+                <span class="material-symbols-rounded">tune</span>
                 <span class="tab-label">対戦設定</span>
             </button>
             <button class="tab-button" data-tab="team-display">
-                <span class="material-symbols-outlined">people</span>
+                <span class="material-symbols-rounded">people</span>
                 <span class="tab-label">チーム情報</span>
             </button>
         </div>
@@ -233,6 +235,7 @@
 
         // 使用しないステージのグローバルリスト
         let unusedStages = []; 
+        let currentStreamStatus = 'normal'; // ▼▼▼ 新規追加: 現在のステータスを追跡 ▼▼▼
 
         // 自分のセッションIDをlocalStorageから取得、なければ生成
         let mySessionId = localStorage.getItem('mySessionId');
@@ -247,7 +250,6 @@
         const pageLoadTime = Date.now();
         let officialMatchup = { alphaTeamId: null, bravoTeamId: null };
         let isViewLocked = false; // ユーザーが手動でチーム表示を変更したか
-        let currentStreamStatus = 'normal'; // 配信ステータスをグローバルで保持
 
         // DOM要素のキャッシュ
         const getEl = (id) => document.getElementById(id);
@@ -267,11 +269,12 @@
             displayAlphaBtn: getEl('display-alpha-btn'), displayBravoBtn: getEl('display-bravo-btn'),
             roundInfoInput: getEl('round-info-input'), bo3Btn: getEl('bo3-btn'), bo5Btn: getEl('bo5-btn'), stageWinnerRows: getEl('stage-winner-rows'),
             resetStagesButton: getEl('reset-stages-button'),
-            // 配信ステータスセレクター
+            // ▼▼▼ 新規追加 ▼▼▼
             streamStatusSelector: getEl('stream-status-selector'),
-            statusNormalBtn: getEl('status-normal-btn'),
-            statusLagBtn: getEl('status-lag-btn'),
-            statusWaitingBtn: getEl('status-waiting-btn'),
+            statusBtnNormal: getEl('status-btn-normal'),
+            statusBtnLag: getEl('status-btn-lag'),
+            statusBtnWaiting: getEl('status-btn-waiting'),
+            // ▲▲▲ 新規追加 ▲▲▲
         };
 
         // 接続ステータスをUIに反映
@@ -291,6 +294,26 @@
             if (DOMElements.syncViewButtonPC) DOMElements.syncViewButtonPC.classList.toggle('is-desynced', isDesynced);
             if (DOMElements.syncViewButtonMobile) DOMElements.syncViewButtonMobile.classList.toggle('is-desynced', isDesynced);
         };
+        
+        // ▼▼▼ 新規追加: システムコメント送信 ▼▼▼
+        const sendSystemComment = (text) => {
+            if (!text) return;
+            db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(sessionDocRef);
+                const currentComments = doc.data().comments || [];
+                const newComment = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    text,
+                    senderId: 'system', // システムとして送信
+                    role: 'システム',
+                    displayName: 'システム',
+                    timestamp: new Date()
+                };
+                const updatedComments = [...currentComments, newComment].slice(-100);
+                transaction.update(sessionDocRef, { comments: updatedComments });
+            });
+        };
+        // ▲▲▲ 新規追加 ▲▲▲
 
         // Firestoreのセッション情報を監視
         sessionDocRef.onSnapshot((doc) => {
@@ -298,10 +321,7 @@
             const state = doc.data();
             setConnectionStatus('connected');
 
-            // グローバル変数のステータスを更新
-            if (state.streamStatus !== currentStreamStatus) {
-                currentStreamStatus = state.streamStatus || 'normal';
-            }
+            // unusedStagesリストを更新
             unusedStages = state.unusedStages || [];
 
             // 対戦カードの更新
@@ -320,17 +340,35 @@
                     checkSyncStatus();
                 }
             }
+            
+            // ▼▼▼ 新規追加: 配信ステータス変更監視 & システムコメント送信 ▼▼▼
+            const newStatus = state.streamStatus || 'normal';
+            if (newStatus !== currentStreamStatus) {
+                // ラグ対応開始
+                if (newStatus === 'lag') {
+                    sendSystemComment('【システム】ラグ対応を開始しました。');
+                } 
+                // ラグ対応終了 (他のステータスに変わった)
+                else if (currentStreamStatus === 'lag') {
+                    sendSystemComment('【システム】ラグ対応が終了しました。');
+                }
+                currentStreamStatus = newStatus; // グローバル変数を更新
+            }
+            renderStreamStatus(newStatus); // UIのレンダリング
+            // ▲▲▲ 新規追加 ▲▲▲
 
             // 各コンポーネントを描画
             renderScript(state.scriptIndex || 0);
             renderComments(state.comments || []);
             renderMatchSettings(state);
-            renderStreamStatusSelector(currentStreamStatus); // 配信ステータス描画
 
             // 新着コメントモーダルの表示判定
             const lastComment = (state.comments || []).slice(-1)[0];
             const isCommentTabActive = document.querySelector('.tab-button[data-tab="comment"]')?.classList.contains('active');
-            if (lastComment && lastComment.senderId !== mySessionId && lastComment.senderId !== 'system' && !isCommentTabActive) { // システムコメントは除外
+            if (lastComment && lastComment.senderId !== mySessionId && !isCommentTabActive) {
+                // ▼▼▼ 修正: システムメッセージはモーダルを表示しない ▼▼▼
+                if (lastComment.role === 'システム') return;
+                
                 const lastShownTime = DOMElements.commentModal.dataset.lastShownTime || 0;
                 if (lastComment.timestamp && lastComment.timestamp.toMillis() > pageLoadTime && lastComment.timestamp.toMillis() > lastShownTime) {
                     showCommentModal(lastComment.text, lastComment.role, lastComment.displayName);
@@ -349,11 +387,16 @@
                 } else if (c.role === '運営') { badgeClass = 'is-operator'; }
                 else if (c.role === '実況解説') { badgeClass = 'is-commentator'; }
                 else if (c.role === '配信担当') { badgeClass = 'is-stream-staff'; }
-                else if (c.role === 'システム') { badgeClass = 'is-system'; } // システムバッジ
+                // ▼▼▼ 新規追加: システムメッセージ用 ▼▼▼
+                else if (c.role === 'システム') { badgeClass = 'is-system'; badgeText = 'システム'; }
 
                 const displayNameHTML = c.displayName ? `<span class="display-name">${c.displayName}</span>` : '';
+                
+                // ▼▼▼ 修正: システムメッセージ用のラッパーlassを追加 ▼▼▼
+                let wrapperClass = isMe ? 'is-me' : '';
+                if (c.role === 'システム') wrapperClass = 'is-system-message';
 
-                return `<div class="comment-item-wrapper ${isMe ? 'is-me' : ''}">
+                return `<div class="comment-item-wrapper ${wrapperClass}">
                            <div class="comment-item" id="comment-${c.id}">
                              <div class="comment-header">${displayNameHTML}<span class="badge ${badgeClass}">${badgeText}</span></div>
                              <span class="text">${c.text}</span>
@@ -418,7 +461,7 @@
         // チーム情報タブの表示を更新 (PC/モバイル切り替え含む)
         const updateTeamDisplay = () => {
             DOMElements.teamAlphaCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
-            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewAlphaSelect.value);
+            DOMElements.teamBravoCard.innerHTML = createTeamCardHTML(DOMElements.viewBravoSelect.value);
 
             // モバイル表示の切り替え
             if (window.innerWidth <= 768) {
@@ -461,14 +504,14 @@
                 DOMElements.stageWinnerRows.appendChild(row);
             }
         };
-
-        // 配信ステータスセレクターの表示を更新
-        const renderStreamStatusSelector = (status) => {
-            const currentStatus = status || 'normal';
-            DOMElements.statusNormalBtn.classList.toggle('active', currentStatus === 'normal');
-            DOMElements.statusLagBtn.classList.toggle('active', currentStatus === 'lag');
-            DOMElements.statusWaitingBtn.classList.toggle('active', currentStatus === 'waiting');
+        
+        // ▼▼▼ 新規追加: 配信ステータスセレクターの表示を更新 ▼▼▼
+        const renderStreamStatus = (status) => {
+            DOMElements.statusBtnNormal.classList.toggle('active', status === 'normal');
+            DOMElements.statusBtnLag.classList.toggle('active', status === 'lag');
+            DOMElements.statusBtnWaiting.classList.toggle('active', status === 'waiting');
         };
+        // ▲▲▲ 新規追加 ▲▲▲
 
         // ページ初期化 (静的JSON読み込み、UIセットアップ)
         const initializePage = async () => {
@@ -527,58 +570,24 @@
         DOMElements.viewAlphaSelect.onchange = viewChangeHandler;
         DOMElements.viewBravoSelect.onchange = viewChangeHandler;
 
-        // システムコメント送信
-        const sendSystemComment = (text) => {
-            const newComment = {
-                id: Math.random().toString(36).substr(2, 9),
-                text: text,
-                senderId: 'system', // 専用ID
-                role: 'システム',
-                displayName: 'システム',
-                timestamp: new Date()
-            };
-            db.runTransaction(async (transaction) => {
-                const doc = await transaction.get(sessionDocRef);
-                const currentComments = doc.data().comments || [];
-                const updatedComments = [...currentComments, newComment].slice(-100);
-                transaction.update(sessionDocRef, { comments: updatedComments });
-            }).catch(console.error);
-        };
-
-        // 配信ステータス更新
-        const updateStreamStatus = (newStatus) => {
-            if (newStatus === currentStreamStatus) return; // 変更がない場合は何もしない
-            const oldStatus = currentStreamStatus;
-            
-            sessionDocRef.update({ streamStatus: newStatus })
-                .then(() => {
-                    // コメント送信ロジック (Firestore更新が成功したら実行)
-                    if (newStatus === 'lag' && oldStatus !== 'lag') {
-                        sendSystemComment("【システム】ラグ対応を開始しました。");
-                    } else if (newStatus !== 'lag' && oldStatus === 'lag') {
-                        sendSystemComment("【システム】ラグ対応が終了しました。");
-                    }
-                })
-                .catch(console.error);
-            // ローカルの currentStreamStatus は onSnapshot によって更新される
-        };
-
-        // 配信ステータスセレクターのクリックイベント
-        DOMElements.streamStatusSelector.addEventListener('click', (e) => {
-            const target = e.target.closest('button');
-            if (target && target.dataset.status) {
-                updateStreamStatus(target.dataset.status);
-            }
-        });
-
         // コメントをFirestoreに送信
         const sendComment = () => {
             const text = DOMElements.commentInput.value.trim();
             if (text) {
+                // ▼▼▼ 修正: システムロールでの送信を防ぐ ▼▼▼
+                const roleToSend = (MY_ROLE === 'システム') ? '運営' : MY_ROLE;
+
                 db.runTransaction(async (transaction) => {
                     const doc = await transaction.get(sessionDocRef);
                     const currentComments = doc.data().comments || [];
-                    const newComment = { id: Math.random().toString(36).substr(2, 9), text, senderId: mySessionId, role: MY_ROLE, displayName: myDisplayName, timestamp: new Date() };
+                    const newComment = { 
+                        id: Math.random().toString(36).substr(2, 9), 
+                        text, 
+                        senderId: mySessionId, 
+                        role: roleToSend, // 修正
+                        displayName: myDisplayName, 
+                        timestamp: new Date() 
+                    };
                     // コメントは最新100件のみ保持
                     const updatedComments = [...currentComments, newComment].slice(-100);
                     transaction.update(sessionDocRef, { comments: updatedComments });
@@ -794,6 +803,20 @@
             initializePage();
             setupTabs();
             setupModals();
+            
+            // ▼▼▼ 新規追加: 配信ステータスセレクターのクリックイベント ▼▼▼
+            DOMElements.streamStatusSelector.addEventListener('click', (e) => {
+                const target = e.target.closest('button');
+                if (target && target.dataset.status) {
+                    const newStatus = target.dataset.status;
+                    // 現在のステータスと異なる場合のみFirestoreを更新
+                    // onSnapshotが変更を検知してシステムコメント送信とUI更新を行う
+                    if (newStatus !== currentStreamStatus) {
+                        sessionDocRef.update({ streamStatus: newStatus });
+                    }
+                }
+            });
+            // ▲▲▲ 新規追加 ▲▲▲
         });
     </script>
 </body>
