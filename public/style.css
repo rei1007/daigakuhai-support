@@ -273,6 +273,10 @@ main {
     }
 }
 
+.script-action-bar, .modal-button-bar {
+    flex-direction: row;
+}
+
 .tab-button {
     /* ボックスモデル */
     display: flex;
@@ -682,7 +686,6 @@ main {
     display: flex;
     justify-content: center;
     gap: var(--space-md);
-    width: 100%;
     /* アクションバー全体に広がるように */
 }
 
@@ -1635,9 +1638,7 @@ main {
 /* 8. 配信画面セレクター */
 .stream-view-selector {
     /* ボックスモデル */
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    /* 6列に変更 */
+    display: flex;
     gap: var(--space-sm);
     margin-bottom: var(--space-lg);
 }
@@ -1649,6 +1650,7 @@ main {
     align-items: center;
     justify-content: center;
     gap: var(--space-xs);
+    width: 100%;
     padding: var(--space-md) var(--space-sm);
     border: 1px solid var(--outline-color);
     /* タイポグラフィ */
@@ -1849,15 +1851,15 @@ main {
 }
 
 .stream-status-display-only .status-tile.is-waiting {
-    color: var(--on-surface-color);
-    background-color: var(--status-connecting);
-    border-color: var(--status-connecting);
+    color: var(--on-primary-container-color);
+    background-color: var(--primary-container-color);
+    border-color: var(--primary-color);
 }
 
 .stream-status-display-only .status-tile.is-ingame {
     /* 対戦中 */
-    color: white;
-    background-color: var(--primary-color);
+    color: var(--on-primary-container-color);
+    background-color: var(--primary-container-color);
     border-color: var(--primary-color);
 }
 
