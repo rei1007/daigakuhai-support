@@ -21,8 +21,14 @@
 
     <style>
         :root {
-            --background-color-w: #fafafa;
-            --background-color: #dfd3b2;
+            --color-white-bg: #f5f5f5;
+            --color-main-bg: #dfd3b2;
+            --color-accent: #6d5d38;
+            --color-black: #000000;
+            --color-gradient-1: #293868;
+            --color-gradient-2: #33698D;
+            --color-gradient-3: #34918B;
+
             --font-yuji: "Yuji Syuku", serif;
             --font-WDXL: "WDXL Lubrifont JP N", sans-serif;
             --font-zen-antique: "Zen Antique Soft", serif;
@@ -39,42 +45,41 @@
         }
 
         html {
-            background-color: black;
+            background-color: var(--color-black);
         }
 
-        main {
-            width: 1880px;
-            height: 1040px;
-            background-color: var(--background-color);
+        #layout-container {
             display: flex;
             gap: 20px;
             justify-content: center;
+            width: 1880px;
+            height: 1040px;
             padding: 20px;
+            background-color: var(--color-main-bg);
         }
 
-        #main-info {
+        #stream-info-main {
+            position: relative;
             width: 100%;
             height: 1040px;
-            background-color: var(--background-color-w);
-            border-radius: 40px;
             overflow: hidden;
-            position: relative;
+            background-color: var(--color-white-bg);
+            border-radius: 40px;
 
-            #info-tab {
-                display: flex;
+            #stream-title-bar {
                 position: relative;
+                display: flex;
                 justify-content: center;
 
                 h1 {
-                    font-family: var(--font-yuji);
-                    padding: 0 40px 25px;
-                    font-size: 80px;
-                    background-color: var(--background-color);
                     z-index: 2;
+                    padding: 0 40px 25px;
+                    font-family: var(--font-yuji);
+                    font-size: 80px;
+                    background-color: var(--color-main-bg);
 
                     &:first-child {
                         border-bottom-left-radius: 40px;
-
                     }
 
                     &:last-child {
@@ -85,62 +90,63 @@
                 &::after {
                     position: absolute;
                     content: "";
-                    background: repeating-linear-gradient(to right, #293868 0% 4%, #33698D 4% 8%, #34918B 8% 12%);
                     width: 100%;
                     height: 75%;
+                    background: repeating-linear-gradient(to right, var(--color-gradient-1) 0% 4%, var(--color-gradient-2) 4% 8%, var(--color-gradient-3) 8% 12%);
                 }
             }
 
-            #circle-card {
-                padding: 20px 40px;
+            #circle-info-card {
                 display: flex;
                 gap: 40px;
+                padding: 80px 80px;
 
-                #circle-info {
-                    width: 200px;
-                    gap: 20px;
+                #circle-identity {
                     display: flex;
                     gap: 10px;
 
-                    #univ-name {
+                    #circle-university {
+                        writing-mode: vertical-lr;
                         font-family: var(--font-yuji);
                         font-size: 50px;
-                        writing-mode: vertical-lr;
                     }
 
                     #circle-name {
-                        font-family: var(--font-zen-antique);
-                        font-size: 60px;
                         writing-mode: vertical-lr;
+                        text-orientation: upright;
+                        font-family: var(--font-zen-antique);
+                        font-size: 70px;
+                        width: 100px;
                     }
                 }
 
-                #circle-introduce {
+                #circle-details {
                     display: flex;
                     flex-direction: column;
                     gap: 20px;
-                    #x-info {
+
+                    #circle-social {
                         display: flex;
                         gap: 20px;
 
                         img {
                             width: 200px;
                             height: 200px;
-                            border-radius: 40px;
-                            border: 4px solid #8b7440;
+                            border: 4px solid var(--color-accent);
                             box-sizing: border-box;
+                            border-radius: 40px;
                         }
 
-                        #x-text {
+                        #circle-social-text {
                             display: flex;
                             flex-direction: column;
                             justify-content: end;
                             margin-bottom: 20px;
 
                             p {
+                                border-bottom: solid 4px var(--color-accent);
                                 font-size: 45px;
                                 font-family: var(--font-zen-antique);
-                                border-bottom: solid 4px #8b7440;
                                 line-height: 1.6;
                             }
                         }
@@ -148,42 +154,42 @@
 
                     #circle-comment {
                         font-family: var(--font-shippori-mincho);
-                        font-size: 45px;
+                        font-size: 50px;
                         line-height: 1.4;
 
                         &::before {
                             content: "コメント";
-                            line-height: 45px;
-                            background: linear-gradient(to right, #8b7440 0% 5%, #fafafa 5% 7%, #8b7440 7% 93%, #fafafa 93% 95%, #8b7440 95% 100%);
-                            color: var(--background-color-w);
-                            font-family: var(--font-zen-antique);
                             margin: 0 20px;
                             padding: 0 20px;
+                            font-family: var(--font-zen-antique);
                             font-size: 30px;
+                            line-height: 45px;
+                            color: var(--color-white-bg);
+                            background: linear-gradient(to right, var(--color-accent) 0% 5%, var(--color-white-bg) 5% 7%, var(--color-accent) 7% 93%, var(--color-white-bg) 93% 95%, var(--color-accent) 95% 100%);
                         }
                     }
                 }
             }
 
-            #message {
-                bottom: 0;
-                width: 100%;
-                display: flex;
+            #info-ticker {
                 position: absolute;
+                bottom: 0;
+                display: flex;
                 justify-content: center;
+                width: 100%;
 
                 p {
-                    width: 80%;
-                    text-align: center;
-                    font-family: var(--font-zen-antique);
-                    padding: 20px 40px;
-                    font-size: 40px;
-                    background-color: var(--background-color);
-                    z-index: 2;
-                    border-radius: 100px;
-                    margin-bottom: 20px;
-                    color: #8b7440;
                     position: relative;
+                    z-index: 2;
+                    width: 80%;
+                    margin-bottom: 20px;
+                    padding: 20px 40px;
+                    font-family: var(--font-zen-antique);
+                    font-size: 40px;
+                    text-align: center;
+                    color: var(--color-accent);
+                    background-color: var(--color-main-bg);
+                    border-radius: 100px;
 
                     &::before {
                         position: absolute;
@@ -192,7 +198,7 @@
                         content: "";
                         width: 20px;
                         height: 40px;
-                        background: #8b7440;
+                        background: var(--color-accent);
                         border-radius: 20px 0 0 20px;
                     }
 
@@ -203,7 +209,7 @@
                         content: "";
                         width: 20px;
                         height: 40px;
-                        background: #8b7440;
+                        background: var(--color-accent);
                         border-radius: 0 20px 20px 0;
                     }
                 }
@@ -212,25 +218,25 @@
                     position: absolute;
                     bottom: 0;
                     content: "";
-                    background: #8b7440;
                     width: 100%;
                     height: 60px;
+                    background: var(--color-accent);
                 }
             }
         }
 
-        #sub-info {
+        #stream-info-sub {
             display: flex;
             flex-direction: column;
             gap: 20px;
             align-items: center;
 
             .sub-info-card {
-                background-color: var(--background-color-w);
-                padding: 20px;
-                border-radius: 40px;
                 width: 160px;
+                padding: 20px;
                 text-align: center;
+                background-color: var(--color-white-bg);
+                border-radius: 40px;
 
                 p {
                     font-size: 30px;
@@ -238,100 +244,192 @@
 
                 .time {
                     width: 100%;
-                    font-size: 55px;
                     margin: 10px 0;
                     font-family: var(--font-WDXL);
+                    font-size: 55px;
                 }
             }
 
-            #waiting-message {
-                font-family: var(--font-yuji);
+            #stream-status-message {
                 writing-mode: vertical-rl;
+                font-family: var(--font-yuji);
                 font-size: 55px;
                 line-height: 1.25;
             }
 
-            #logo {
+            #event-logo {
                 width: 160px;
                 margin-top: auto;
                 margin-bottom: 20px;
             }
         }
+
+        .fade-transition {
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .fade-out {
+            opacity: 0;
+        }
     </style>
 </head>
 
 <body>
-    <main id="screen">
-        <div id="main-info">
-            <div id="info-tab">
+    <main id="layout-container">
+        <div id="stream-info-main">
+            <div id="stream-title-bar">
                 <h1>大学杯真打 本戦配信</h1>
             </div>
-            <div id="circle-card">
-                <div id="circle-info">
-                    <h2 id="univ-name">金沢大学</h2>
+            <div id="circle-info-card" class="fade-transition fade-out">
+                <div id="circle-identity">
+                    <h2 id="circle-university">金沢大学</h2>
                     <h2 id="circle-name">金大スプラサークル</h2>
                 </div>
-                <div id="circle-introduce">
-                    <div id="x-info">
+                <div id="circle-details">
+                    <div id="circle-social">
                         <img src="https://pbs.twimg.com/profile_images/1775133728358227969/lEATk4CW_400x400.jpg">
-                        <div id="x-text">
+                        <div id="circle-social-text">
                             <p>@kindaisp2023</p>
                             <p>#アカンサスWIN</p>
                         </div>
                     </div>
-                    <p id="circle-comment">XP18から30まで！まったりプレイし、ウデマエを高め合い、ついにサー員100名達成🙌✨設立3年目のサークルに金大に通うたくさんのスプラトゥーン仲間が集まりました！- ̗̀🤝🏻
+                    <p id="circle-comment">
+                        XP18から30まで！まったりプレイし、ウデマエを高め合い、ついにサー員100名達成🙌✨設立3年目のサークルに金大に通うたくさんのスプラトゥーン仲間が集まりました！- ̗̀🤝🏻
                         ̖́-<br>今年は他大学との交流戦をたくさん実践し、スプラトゥーンを楽しむ仲間との繋がりを増やしたいです！🦑</p>
                 </div>
             </div>
-            <div id="message">
-                <p>・Xアカウント(@daigakuhai)のフォローよろしくお願いします・</p>
+            <div id="info-ticker">
+                <p>
+                    <span id="ticker-text" class="fade-transition">・Xアカウント(@daigakuhai)のフォローよろしくお願いします・</span>
+                </p>
             </div>
         </div>
-        <div id="sub-info">
-            <div id="clock" class="sub-info-card">
+        <div id="stream-info-sub">
+            <div id="clock-widget" class="sub-info-card">
                 <p>現在時刻</p>
-                <p id="now-time" class="time">00 : 00</p>
+                <p id="clock-time-now" class="time">00 : 00</p>
             </div>
-            <div class="sub-info-card">
+            <div id="start-time-widget" class="sub-info-card">
                 <p>開始予定</p>
-                <p class="time">20 : 00</p>
+                <p id="clock-time-start" class="time">20 : 00</p>
             </div>
-            <p id="waiting-message">配信開始まで<br>　　お待ちください</p>
-            <img id="logo" src="../icons/大学杯真打ロゴ.png">
+            <p id="stream-status-message">配信開始まで<br>　　お待ちください</p>
+            <img id="event-logo" src="../icons/大学杯真打ロゴ.png">
         </div>
     </main>
 
     <script>
-        // 時計を更新する関数
         const updateClock = () => {
             const now = new Date();
-            const d = new Date(now.getTime() + 10000);
+            const d = now;
             const h = String(d.getHours()).padStart(2, '0');
             const m = String(d.getMinutes()).padStart(2, '0');
-            document.getElementById('now-time').innerHTML = `${h} : ${m}`;
+            document.getElementById('clock-time-now').innerHTML = `${h} : ${m}`;
         };
 
         updateClock();
         setInterval(updateClock, 1000);
 
-        // メッセージ欄を更新する関数
         const messages = [
-            '<p>大学杯運営Xアカウント(@daigakuhai)のフォローお願いします！</p>',
-            '<p>「#大学杯」をつけて配信の感想や感動をポストしよう！</p>',
-            '<p>運営員募集中！詳しくは大学杯運営XアカウントのDMまで</p>'
+            '大学杯運営Xアカウント(@daigakuhai)のフォローお願いします！',
+            '「#大学杯」をつけて配信の感想や感動をポストしよう！',
+            '運営員募集中！詳しくは大学杯運営XアカウントのDMまで'
         ];
         let messageIndex = 0;
-        const targetElement = document.getElementById('message');
+        const tickerTextElement = document.getElementById('ticker-text');
+        const messageInterval = 5000;
+        const messageTransitionTime = 500; 
 
-        function updateMessage() {
-            if (targetElement) {
-                targetElement.innerHTML = messages[messageIndex];
+        function animateMessageUpdate() {
+            if (tickerTextElement) {
+                tickerTextElement.classList.add('fade-out');
+
+                setTimeout(() => {
+                    messageIndex = (messageIndex + 1) % messages.length;
+                    tickerTextElement.textContent = '・' + messages[messageIndex] + '・';
+                    tickerTextElement.classList.remove('fade-out');
+                }, messageTransitionTime);
             }
-            messageIndex = (messageIndex + 1) % messages.length;
         }
 
-        updateMessage();
-        setInterval(updateMessage, 5000);
+        if (tickerTextElement) {
+            tickerTextElement.classList.add('fade-out');
+            setTimeout(() => {
+                tickerTextElement.textContent = '・' + messages[messageIndex] + '・'; 
+                tickerTextElement.classList.remove('fade-out');
+            }, messageTransitionTime);
+        }
+
+        setInterval(animateMessageUpdate, messageInterval);
+
+        const universityEl = document.getElementById('circle-university');
+        const nameEl = document.getElementById('circle-name');
+        const imgEl = document.querySelector('#circle-social img');
+        const socialTextEl = document.getElementById('circle-social-text');
+        const socialIdEl = socialTextEl.querySelector('p:nth-child(1)');
+        const socialWinEl = socialTextEl.querySelector('p:nth-child(2)');
+        const commentEl = document.getElementById('circle-comment');
+
+        const circleInfoCard = document.getElementById('circle-info-card');
+        const circleTransitionTime = 500; 
+        const circleInterval = 8000;
+        let circleIndex = 0;
+
+        function updateCircleInfo(circleData) {
+            universityEl.textContent = circleData['circle-university'];
+            nameEl.textContent = circleData['circle-name'];
+            imgEl.src = circleData['circle-social-img'];
+            socialIdEl.textContent = '@' + circleData['circle-social-id'];
+            socialWinEl.textContent = '#' + circleData['circle-social-win'];
+            commentEl.innerHTML = circleData['circle-comment']; 
+        }
+
+        function createAnimateCircleUpdate(circleDataArray) {
+            return function animateCircleUpdate() {
+                if (circleDataArray.length === 0 || !circleInfoCard) return; 
+
+                circleInfoCard.classList.add('fade-out');
+
+                setTimeout(() => {
+                    circleIndex = (circleIndex + 1) % circleDataArray.length;
+                    const currentCircle = circleDataArray[circleIndex];
+                    updateCircleInfo(currentCircle);
+                    circleInfoCard.classList.remove('fade-out');
+                }, circleTransitionTime);
+            }
+        }
+
+        fetch('../json/circle-info.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(circleDataArray => {
+                if (!circleDataArray || circleDataArray.length === 0) {
+                    console.error('サークル情報データが空です。');
+                    return; 
+                }
+
+                const firstCircle = circleDataArray[circleIndex];
+                updateCircleInfo(firstCircle);
+
+                setTimeout(() => {
+                    circleInfoCard.classList.remove('fade-out');
+                }, 100); 
+
+                const animateCircleUpdate = createAnimateCircleUpdate(circleDataArray);
+                setInterval(animateCircleUpdate, circleInterval);
+            })
+            .catch(error => {
+                console.error('サークル情報のJSONデータの読み込みに失敗しました:', error);
+                commentEl.textContent = 'サークル情報の読み込みに失敗しました。';
+                setTimeout(() => {
+                    circleInfoCard.classList.remove('fade-out');
+                }, 100);
+            });
+
     </script>
 </body>
 
