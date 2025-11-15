@@ -45,7 +45,7 @@
         }
 
         html {
-            background-color: var(--color-black);
+            background-color: transparent;
         }
 
         #layout-container {
@@ -225,7 +225,7 @@
             }
         }
 
-        #stream-info-sub {
+        #stream-info-side {
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -240,6 +240,7 @@
 
                 p {
                     font-size: 30px;
+                    font-family: var(--font-kosugi);
                 }
 
                 .time {
@@ -248,6 +249,10 @@
                     font-family: var(--font-WDXL);
                     font-size: 55px;
                 }
+            }
+
+            #start-time-widget {
+                color: var(--color-gradient-2);
             }
 
             #stream-status-message {
@@ -304,7 +309,7 @@
                 </p>
             </div>
         </div>
-        <div id="stream-info-sub">
+        <div id="stream-info-side">
             <div id="clock-widget" class="sub-info-card">
                 <p>現在時刻</p>
                 <p id="clock-time-now" class="time">00 : 00</p>
