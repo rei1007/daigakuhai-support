@@ -5,10 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>情報画面</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi&family=Shippori+Mincho+B1&family=WDXL+Lubrifont+JP+N&family=Yuji+Syuku&family=Yusei+Magic&family=Zen+Antique+Soft&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kosugi&family=Shippori+Mincho+B1&family=WDXL+Lubrifont+JP+N&family=Yuji+Syuku&family=Yusei+Magic&family=Zen+Antique+Soft&display=swap"
+        rel="stylesheet">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -56,15 +59,17 @@
             background-color: var(--color-main-bg);
         }
 
-        #stream-info-main {
+        #main-panel {
             position: relative;
+            display: flex;
+            flex-direction: column;
             width: 100%;
             height: 1040px;
             overflow: hidden;
             background-color: var(--color-white-bg);
             border-radius: 40px;
 
-            #stream-title-bar {
+            #title-bar {
                 position: relative;
                 display: flex;
                 justify-content: center;
@@ -94,70 +99,223 @@
                 }
             }
 
-            #team-infos {
+            #score-info {
                 display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                gap: 20px;
+                margin-top: 40px;
+
+                .team-score {
+                    text-align: center;
+                    width: 100px;
+                    padding: 10px 0 20px;
+                    color: var(--color-white-bg);
+                    font-size: 70px;
+                    font-family: var(--font-zen-antique);
+                    border-radius: 10px;
+                }
+
+                #alpha-score {
+                    background-color: var(--color-alpha);
+                }
+
+                #bravo-score {
+                    background-color: var(--color-bravo);
+                }
+
+                #round-info {
+                    text-align: center;
+                    width: 600px;
+                    font-size: 50px;
+                    font-family: var(--font-yuji);
+                }
             }
 
-            .team-info {
+            #tabs-nav {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                position: absolute;
+                bottom: 0;
+                left: 0;
                 width: 100%;
-                padding: 40px 80px 0;
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    background-color: var(--color-accent);
+                    width: 100%;
+                    height: 60px;
+                    bottom: 0;
+                    left: 0;
+                }
+            }
+
+            .tab-item {
+                z-index: 2;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+                padding: 10px 40px;
+                border-radius: 100px;
+                color: var(--color-white-bg);
+                background-color: var(--color-accent);
+            }
+
+            .tab-item .material-symbols-rounded {
+                font-family: 'Material Symbols Rounded';
+                font-weight: normal;
+                font-style: normal;
+                font-size: 50px;
+                line-height: 1;
+            }
+
+            .tab-item.active {
+                color: var(--color-accent) !important;
+                background-color: var(--color-main-bg);
+                border: solid 6px var(--color-accent);
+            }
+
+            #alpha-team-icon {
+                background-color: var(--color-alpha);
+                color: var(--color-white-bg);
+            }
+
+            #bravo-team-icon {
+                background-color: var(--color-bravo);
+                color: var(--color-white-bg);
+            }
+
+            #teams-container {
+                display: flex;
+                margin: 0;
+            }
+
+            .team-panel {
+                width: 100%;
+                padding-top: 40px;
                 text-align: center;
 
                 h3 {
                     padding-left: 10px;
-                    font-size: 30px;
+                    margin-bottom: 10px;
+                    font-size: 35px;
                     font-family: var(--font-yuji);
                 }
 
                 h2 {
+                    margin-bottom: 10px;
                     font-size: 60px;
                     font-family: var(--font-zen-antique);
                 }
 
-                #alpha-team-name {
-                    color: var(--color-alpha);
-                }
-
-                #bravo-team-name {
-                    color: var(--color-bravo);
-                }
-
-                .team-members {
-                    margin-top: 10px;
+                .member-list {
                     display: flex;
                     flex-direction: column;
+                    align-items: center;
                     gap: 20px;
                 }
 
                 p {
-                    padding-left: 10px;
-                    font-size: 60px;
+                    width: fit-content;
+                    padding: 0 20px 10px;
+                    border-bottom: solid 4px var(--color-accent);
+                    font-size: 65px;
                     font-family: var(--font-shippori-mincho);
                     font-weight: bold;
+                }
+
+                &:first-child {
+                    padding-left: 80px;
+                }
+
+                &:last-child {
+                    padding-right: 80px;
+                }
+
+                .average-xp {
+                    margin: 20px auto;
+                    padding: 10px 20px;
+                    font-family: var(--font-WDXL);
+                    color: var(--color-white-bg);
+                    font-size: 40px;
+                    text-align: center;
+                    opacity: 0.7;
+
+                    span {
+                        font-family: var(--font-kosugi);
+                        font-weight: bold;
+                    }
+                }
+            }
+
+            #team-alpha {
+                h2 {
+                    color: var(--color-alpha);
+                }
+
+                p {
+                    border-image: linear-gradient(to right, #b0b32c 0% 50%, #dfd3b2 50% 100%) 1;
+                }
+
+                .average-xp {
+                    box-sizing: border-box;
+                    border: solid 4px var(--color-alpha);
+                    border-left: none;
+                    border-image: linear-gradient(to top, #b0b32c 0% 60%, transparent 60% 100%) 1;
+                    color: var(--color-alpha);
+                }
+            }
+
+            #team-bravo {
+                h2 {
+                    color: var(--color-bravo);
+                }
+
+                p {
+                    border-image: linear-gradient(to right, #9054c2 0% 50%, #dfd3b2 50% 100%) 1;
+                }
+
+                .average-xp {
+                    box-sizing: border-box;
+                    border: solid 4px var(--color-bravo);
+                    border-left: none;
+                    border-image: linear-gradient(to top, #9054c2 0% 60%, transparent 60% 100%) 1;
+                    color: var(--color-bravo);
                 }
             }
         }
 
-        #stream-info-side {
+        #sidebar {
             display: flex;
             flex-direction: column;
             gap: 20px;
             align-items: center;
 
-            .sub-info-card {
+            #clock {
+                padding: 5px 15px;
+            }
+
+            .sidebar-card {
                 width: 200px;
-                padding: 20px;
+                padding: 15px;
                 text-align: center;
                 background-color: var(--color-white-bg);
                 border-radius: 40px;
 
                 p {
+                    margin-bottom: 10px;
+                    color: var(--color-accent);
                     font-size: 30px;
+                    font-family: var(--font-yuji);
                 }
 
                 h2 {
-                    color: var(--color-gradient-2);
                     margin-top: 10px;
+                    color: var(--color-gradient-2);
                     font-size: 40px;
                     font-family: var(--font-zen-antique);
                 }
@@ -171,15 +329,15 @@
                 }
 
                 .time {
-                    color: var(--color-gradient-2);
                     width: 100%;
                     margin: 10px 0;
+                    color: var(--color-gradient-2);
                     font-family: var(--font-WDXL);
                     font-size: 55px;
                 }
             }
 
-            #stream-status-message {
+            #status-message {
                 writing-mode: vertical-rl;
                 font-family: var(--font-yuji);
                 font-size: 55px;
@@ -187,7 +345,7 @@
             }
 
             #event-logo {
-                width: 160px;
+                width: 200px;
                 margin-top: auto;
                 margin-bottom: 20px;
             }
@@ -205,43 +363,66 @@
 
 <body>
     <main id="layout-container">
-        <div id="stream-info-main">
-            <div id="stream-title-bar">
+        <div id="main-panel">
+            <div id="title-bar">
                 <h1>大学杯真打 本戦配信</h1>
             </div>
-            <div id="team-infos">
-                <div id="alpha-team-info" class="team-info">
-                    <h3>横浜国立大学 / 浜イカ</h3>
-                    <h2 id="alpha-team-name">フロゲーマー</h2>
-                    <div class="team-members">
+            
+            <div id="teams-container">
+                <div id="team-alpha" class="team-panel">
+                    <div class="team-header">
+                        <h3>横浜国立大学/浜イカ</h3>
+                        <h2 id="alpha-team-name">無視すんなぁぁぁぁぁぁぁ</h2>
+                    </div>
+                    <div class="member-list">
                         <p>ぁじ</p>
                         <p>ゆづ</p>
                         <p>283</p>
                         <p>コっペ</p>
                     </div>
+                    <p class="average-xp"><span>平均XP</span>：2878</p>
                 </div>
-                <div id="bravo-team-info" class="team-info">
-                    <h3>立命館大学 / リツメイカ</h3>
-                    <h2 id="bravo-team-name">クマノミカクレ</h2>
-                    <div class="team-members">
+                <div id="team-bravo" class="team-panel">
+                    <div class="team-header">
+                        <h3>立命館大学/リツメイカ</h3>
+                        <h2 id="bravo-team-name">スターミー、立つな</h2>
+                    </div>
+                    <div class="member-list">
                         <p>クマノミ</p>
                         <p>solo♪</p>
                         <p>もく</p>
                         <p>ぼてぇぼぉ</p>
                     </div>
+                    <p class="average-xp"><span>平均XP</span>：2878</p>
                 </div>
             </div>
-
-        </div>
-        <div id="stream-info-side">
-            <div id="clock-widget" class="sub-info-card">
-                <p id="clock-time-now" class="time">00 : 00</p>
+            <div id="score-info">
+                <p id="alpha-score" class="team-score">1</p>
+                <h2 id="round-info">本戦第一試合 / BO3</h2>
+                <p id="bravo-score" class="team-score">3</p>
             </div>
-            <div class="sub-info-card">
+            <nav id="tabs-nav">
+                <span id="battle-icon" class="tab-item active"><span
+                        class="material-symbols-rounded">swords</span></span>
+                <span id="alpha-team-icon" class="tab-item"><span
+                        class="material-symbols-rounded">person_search</span></span>
+                <span id="bravo-team-icon" class="tab-item"><span
+                        class="material-symbols-rounded">person_search</span></span>
+                <span id="stages-icon" class="tab-item"><span class="material-symbols-rounded">distance</span></span>
+                <span id="replay-icon" class="tab-item"><span class="material-symbols-rounded">autoplay</span></span>
+            </nav>
+        </div>
+        <div id="sidebar">
+            <div id="clock" class="sidebar-card">
+                <p id="clock-display" class="time">00 : 00</p>
+            </div>
+            <div class="sidebar-card">
+                <p>実況</p>
                 <img src="https://pbs.twimg.com/profile_images/1902854610894954496/Cer1RMih_400x400.jpg">
                 <h2>たじふ</h2>
             </div>
-            <div class="sub-info-card">
+            <div class="sidebar-card">
+                <p>解説</p>
                 <img src="https://pbs.twimg.com/profile_images/1898290320850452480/s5VHfldw_400x400.jpg">
                 <h2>ブラウド</h2>
             </div>
@@ -255,112 +436,11 @@
             const d = now;
             const h = String(d.getHours()).padStart(2, '0');
             const m = String(d.getMinutes()).padStart(2, '0');
-            document.getElementById('clock-time-now').innerHTML = `${h} : ${m}`;
+            document.getElementById('clock-display').innerHTML = `${h} : ${m}`;
         };
 
         updateClock();
         setInterval(updateClock, 1000);
-
-        const messages = [
-            '大学杯運営Xアカウント(@daigakuhai)のフォローお願いします！',
-            '「#大学杯」をつけて配信の感想や感動をポストしよう！',
-            '運営員募集中！詳しくは大学杯運営XアカウントのDMまで'
-        ];
-        let messageIndex = 0;
-        const tickerTextElement = document.getElementById('ticker-text');
-        const messageInterval = 5000;
-        const messageTransitionTime = 500;
-
-        function animateMessageUpdate() {
-            if (tickerTextElement) {
-                tickerTextElement.classList.add('fade-out');
-
-                setTimeout(() => {
-                    messageIndex = (messageIndex + 1) % messages.length;
-                    tickerTextElement.textContent = '・' + messages[messageIndex] + '・';
-                    tickerTextElement.classList.remove('fade-out');
-                }, messageTransitionTime);
-            }
-        }
-
-        if (tickerTextElement) {
-            tickerTextElement.classList.add('fade-out');
-            setTimeout(() => {
-                tickerTextElement.textContent = '・' + messages[messageIndex] + '・';
-                tickerTextElement.classList.remove('fade-out');
-            }, messageTransitionTime);
-        }
-
-        setInterval(animateMessageUpdate, messageInterval);
-
-        const universityEl = document.getElementById('circle-university');
-        const nameEl = document.getElementById('circle-name');
-        const imgEl = document.querySelector('#circle-social img');
-        const socialTextEl = document.getElementById('circle-social-text');
-        const socialIdEl = socialTextEl.querySelector('p:nth-child(1)');
-        const socialWinEl = socialTextEl.querySelector('p:nth-child(2)');
-        const commentEl = document.getElementById('circle-comment');
-
-        const circleInfoCard = document.getElementById('circle-info-card');
-        const circleTransitionTime = 500;
-        const circleInterval = 8000;
-        let circleIndex = 0;
-
-        function updateCircleInfo(circleData) {
-            universityEl.textContent = circleData['circle-university'];
-            nameEl.textContent = circleData['circle-name'];
-            imgEl.src = circleData['circle-social-img'];
-            socialIdEl.textContent = '@' + circleData['circle-social-id'];
-            socialWinEl.textContent = '#' + circleData['circle-social-win'];
-            commentEl.innerHTML = circleData['circle-comment'];
-        }
-
-        function createAnimateCircleUpdate(circleDataArray) {
-            return function animateCircleUpdate() {
-                if (circleDataArray.length === 0 || !circleInfoCard) return;
-
-                circleInfoCard.classList.add('fade-out');
-
-                setTimeout(() => {
-                    circleIndex = (circleIndex + 1) % circleDataArray.length;
-                    const currentCircle = circleDataArray[circleIndex];
-                    updateCircleInfo(currentCircle);
-                    circleInfoCard.classList.remove('fade-out');
-                }, circleTransitionTime);
-            }
-        }
-
-        fetch('../json/circle-info.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(circleDataArray => {
-                if (!circleDataArray || circleDataArray.length === 0) {
-                    console.error('サークル情報データが空です。');
-                    return;
-                }
-
-                const firstCircle = circleDataArray[circleIndex];
-                updateCircleInfo(firstCircle);
-
-                setTimeout(() => {
-                    circleInfoCard.classList.remove('fade-out');
-                }, 100);
-
-                const animateCircleUpdate = createAnimateCircleUpdate(circleDataArray);
-                setInterval(animateCircleUpdate, circleInterval);
-            })
-            .catch(error => {
-                console.error('サークル情報のJSONデータの読み込みに失敗しました:', error);
-                commentEl.textContent = 'サークル情報の読み込みに失敗しました。';
-                setTimeout(() => {
-                    circleInfoCard.classList.remove('fade-out');
-                }, 100);
-            });
-
     </script>
 </body>
 
