@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配信台本表示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <style>
+        body { font-family: 'Kosugi Maru', sans-serif; scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+        /* 台本タイルスタイル (元のデザイン) */
+        .script-paragraph {
+            background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 1.25rem; 
+            padding: 1.25rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease-in-out; opacity: 0.9;
+        }
+        .paragraph-future { background-color: #F9FAFB; border-color: #E5E7EB; opacity: 0.9; }
+        .paragraph-future:hover { background-color: #F3F4F6; border-color: #D1D5DB; }
+        .paragraph-past { background-color: #F9FAFB; border-color: #E5E7EB; opacity: 0.45; }
+        .paragraph-past:hover { opacity: 0.7; }
+        
+        /* アクティブな段落 (強調) */
+        .paragraph-active {
+            background-color: #ffffff; border-color: #111827; 
+            box-shadow: 0 4px 10px -1px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.1);
+            opacity: 1; transform: scale(1.02);
+        }
+
+        .speaker-name {
+            display: inline-block; font-weight: 600; margin-bottom: 0.75rem; font-size: 1.125rem; 
+            background-color: #F3F4F6; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #D1D5DB;
+        }
+        .paragraph-active .speaker-name { background-color: #111827; color: #F9FAFB; border-color: #111827; }
+        
+        .line-text { color: #1F2937; line-height: 1.8; white-space: pre-line; }
+        .paragraph-past .line-text { color: #4B5563; }
+
+        .speaker-memo .speaker-name { background-color: #FEF3C7; border-color: #FDE68A; color: #92400E; font-style: italic; }
+        .paragraph-active.speaker-memo .speaker-name { background-color: #D97706; color: #ffffff; border-color: #D97706; }
+        
+        .speaker-action .speaker-name { background-color: transparent; border-color: transparent; color: #4B5563; font-style: italic; font-weight: 500; font-size: 1rem; }
+        .paragraph-active.speaker-action .speaker-name { background-color: transparent; border-color: transparent; color: #111827; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <div class="max-w-[1080px] mx-auto">
+        <main id="script-container" class="p-4 md:p-6"></main>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const broadcastRef = doc(db, "state", "broadcast");
+        const scriptContainer = document.getElementById('script-container');
+
+        const scriptData = [
+            {"speaker":"ようくん (配信担当)","line":"配信にお集まりいただいた皆さん、こんばんは！大学杯の運営をしております大学杯運営3年のようくんと申します。この配信ではこの後から始まるシン・大学杯の様子をお届けいたします。\n本戦が始まる前に、わたくしからこの大会について説明させていただきます。まず、この大会は、任天堂の協賛‧提携を受けたものではありません。コミュニティ大会への出場および観戦に関する規約は概要欄のURLからご確認くださるようお願いいたします。"},
+            {"speaker":"→ページ送り","line":"まず最初に、このシン・大学杯について簡単におさらいしていきましょう。シン・大学杯は大学をはじめとする高等教育機関の学生を対象とした学生による学生のための大会です。今大会では各大学のサークルから選抜された1チームのみが参加可能となっております。"},
+            {"speaker":"→ページ送り","line":"使用するルールはガチエリアのみで、ステージは現時点で実装されている25ステージすべてから選択されます。また使用するブキ・ギアに制限はありません。基本は2本先取でステージはお任せによるランダム、最後の準決勝と決勝のみ3本先取のカウンターステージ制となります。"},
+            {"speaker":"→ページ送り","line":"そして決勝を制し、見事優勝を勝ち取ったチームには「むつき」様による優勝イラストを贈呈します。"},
+            {"speaker":"→ページ送り","line":"それでは次に、このシン・大学杯を盛り上げてくださる実況解説者の方々をご紹介いたします！まず、実況を担当してくださるのはくぼじさんです！"},
+            {"speaker":"くぼじさん","line":"※お名前とお一言いただければと思います。"},
+            {"speaker":"ようくん (配信担当)","line":"そして、解説を担当してくださるブラウドさんです！"},
+            {"speaker":"ブラウドさん","line":"※お名前とお一言いただければと思います。"},
+            {"speaker":"ようくん (配信担当)","line":"ありがとうございます！それではそろそろ配信試合開始のお時間になりますので、お二方、よろしくお願いいたします！"},
+            {"speaker":"メモ","line":"※ここからは自由に話していただいて大丈夫です！"},
+            {"speaker":"メモ","line":"※これ以降は決勝後のインタビュー台本：詳しい流れは「OP/EDトーク用台本」を参照してください"},
+            {"speaker":"くぼじさん","line":"優勝チームの○○の皆さんが実況解説席に来てくださいました！改めまして、シン・大学杯優勝おめでとうございます！"},
+            {"speaker":"くぼじさん","line":"（※jsonファイルに重複があったため片方を修正）優勝チームにインタビューをしていきます。"},
+            {"speaker":"くぼじさん","line":"解説のブラウドさんは何か聞きたいことはありますか？"},
+            {"speaker":"メモ","line":"※優勝チーム退出→実況解説お二人の大会全体の感想などトーク→まとまったら締めへ"},
+            {"speaker":"くぼじさん","line":"改めて、シン・大学杯の優勝チームは○○でした！\n皆さん、大学杯へのご参加、ありがとうございました！"}
+        ];
+
+        function initializeScript() {
+            scriptData.forEach((item, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'script-paragraph';
+                tile.dataset.index = index;
+                if (item.speaker === 'メモ') tile.classList.add('speaker-memo');
+                else if (item.speaker.startsWith('→')) tile.classList.add('speaker-action');
+                
+                const speakerName = document.createElement('div');
+                speakerName.className = 'speaker-name';
+                speakerName.textContent = item.speaker;
+                
+                const lineText = document.createElement('p');
+                lineText.className = 'line-text';
+                lineText.textContent = item.line; 
+
+                tile.appendChild(speakerName);
+                tile.appendChild(lineText);
+                scriptContainer.appendChild(tile);
+            });
+        }
+
+        // スクロール関数 (指定された要素または現在のアクティブ要素へ)
+        function scrollToActive(element) {
+            const target = element || document.querySelector('.paragraph-active');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // 表示更新ロジック
+        function updateScriptView(activeIndex) {
+            const allTiles = document.querySelectorAll('.script-paragraph');
+            let activeTile = null;
+            allTiles.forEach(tile => {
+                const index = parseInt(tile.dataset.index, 10);
+                tile.classList.remove('paragraph-active', 'paragraph-past', 'paragraph-future');
+                if (index < activeIndex) { tile.classList.add('paragraph-past'); } 
+                else if (index === activeIndex) { 
+                    tile.classList.add('paragraph-active'); 
+                    activeTile = tile;
+                } 
+                else { tile.classList.add('paragraph-future'); }
+            });
+            
+            // Firestore更新時は自動でスクロール
+            if (activeTile) { scrollToActive(activeTile); }
+        }
+
+        onSnapshot(broadcastRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.scriptIndex !== undefined) { updateScriptView(data.scriptIndex); }
+            }
+        });
+
+        scriptContainer.addEventListener('click', async (e) => {
+            const clickedTile = e.target.closest('.script-paragraph');
+            if (clickedTile) {
+                const newIndex = parseInt(clickedTile.dataset.index, 10);
+                try { await setDoc(broadcastRef, { scriptIndex: newIndex }, { merge: true }); } catch(err) { console.error(err); }
+            }
+        });
+
+        // 親フレーム(tools.html)からのスクロール指示を受け取る
+        window.addEventListener('message', (event) => {
+            if (event.data === 'scroll-to-current') {
+                scrollToActive();
+            }
+        });
+
+        initializeScript();
+    </script>
+</body>
+</html>

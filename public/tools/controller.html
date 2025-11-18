@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配信画面コントローラー</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <style>
+        /* Kosugi Maru フォントを全体に適用 */
+        body {
+            font-family: 'Kosugi Maru', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Material Symbols (Rounded) の基本スタイル調整 */
+        .material-symbols-rounded {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 48;
+            font-size: 36px; /* アイコンのデフォルトサイズ */
+        }
+        
+        /* タイルの共通スタイル */
+        .controller-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem; /* p-6 */
+            border-radius: 1.25rem; /* rounded-2xl */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #D1D5DB; /* border-gray-300 */
+            text-align: center;
+            min-height: 120px;
+        }
+        
+        /* 非選択時のタイルスタイル (モノトーン) */
+        .tile-inactive {
+            background-color: #ffffff; /* bg-white */
+            color: #1F2937; /* text-gray-800 */
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); /* shadow-sm */
+        }
+        .tile-inactive:hover {
+            background-color: #F9FAFB; /* hover:bg-gray-50 */
+            border-color: #9CA3AF; /* hover:border-gray-400 */
+        }
+        
+        /* 選択時のタイルスタイル (モノトーン) */
+        .tile-active {
+            background-color: #111827; /* bg-gray-900 */
+            color: #F9FAFB; /* text-gray-50 */
+            border-color: #111827; /* border-gray-900 */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+        }
+
+        /* 選択時タイルのアイコン色調整 */
+        .tile-active .material-symbols-rounded {
+            color: #F9FAFB; /* text-gray-50 */
+        }
+        .tile-inactive .material-symbols-rounded {
+            color: #374151; /* text-gray-700 */
+        }
+
+        /* 中部パネル内タイルのアイコンサイズを少し小さく調整 */
+        #operation-panels .controller-tile .material-symbols-rounded {
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <div class="max-w-[1080px] mx-auto p-4 md:p-6 min-h-screen">
+        
+        <section id="operation-section" class="mb-8 hidden">
+            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">画面内操作</h2>
+            
+            <div id="operation-panels" class="bg-white p-6 rounded-2xl border border-gray-300 shadow-sm min-h-[12rem]">
+            
+                <div id="panel-standby" data-scene="standby" class="hidden">
+                     <div class="flex items-center justify-center text-gray-500 h-32">
+                        (配信待機 操作パネル)
+                     </div>
+                </div>
+
+                <div id="panel-info" data-scene="info" class="hidden">
+                     <div class="grid grid-cols-3 gap-3 md:gap-4">
+                        <div class="controller-tile tile-inactive" data-group="info-op" data-value="info-team-rules">
+                            <span class="material-symbols-rounded mb-2">how_to_reg</span>
+                            <span class="font-medium text-sm">出場ルール</span>
+                        </div>
+                        <div class="controller-tile tile-inactive" data-group="info-op" data-value="info-tournament-rules">
+                            <span class="material-symbols-rounded mb-2">gavel</span>
+                            <span class="font-medium text-sm">大会ルール</span>
+                        </div>
+                        <div class="controller-tile tile-inactive" data-group="info-op" data-value="info-casters">
+                            <span class="material-symbols-rounded mb-2">campaign</span>
+                            <span class="font-medium text-sm">実況・解説</span>
+                        </div>
+                     </div>
+                </div>
+                
+                <div id="panel-main" data-scene="main" class="hidden">
+                     <div class="grid grid-cols-3 gap-3 md:gap-4">
+                        <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-matchup">
+                            <span class="material-symbols-rounded mb-2">swords</span>
+                            <span class="font-medium text-sm">対戦情報</span>
+                        </div>
+                        <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-alpha">
+                            <span class="material-symbols-rounded mb-2">group</span>
+                            <span class="font-medium text-sm">アルファ詳細</span>
+                        </div>
+                        <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-beta">
+                            <span class="material-symbols-rounded mb-2">groups</span>
+                            <span class="font-medium text-sm">ベータ詳細</span>
+                        </div>
+                        <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-stage">
+                            <span class="material-symbols-rounded mb-2">map</span>
+                            <span class="font-medium text-sm">ステージ</span>
+                        </div>
+                        <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-replay">
+                            <span class="material-symbols-rounded mb-2">replay</span>
+                            <span class="font-medium text-sm">リプレイ</span>
+                        </div>
+                     </div>
+                </div>
+
+                <div id="panel-interview" data-scene="interview" class="hidden">
+                     <div class="flex items-center justify-center text-gray-500 h-32">
+                        (インタビュー 操作パネル)
+                     </div>
+                </div>
+            
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">画面切り替え</h2>
+            <div id="scene-selector" class="grid grid-cols-2 gap-3 md:gap-4">
+                
+                <div class="controller-tile tile-inactive" 
+                     data-group="scene"
+                     data-value="standby">
+                    <span class="material-symbols-rounded mb-2">pause_circle</span>
+                    <span class="font-medium">配信待機</span>
+                </div>
+
+                <div class="controller-tile tile-inactive" 
+                     data-group="scene"
+                     data-value="info">
+                    <span class="material-symbols-rounded mb-2">emoji_events</span>
+                    <span class="font-medium">大会情報</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" 
+                     data-group="scene"
+                     data-value="main">
+                    <span class="material-symbols-rounded mb-2">play_circle</span>
+                    <span class="font-medium">メイン</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" 
+                     data-group="scene"
+                     data-value="interview">
+                    <span class="material-symbols-rounded mb-2">mic</span>
+                    <span class="font-medium">インタビュー</span>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="pb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">トラブル対応</h2>
+            <div id="trouble-selector" class="grid grid-cols-3 gap-3 md:gap-4">
+
+                <div class="controller-tile tile-inactive" 
+                     data-group="trouble" 
+                     data-value="lag"
+                     data-message="ラグ対応中">
+                    <span class="material-symbols-rounded mb-2">network_check</span>
+                    <span class="font-medium">ラグ対応</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" 
+                     data-group="trouble" 
+                     data-value="stream"
+                     data-message="配信トラブル対応中">
+                    <span class="material-symbols-rounded mb-2">settings_input_antenna</span>
+                    <span class="font-medium">配信トラブル</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" 
+                     data-group="trouble" 
+                     data-value="admin"
+                     data-message="運営トラブル対応中">
+                    <span class="material-symbols-rounded mb-2">admin_panel_settings</span>
+                    <span class="font-medium">運営トラブル</span>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // --- Firebase設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+
+        // Firebase 初期化
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        // 状態保存用のドキュメント参照
+        const broadcastRef = doc(db, "state", "broadcast");
+
+        // --- UI要素の取得 ---
+        const sceneTiles = document.querySelectorAll('.controller-tile[data-group="scene"]');
+        const troubleTiles = document.querySelectorAll('.controller-tile[data-group="trouble"]');
+        const infoOpTiles = document.querySelectorAll('.controller-tile[data-group="info-op"]');
+        const mainOpTiles = document.querySelectorAll('.controller-tile[data-group="main-op"]');
+        
+        const operationSection = document.getElementById('operation-section');
+        const operationPanels = document.querySelectorAll('#operation-panels [data-scene]');
+
+        // --- 現在の状態保持用変数 (初期値) ---
+        let currentState = {
+            scene: 'standby',
+            trouble: 'none',
+            infoOp: 'info-team-rules',
+            mainOp: 'main-matchup',
+            scriptIndex: 0
+        };
+
+        // --- Firestoreへの書き込み ---
+        async function updateState(updates) {
+            try {
+                // 既存の状態に新しい変更をマージして更新
+                await setDoc(broadcastRef, { ...currentState, ...updates }, { merge: true });
+            } catch (e) {
+                console.error("Error updating state: ", e);
+            }
+        }
+
+        // --- UI更新ロジック (Firestoreからのデータ反映) ---
+        function renderUI(state) {
+            currentState = state; // ローカルステートを最新に更新
+
+            // 1. シーン切り替えの反映
+            updateTileGroup(sceneTiles, state.scene);
+            
+            // パネルの表示/非表示制御
+            if (state.scene === 'standby' || state.scene === 'interview') {
+                operationSection.classList.add('hidden');
+            } else {
+                operationSection.classList.remove('hidden');
+                
+                operationPanels.forEach(panel => {
+                    if (panel.dataset.scene === state.scene) {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
+                });
+            }
+
+            // 2. トラブル対応の反映 (通知バーはtools.htmlで制御)
+            updateTileGroup(troubleTiles, state.trouble);
+            
+            // 3. 中段パネル選択状態の反映 (個別に管理)
+            updateTileGroup(infoOpTiles, state.infoOp);
+            updateTileGroup(mainOpTiles, state.mainOp);
+        }
+
+        // タイルグループの見た目 (active/inactive) を更新するヘルパー関数
+        function updateTileGroup(tiles, activeValue) {
+            tiles.forEach(tile => {
+                if (tile.dataset.value === activeValue) {
+                    tile.classList.remove('tile-inactive');
+                    tile.classList.add('tile-active');
+                } else {
+                    tile.classList.remove('tile-active');
+                    tile.classList.add('tile-inactive');
+                }
+            });
+        }
+
+        // --- Firestoreのリスナー開始 (読み込み) ---
+        onSnapshot(broadcastRef, (docSnap) => {
+            if (docSnap.exists()) {
+                // データが存在すればUIを更新
+                renderUI(docSnap.data());
+            } else {
+                // ドキュメントがまだ無い場合は初期値で作成
+                updateState(currentState);
+            }
+        });
+
+        // --- イベントリスナー設定 (クリック時の書き込み) ---
+        
+        // シーン切り替え
+        sceneTiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                updateState({ scene: tile.dataset.value });
+            });
+        });
+
+        // トラブル切り替え (トグル動作)
+        troubleTiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                // クリックしたタイルが既にアクティブなら 'none' に戻す
+                const newVal = (currentState.trouble === tile.dataset.value) ? 'none' : tile.dataset.value;
+                updateState({ trouble: newVal });
+            });
+        });
+
+        // 大会情報 操作パネル
+        infoOpTiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                updateState({ infoOp: tile.dataset.value });
+            });
+        });
+
+        // メイン 操作パネル
+        mainOpTiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                updateState({ mainOp: tile.dataset.value });
+            });
+        });
+
+    </script>
+
+</body>
+</html>
