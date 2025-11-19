@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大学杯 配信ツール</title>
+    <link rel="icon" href="../icons/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
     <style>
         body { font-family: 'Kosugi Maru', sans-serif; overflow: hidden; background-color: #F3F4F6; }
         .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48; font-size: 28px; }
@@ -21,60 +23,44 @@
 
         @keyframes slideInDown { from { transform: translate(-50%, -120%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         .notification-animate { animation: slideInDown 0.3s ease-out forwards; }
-        
         .close-notification-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: #9CA3AF; cursor: pointer; transition: color 0.2s; }
         .close-notification-btn:hover { color: #6B7280; }
     </style>
 </head>
 <body class="text-gray-900">
 
-    <div id="chat-notification"
-         class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] 
-                bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-2xl p-3 pr-8 cursor-pointer 
-                flex items-center gap-4 hover:bg-gray-50 transition-colors">
-        <div class="flex-shrink-0 bg-blue-100 text-blue-600 p-2.5 rounded-full flex items-center justify-center">
-            <span class="material-symbols-rounded !text-2xl">chat</span>
-        </div>
+    <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-2xl p-3 pr-8 cursor-pointer flex items-center gap-4 hover:bg-gray-50 transition-colors">
+        <div class="flex-shrink-0 bg-blue-100 text-blue-600 p-2.5 rounded-full flex items-center justify-center"><span class="material-symbols-rounded !text-2xl">chat</span></div>
         <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center mb-0.5">
-                <p id="notif-sender" class="text-sm font-bold text-gray-500 truncate">Sender</p>
-                <p class="text-xs text-gray-400">今</p>
-            </div>
+            <div class="flex justify-between items-center mb-0.5"><p id="notif-sender" class="text-sm font-bold text-gray-500 truncate">Sender</p><p class="text-xs text-gray-400">今</p></div>
             <p id="notif-text" class="text-base font-medium text-gray-800 truncate">Message content</p>
         </div>
-        <button class="close-notification-btn" onclick="event.stopPropagation(); hideNotification();">
-            <span class="material-symbols-rounded !text-lg">close</span>
-        </button>
+        <button class="close-notification-btn" onclick="event.stopPropagation(); hideNotification();"><span class="material-symbols-rounded !text-lg">close</span></button>
     </div>
 
     <div class="max-w-[1080px] mx-auto flex flex-col h-screen bg-gray-100 shadow-xl relative">
         <header class="bg-white border-b border-gray-300 shadow-sm flex-shrink-0 z-20">
             <div class="flex justify-between items-center p-4 relative">
                 <h1 id="header-title" class="text-xl font-bold transition-all duration-300">配信画面コントローラー</h1>
-                <div id="header-trouble-status" class="hidden">
-                    <span class="material-symbols-rounded">error</span>
-                    <span id="trouble-message"></span>
-                </div>
+                <div id="header-trouble-status" class="hidden"><span class="material-symbols-rounded">error</span><span id="trouble-message"></span></div>
             </div>
         </header>
 
         <main class="flex-1 relative overflow-hidden bg-gray-100">
-            <iframe id="frame-controller" src="controller.html" class="absolute top-0 left-0 w-full h-full"></iframe>
             <iframe id="frame-chat" src="chat.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
+            <iframe id="frame-controller" src="controller.html" class="absolute top-0 left-0 w-full h-full"></iframe>
+            <iframe id="frame-match" src="match-setting.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
+            <iframe id="frame-team" src="team-viewer.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-script" src="script.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
         </main>
 
         <nav class="bg-white border-t border-gray-300 flex-shrink-0 pb-safe z-20">
-            <div class="grid grid-cols-3 h-16">
-                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')">
-                    <span class="material-symbols-rounded mb-0.5">gamepad</span><span class="text-[10px] font-bold">操作</span>
-                </button>
-                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')">
-                    <span class="material-symbols-rounded mb-0.5">chat</span><span class="text-[10px] font-bold">チャット</span>
-                </button>
-                <button class="nav-btn" data-target="script" onclick="switchTab('script')">
-                    <span class="material-symbols-rounded mb-0.5">description</span><span class="text-[10px] font-bold">台本</span>
-                </button>
+            <div class="grid grid-cols-5 h-16">
+                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')"><span class="material-symbols-rounded mb-0.5">chat</span><span class="text-[10px] font-bold">チャット</span></button>
+                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')"><span class="material-symbols-rounded mb-0.5">gamepad</span><span class="text-[10px] font-bold">操作</span></button>
+                <button class="nav-btn" data-target="match" onclick="switchTab('match')"><span class="material-symbols-rounded mb-0.5">tune</span><span class="text-[10px] font-bold">対戦設定</span></button>
+                <button class="nav-btn" data-target="team" onclick="switchTab('team')"><span class="material-symbols-rounded mb-0.5">groups</span><span class="text-[10px] font-bold">チーム</span></button>
+                <button class="nav-btn" data-target="script" onclick="switchTab('script')"><span class="material-symbols-rounded mb-0.5">description</span><span class="text-[10px] font-bold">台本</span></button>
             </div>
         </nav>
     </div>
@@ -103,8 +89,8 @@
         const notifSender = document.getElementById('notif-sender');
         const notifText = document.getElementById('notif-text');
         let notificationTimeout;
-        let currentTab = 'controller';
-        let lastMessageTimestamp = Date.now();
+        let currentTab = 'controller'; 
+        let lastMessageTimestamp = Date.now(); 
 
         const troubleMessages = { 'lag': 'ラグ対応', 'stream': '配信トラブル', 'admin': '運営トラブル' };
 
@@ -137,42 +123,53 @@
             notifText.textContent = text;
             chatNotification.classList.remove('hidden');
             chatNotification.classList.add('notification-animate');
-            
             chatNotification.onclick = (e) => {
-                // ボタンクリック以外の場合のみ遷移
-                if (!e.target.closest('.close-notification-btn')) {
-                    switchTab('chat');
-                    hideNotification();
-                }
+                if (!e.target.closest('.close-notification-btn')) { switchTab('chat'); hideNotification(); }
             };
-
-            notificationTimeout = setTimeout(() => { hideNotification(); }, 5000);
+            notificationTimeout = setTimeout(() => { hideNotification(); }, 5000); 
         }
 
         window.hideNotification = function() {
             chatNotification.classList.add('hidden');
             chatNotification.classList.remove('notification-animate');
-            if (notificationTimeout) clearTimeout(notificationTimeout);
+            if (notificationTimeout) clearTimeout(notificationTimeout); 
         };
 
         window.switchTab = function(targetName) {
-            currentTab = targetName;
+            currentTab = targetName; 
+            
+            // ローカルストレージに現在のタブを保存
+            localStorage.setItem('tools_activeTab', targetName);
+
             if (targetName === 'chat') { hideNotification(); }
 
-            const titles = { controller: "配信画面コントローラー", chat: "配信メンバーチャット", script: "配信台本表示" };
+            const titles = {
+                chat: "配信メンバーチャット",
+                controller: "配信画面コントローラー",
+                match: "対戦設定",
+                team: "チーム情報閲覧",
+                script: "配信台本表示"
+            };
             
-            document.querySelectorAll('iframe').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('iframe').forEach(el => { el.classList.add('hidden'); });
             const targetFrame = document.getElementById(`frame-${targetName}`);
             if (targetFrame) {
                 targetFrame.classList.remove('hidden');
                 if (targetName === 'script') {
-                    targetFrame.contentWindow.postMessage('scroll-to-current', '*');
+                    if (targetFrame.contentWindow.document.readyState === 'complete') {
+                         targetFrame.contentWindow.postMessage('scroll-to-current', '*');
+                    } else {
+                         targetFrame.onload = () => { targetFrame.contentWindow.postMessage('scroll-to-current', '*'); };
+                    }
                 }
             }
 
             const titleEl = document.getElementById('header-title');
             titleEl.style.opacity = 0;
-            setTimeout(() => { titleEl.textContent = titles[targetName]; titleEl.style.opacity = 1; }, 150);
+            setTimeout(() => {
+                titleEl.textContent = titles[targetName];
+                titleEl.style.opacity = 1;
+            }, 150);
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -188,8 +185,10 @@
             }
         };
         
-        const initBtn = document.querySelector(`.nav-btn[data-target="controller"] .material-symbols-rounded`);
-        if(initBtn) initBtn.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48";
+        // 初期化: ローカルストレージからタブを復元、なければcontroller
+        const savedTab = localStorage.getItem('tools_activeTab');
+        window.switchTab(savedTab || 'controller');
+
     </script>
 </body>
 </html>

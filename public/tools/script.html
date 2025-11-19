@@ -14,7 +14,7 @@
         ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 6px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        /* 台本タイルスタイル (元のデザイン) */
+        /* 台本タイルスタイル */
         .script-paragraph {
             background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 1.25rem; 
             padding: 1.25rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease-in-out; opacity: 0.9;
@@ -49,7 +49,9 @@
 </head>
 <body class="bg-gray-100 text-gray-900">
     <div class="max-w-[1080px] mx-auto">
-        <main id="script-container" class="p-4 md:p-6"></main>
+        <main id="script-container" class="p-4 md:p-6">
+            <div class="text-center text-gray-500 py-10">台本データを読み込み中...</div>
+        </main>
     </div>
     
     <script type="module">
@@ -69,28 +71,40 @@
         const db = getFirestore(app);
         const broadcastRef = doc(db, "state", "broadcast");
         const scriptContainer = document.getElementById('script-container');
+        
+        // 現在のアクティブな行番号を保持
+        let currentActiveIndex = 0;
 
-        const scriptData = [
-            {"speaker":"ようくん (配信担当)","line":"配信にお集まりいただいた皆さん、こんばんは！大学杯の運営をしております大学杯運営3年のようくんと申します。この配信ではこの後から始まるシン・大学杯の様子をお届けいたします。\n本戦が始まる前に、わたくしからこの大会について説明させていただきます。まず、この大会は、任天堂の協賛‧提携を受けたものではありません。コミュニティ大会への出場および観戦に関する規約は概要欄のURLからご確認くださるようお願いいたします。"},
-            {"speaker":"→ページ送り","line":"まず最初に、このシン・大学杯について簡単におさらいしていきましょう。シン・大学杯は大学をはじめとする高等教育機関の学生を対象とした学生による学生のための大会です。今大会では各大学のサークルから選抜された1チームのみが参加可能となっております。"},
-            {"speaker":"→ページ送り","line":"使用するルールはガチエリアのみで、ステージは現時点で実装されている25ステージすべてから選択されます。また使用するブキ・ギアに制限はありません。基本は2本先取でステージはお任せによるランダム、最後の準決勝と決勝のみ3本先取のカウンターステージ制となります。"},
-            {"speaker":"→ページ送り","line":"そして決勝を制し、見事優勝を勝ち取ったチームには「むつき」様による優勝イラストを贈呈します。"},
-            {"speaker":"→ページ送り","line":"それでは次に、このシン・大学杯を盛り上げてくださる実況解説者の方々をご紹介いたします！まず、実況を担当してくださるのはくぼじさんです！"},
-            {"speaker":"くぼじさん","line":"※お名前とお一言いただければと思います。"},
-            {"speaker":"ようくん (配信担当)","line":"そして、解説を担当してくださるブラウドさんです！"},
-            {"speaker":"ブラウドさん","line":"※お名前とお一言いただければと思います。"},
-            {"speaker":"ようくん (配信担当)","line":"ありがとうございます！それではそろそろ配信試合開始のお時間になりますので、お二方、よろしくお願いいたします！"},
-            {"speaker":"メモ","line":"※ここからは自由に話していただいて大丈夫です！"},
-            {"speaker":"メモ","line":"※これ以降は決勝後のインタビュー台本：詳しい流れは「OP/EDトーク用台本」を参照してください"},
-            {"speaker":"くぼじさん","line":"優勝チームの○○の皆さんが実況解説席に来てくださいました！改めまして、シン・大学杯優勝おめでとうございます！"},
-            {"speaker":"くぼじさん","line":"（※jsonファイルに重複があったため片方を修正）優勝チームにインタビューをしていきます。"},
-            {"speaker":"くぼじさん","line":"解説のブラウドさんは何か聞きたいことはありますか？"},
-            {"speaker":"メモ","line":"※優勝チーム退出→実況解説お二人の大会全体の感想などトーク→まとまったら締めへ"},
-            {"speaker":"くぼじさん","line":"改めて、シン・大学杯の優勝チームは○○でした！\n皆さん、大学杯へのご参加、ありがとうございました！"}
-        ];
+        // --- JSON読み込み処理 ---
+        async function loadScript() {
+            try {
+                // 相対パスでJSONを取得
+                const response = await fetch('../json/script.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const scriptData = await response.json();
+                initializeScript(scriptData);
+                
+            } catch (error) {
+                console.error("台本データの読み込みに失敗しました:", error);
+                scriptContainer.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-center">
+                        <p class="font-bold mb-2">読み込みエラー</p>
+                        <p class="text-sm">script.jsonが見つからないか、形式が正しくありません。</p>
+                        <p class="text-xs mt-2 text-gray-500">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
 
-        function initializeScript() {
-            scriptData.forEach((item, index) => {
+        // --- 初期化処理 ---
+        function initializeScript(data) {
+            scriptContainer.innerHTML = ''; // ローディング表示をクリア
+
+            data.forEach((item, index) => {
                 const tile = document.createElement('div');
                 tile.className = 'script-paragraph';
                 tile.dataset.index = index;
@@ -109,9 +123,12 @@
                 tile.appendChild(lineText);
                 scriptContainer.appendChild(tile);
             });
+
+            // データ読み込み完了後に現在の位置を反映
+            updateScriptView(currentActiveIndex);
         }
 
-        // スクロール関数 (指定された要素または現在のアクティブ要素へ)
+        // --- スクロール関数 ---
         function scrollToActive(element) {
             const target = element || document.querySelector('.paragraph-active');
             if (target) {
@@ -119,9 +136,14 @@
             }
         }
 
-        // 表示更新ロジック
+        // --- 表示更新ロジック ---
         function updateScriptView(activeIndex) {
+            currentActiveIndex = activeIndex; // 最新の状態を保存
             const allTiles = document.querySelectorAll('.script-paragraph');
+            
+            // まだDOMが生成されていない場合はスキップ
+            if (allTiles.length === 0) return;
+
             let activeTile = null;
             allTiles.forEach(tile => {
                 const index = parseInt(tile.dataset.index, 10);
@@ -134,17 +156,20 @@
                 else { tile.classList.add('paragraph-future'); }
             });
             
-            // Firestore更新時は自動でスクロール
             if (activeTile) { scrollToActive(activeTile); }
         }
 
+        // --- Firestore リスナー ---
         onSnapshot(broadcastRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                if (data.scriptIndex !== undefined) { updateScriptView(data.scriptIndex); }
+                if (data.scriptIndex !== undefined) { 
+                    updateScriptView(data.scriptIndex); 
+                }
             }
         });
 
+        // --- クリック時の更新 ---
         scriptContainer.addEventListener('click', async (e) => {
             const clickedTile = e.target.closest('.script-paragraph');
             if (clickedTile) {
@@ -153,14 +178,16 @@
             }
         });
 
-        // 親フレーム(tools.html)からのスクロール指示を受け取る
+        // --- 親フレームからのスクロール指示 ---
         window.addEventListener('message', (event) => {
             if (event.data === 'scroll-to-current') {
                 scrollToActive();
             }
         });
 
-        initializeScript();
+        // 実行
+        loadScript();
+
     </script>
 </body>
 </html>

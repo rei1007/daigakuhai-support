@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>バトルオーバーレイ - 真打スタイル (Firebase連携)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi&family=Shippori+Mincho+B1&family=WDXL+Lubrifont+JP+N&family=Yuji+Syuku&family=Yusei+Magic&family=Zen+Antique+Soft&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- デザイン定義 (変更なし) --- */
+        :root {
+            --color-white-bg: #f5f5f5;
+            --color-main-bg: #dfd3b2;
+            --color-accent: #6d5d38;
+            --color-black: #000000;
+            --color-alpha: #b0b32c;
+            --color-bravo: #9054c2;
+            
+            --font-yuji: "Yuji Syuku", serif;
+            --font-WDXL: "WDXL Lubrifont JP N", sans-serif;
+            --font-zen-antique: "Zen Antique Soft", serif;
+            --font-kosugi: "Kosugi", sans-serif;
+            --font-shippori-mincho: "Shippori Mincho B1", serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: transparent;
+            overflow: hidden;
+        }
+
+        #screen {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+        }
+
+        /* --- スコアボード (左上) --- */
+        #teams {
+            position: relative;
+            width: fit-content;
+            min-width: 340px;
+            height: fit-content;
+            padding: 15px 20px 20px;
+            background: rgba(245, 245, 245, 0.9); 
+            border-radius: 0 0 20px 0;
+            border-right: 3px solid var(--color-accent);
+            border-bottom: 3px solid var(--color-accent);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .team {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 5px;
+        }
+
+        /* スコア表示タグ (::before) */
+        .team::before {
+            content: var(--alpha-score, "0");
+            position: absolute;
+            top: 50%;
+            left: -20px;
+            transform: translateY(-50%);
+            width: 45px;
+            height: 60px;
+            border-radius: 0 10px 10px 0;
+            color: #fff;
+            text-align: center;
+            line-height: 60px;
+            font-family: var(--font-WDXL); 
+            font-size: 40px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .team.alpha::before {
+            background-color: var(--color-alpha);
+            content: var(--alpha-score, "0");
+        }
+        .team.bravo::before {
+            background-color: var(--color-bravo);
+            content: var(--bravo-score, "0");
+        }
+
+        /* 大学名・サークル名 */
+        .team .univ-name {
+            margin: 0 0 0 10px;
+            font-family: var(--font-yuji);
+            font-size: 24px;
+            color: #555;
+            line-height: 1.2;
+        }
+
+        /* チーム名 */
+        .team .team-name {
+            margin-right: 10px;
+            font-family: var(--font-zen-antique);
+            font-size: 45px;
+            font-weight: normal;
+            line-height: 1.1;
+            color: #222;
+            text-shadow: 1px 1px 0 #fff;
+            white-space: nowrap;
+        }
+        .team.alpha .team-name { color: var(--color-alpha); }
+        .team.bravo .team-name { color: var(--color-bravo); }
+
+        /* 勝利数ポイントバー */
+        #points {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0 5px;
+            height: 12px;
+            width: 100%;
+            padding-left: 10px;
+        }
+
+        #points .point {
+            flex-grow: 1;
+            height: 100%;
+            background-color: #ddd;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        #points .point.alpha { background-color: var(--color-alpha); }
+        #points .point.bravo { background-color: var(--color-bravo); }
+
+
+        /* --- ラウンド情報 --- */
+        #round {
+            width: fit-content;
+            margin: 10px 0 0 20px;
+            padding: 5px 25px;
+            font-family: var(--font-kosugi);
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.5;
+            color: var(--color-white-bg);
+            text-align: center;
+            background: var(--color-accent);
+            border-radius: 20px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- メンバーリスト共通スタイル --- */
+        #alpha-members, #bravo-members {
+            position: absolute;
+            bottom: 0;
+            background: rgba(245, 245, 245, 0.95);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .member {
+            font-family: var(--font-shippori-mincho);
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1.2;
+            color: #333;
+            white-space: nowrap;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #ccc;
+            margin: 2px 0;
+        }
+
+        /* アルファメンバー (左下) */
+        #alpha-members {
+            left: 0;
+            width: 400px;
+            padding: 15px 15px 15px 35px;
+            border-radius: 0 20px 0 0;
+            border-top: 3px solid var(--color-alpha);
+            border-right: 3px solid var(--color-alpha);
+        }
+        #alpha-members::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 15px;
+            height: 100%;
+            background-color: var(--color-alpha);
+        }
+        #alpha-members hr { background-color: var(--color-alpha); opacity: 0.5; }
+
+        /* ブラボーメンバー (右下) */
+        #bravo-members {
+            right: 0;
+            width: 400px;
+            padding: 15px 35px 15px 15px;
+            text-align: right;
+            border-radius: 20px 0 0 0;
+            border-top: 3px solid var(--color-bravo);
+            border-left: 3px solid var(--color-bravo);
+        }
+        #bravo-members::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 15px;
+            height: 100%;
+            background-color: var(--color-bravo);
+        }
+        #bravo-members hr { background-color: var(--color-bravo); opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <main id="screen">
+        <div id="teams">
+            <div class="team alpha">
+                <p id="alpha-univ" class="univ-name">---</p>
+                <h1 id="alpha-team-name" class="team-name">---</h1>
+            </div>
+            <div id="points"></div>
+            <div class="team bravo">
+                <p id="bravo-univ" class="univ-name">---</p>
+                <h1 id="bravo-team-name" class="team-name">---</h1>
+            </div>
+        </div>
+        
+        <div id="round">---</div>
+
+        <div id="alpha-members">
+            <h2 id="alpha-member1" class="member">-</h2><hr>
+            <h2 id="alpha-member2" class="member">-</h2><hr>
+            <h2 id="alpha-member3" class="member">-</h2><hr>
+            <h2 id="alpha-member4" class="member">-</h2>
+        </div>
+
+        <div id="bravo-members">
+            <h2 id="bravo-member1" class="member">-</h2><hr>
+            <h2 id="bravo-member2" class="member">-</h2><hr>
+            <h2 id="bravo-member3" class="member">-</h2><hr>
+            <h2 id="bravo-member4" class="member">-</h2>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let teamsData = [];
+
+        // チームデータの読み込み (main.htmlと同様にjsonから取得)
+        async function loadTeamsData() {
+            try {
+                const response = await fetch('../json/teams.json');
+                teamsData = await response.json();
+                console.log("Teams data loaded:", teamsData.length);
+            } catch (e) {
+                console.error("Failed to load teams.json:", e);
+                // 失敗時は空配列で続行（表示は---になる）
+            }
+        }
+
+        // メイン処理
+        loadTeamsData().then(() => {
+            // state/match ドキュメントを監視
+            onSnapshot(doc(db, "state", "match"), (docSnap) => {
+                if (docSnap.exists()) {
+                    updateOverlay(docSnap.data());
+                }
+            });
+        });
+
+        function updateOverlay(matchData) {
+            console.log("Updating overlay with Firebase data...", matchData);
+
+            // 1. スコアの計算
+            let alphaScore = 0;
+            let bravoScore = 0;
+            if (matchData.games && Array.isArray(matchData.games)) {
+                matchData.games.forEach(game => {
+                    if (game.winner === 'alpha') alphaScore++;
+                    if (game.winner === 'bravo') bravoScore++;
+                });
+            }
+
+            // 2. 表示の更新（CSS変数）
+            document.documentElement.style.setProperty('--alpha-score', `"${alphaScore}"`);
+            document.documentElement.style.setProperty('--bravo-score', `"${bravoScore}"`);
+
+            // 3. ラウンド情報の更新
+            const roundName = matchData.roundName || '試合情報なし';
+            const boType = matchData.boType || 'BO3'; // BO3, BO5など
+            document.getElementById('round').textContent = `${roundName} ${boType}`;
+
+            // 4. チーム情報の更新
+            updateTeamInfo('alpha', matchData.alphaTeamId);
+            updateTeamInfo('bravo', matchData.bravoTeamId);
+
+            // 5. ポイントバー（勝利数インジケータ）の更新
+            const pointsContainer = document.getElementById('points');
+            pointsContainer.innerHTML = '';
+            
+            // BO数に応じてバーの数を決定 (BO3なら3つ, BO5なら5つ)
+            const maxGames = (boType === 'BO5') ? 5 : 3; 
+
+            for (let i = 0; i < maxGames; i++) {
+                const pointDiv = document.createElement('div');
+                pointDiv.className = 'point';
+
+                // 試合結果があれば色付け
+                if (matchData.games && matchData.games[i]) {
+                    const winner = matchData.games[i].winner;
+                    if (winner === 'alpha') pointDiv.classList.add('alpha');
+                    else if (winner === 'bravo') pointDiv.classList.add('bravo');
+                }
+                pointsContainer.appendChild(pointDiv);
+            }
+        }
+
+        function updateTeamInfo(side, teamId) {
+            const team = teamsData.find(t => String(t.id) === String(teamId));
+            
+            // 要素の取得
+            const elUniv = document.getElementById(`${side}-univ`);
+            const elName = document.getElementById(`${side}-team-name`);
+
+            if (!team) {
+                // チーム未選択時
+                elUniv.textContent = "---";
+                elName.textContent = "Waiting...";
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById(`${side}-member${i}`).textContent = "-";
+                }
+                return;
+            }
+
+            // テキスト更新
+            elUniv.textContent = `${team.university || ''} ${team.circle || ''}`;
+            elName.textContent = team.teamName;
+
+            // メンバー更新
+            for (let i = 1; i <= 4; i++) {
+                const memberName = team[`p${i}_name`];
+                const elMember = document.getElementById(`${side}-member${i}`);
+                elMember.textContent = (memberName && memberName !== '----') ? memberName : '';
+            }
+        }
+    </script>
+</body>
+</html>
