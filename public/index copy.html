@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学杯 配信サポート</title>
+    <link rel="icon" href="icons/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <style>
+        /* 1. Root Variables & Base Styles */
+        :root {
+            /* Color Palette */
+            --primary-color: #000000;
+            --primary-container-color: #E5E5E5;
+            --on-primary-container-color: #000000;
+            --surface-container-low-color: #F5F5F5;
+            --surface-color: #FFFFFF;
+            --on-surface-color: #1C1C1C;
+            --on-surface-variant-color: #5A5A5A;
+            --outline-color: #E0E0E0;
+
+            /* Mobile-First Typography & Spacing Scale (rem units) */
+            --font-size-xs: 1.2rem;
+            --font-size-sm: 1.4rem;
+            --font-size-base: 1.5rem;
+            --font-size-md: 1.6rem;
+            --font-size-lg: 2.0rem;
+            --font-size-xl: 2.4rem;
+            --font-size-xxl: 3.2rem;
+
+            --space-sm: 0.8rem;
+            --space-md: 1.6rem;
+            --space-lg: 2.4rem;
+            --space-xl: 4.8rem;
+
+            /* Border Radius */
+            --radius-lg: 16px;
+
+            /* Font Family */
+            --font-family: "M PLUS Rounded 1c", sans-serif;
+        }
+
+        /* デスクトップ用スケール */
+        @media (min-width: 1200px) {
+            :root {
+                /* Desktop Typography & Spacing Scale */
+                --font-size-xs: 1.4rem;
+                --font-size-sm: 1.6rem;
+                --font-size-base: 1.8rem;
+                --font-size-md: 2.0rem;
+                --font-size-lg: 2.8rem;
+                --font-size-xl: 3.6rem;
+                --font-size-xxl: 4.8rem;
+
+                --space-sm: 1.2rem;
+                --space-md: 2.0rem;
+                --space-lg: 3.0rem;
+                --space-xl: 5.2rem;
+            }
+        }
+
+        /* 基礎スタイル */
+        html {
+            /* ボックスモデル */
+            height: 100%;
+            /* タイポグラフィ */
+            font-size: 62.5%;
+        }
+
+        body {
+            /* ボックスモデル */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: var(--space-lg);
+            box-sizing: border-box;
+            /* タイポグラフィ */
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--on-surface-color);
+            /* 装飾 */
+            background-color: var(--surface-container-low-color);
+        }
+
+        /* 2. Page Layout */
+        .container {
+            /* ボックスモデル */
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .header {
+            /* ボックスモデル */
+            margin-bottom: var(--space-xl);
+            /* タイポグラフィ */
+            text-align: center;
+
+            h1 {
+                /* ボックスモデル */
+                margin: 0;
+                /* タイポグラフィ */
+                font-size: var(--font-size-xxl);
+                font-weight: 700;
+            }
+
+            h2#tournament-name-display {
+                /* ボックスモデル */
+                min-height: var(--font-size-lg);
+                margin: var(--space-sm) 0 0 0;
+                /* タイポグラフィ */
+                font-size: var(--font-size-lg);
+                color: var(--on-surface-color);
+                font-weight: 700;
+            }
+
+            p {
+                /* ボックスモデル */
+                margin-top: var(--space-md);
+                /* タイポグラフィ */
+                font-size: var(--font-size-md);
+                color: var(--on-surface-variant-color);
+            }
+        }
+
+        .settings-section {
+            /* ボックスモデル */
+            margin-top: var(--space-lg);
+        }
+
+        /* 設定ボタン */
+        .settings-button {
+            /* ボックスモデル */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid #C0C0C0;
+            box-sizing: border-box;
+            /* タイポグラフィ */
+            font-size: var(--font-size-md);
+            font-weight: 700;
+            color: var(--on-primary-container-color);
+            text-align: center;
+            text-decoration: none;
+            /* 装飾 */
+            background-color: var(--primary-container-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* その他 */
+            transition: all 0.2s ease-in-out;
+        }
+
+        .settings-button:hover {
+            /* ボックスモデル */
+            border-color: #A0A0A0;
+            /* 装飾 */
+            background-color: #DCDCDC;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            /* その他 */
+            transform: translateY(-2px);
+        }
+
+        .settings-button .material-icons-outlined {
+            /* タイポグラフィ */
+            font-size: var(--font-size-lg);
+        }
+
+        /* ページリンクグリッド */
+        .link-grid {
+            /* ボックスモデル */
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-lg);
+
+            /* デスクトップ */
+            @media (min-width: 769px) {
+                /* ボックスモデル */
+                grid-template-columns: 1fr 1fr 1fr;
+                margin: 0 auto;
+            }
+        }
+
+        /* ページリンクボタン */
+        .page-link-button {
+            /* ボックスモデル */
+            display: block;
+            padding: var(--space-lg);
+            border: 1px solid var(--outline-color);
+            /* タイポグラフィ */
+            font-size: var(--font-size-md);
+            font-weight: 700;
+            color: var(--on-surface-color);
+            text-align: center;
+            text-decoration: none;
+            /* 装飾 */
+            background-color: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* その他 */
+            transition: all 0.2s ease-in-out;
+
+            &:hover {
+                /* ボックスモデル */
+                border-color: var(--primary-color);
+                /* 装飾 */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                /* その他 */
+                transform: translateY(-4px);
+            }
+
+            /* 補助テキスト */
+            span {
+                /* ボックスモデル */
+                display: block;
+                margin-top: var(--space-sm);
+                /* タイポグラフィ */
+                font-size: var(--font-size-sm);
+                font-weight: 400;
+                color: var(--on-surface-variant-color);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>大学杯 配信サポート</h1>
+            <h2 id="tournament-name-display">...</h2>
+            <p>大会配信の運営・実況解説を円滑にするためのサポートツールです。</p>
+        </header>
+
+        <main>
+            <section class="link-grid">
+                <a href="./operator.html" class="page-link-button">運営ページ <span>配信補助の運営員用</span></a>
+                <a href="./stream-staff.html" class="page-link-button">配信担当ページ <span>配信担当の運営員用</span></a>
+                <a href="./commentator.html" class="page-link-button">実況解説ページ <span>実況解説者用</span></a>
+            </section>
+
+            <section class="settings-section">
+                <a href="./setting.html" class="settings-button">
+                    <span class="material-icons-outlined">settings</span>
+                    大会設定
+                </a>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.appspot.com",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const sessionDocRef = db.collection('sessions').doc('daigakuhai-support-v1');
+
+        // 大会名をFirestoreから取得して表示
+        const loadTournamentName = async () => {
+            const nameDisplay = document.getElementById('tournament-name-display');
+            try {
+                const doc = await sessionDocRef.get();
+                if (doc.exists) {
+                    const state = doc.data();
+                    const tournamentName = state.tournamentName;
+
+                    if (tournamentName) {
+                        nameDisplay.textContent = tournamentName;
+                    } else {
+                        nameDisplay.textContent = '大会名未設定';
+                    }
+                } else {
+                    nameDisplay.textContent = '（設定ドキュメントなし）';
+                }
+            } catch (error) {
+                console.error("大会名の取得エラー:", error);
+                nameDisplay.textContent = '（大会名の取得に失敗）';
+            }
+        };
+
+        // ページ読み込み時に大会名を取得
+        document.addEventListener('DOMContentLoaded', loadTournamentName);
+    </script>
+</body>
+
+</html>
