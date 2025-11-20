@@ -4,14 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#FFFFFF">
+    
     <title>大学杯 配信ツール</title>
-    <link rel="icon" href="icons/favicon.ico">
+    <link rel="icon" href="../icons/favicon.ico">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -29,27 +34,32 @@
             --color-warning-border: #EAB308;
         }
 
+        /* --- PWA対応のコアレイアウト --- */
+        html {
+            height: 100%;
+            overflow: hidden; /* バウンス防止 */
+        }
+
         body {
             font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
             background-color: var(--color-bg);
             color: var(--color-main);
-            overflow: hidden; 
+            
+            /* 画面を完全に固定する設定 */
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none; /* 引っ張り更新などを無効化 */
+            
             display: flex;
             justify-content: center;
-            
-            /* スマホのアドレスバー対策 */
-            height: 100vh; /* フォールバック */
-            height: 100dvh; /* Dynamic Viewport Height: アドレスバーを除いた実際の高さ */
-            width: 100%;
         }
 
-        /* セーフエリア対応ユーティリティ (iPhone等のホームバー対策) */
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom, 20px);
-        }
-        .pt-safe {
-            padding-top: env(safe-area-inset-top, 0px);
-        }
+        /* セーフエリア対応ユーティリティ */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 
         /* アプリ本体のコンテナ */
         #app-container {
@@ -80,7 +90,7 @@
             border-right: 2px solid var(--color-main); 
             height: 100%;
             position: relative;
-            flex: 1; /* 均等割り付け */
+            flex: 1;
         }
         .nav-btn:last-child {
             border-right: none; 
@@ -145,6 +155,7 @@
             color: var(--color-warning-text);
             border: 2px solid var(--color-main); 
             border-radius: 0.5rem;
+            white-space: nowrap; /* 折り返し防止 */
         }
         #header-trouble-status.hidden { display: none !important; }
         
@@ -219,9 +230,11 @@
 
     <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] 
                 p-4 cursor-pointer flex items-start gap-4 transition-transform">
+        
         <div class="flex-shrink-0 text-blue-600 mt-1">
             <span class="material-symbols-rounded">chat</span>
         </div>
+
         <div class="flex-1 min-w-0">
             <div class="flex justify-between items-baseline mb-1">
                 <p id="notif-sender" class="text-sm font-black text-gray-900 uppercase tracking-wider">Sender</p>
@@ -229,6 +242,7 @@
             </div>
             <p id="notif-text" class="text-base font-bold text-gray-700 leading-snug line-clamp-2">Message content</p>
         </div>
+
         <button class="close-notification-btn text-gray-400 hover:text-gray-900" onclick="event.stopPropagation(); hideNotification();">
             <span class="material-symbols-rounded">close</span>
         </button>
@@ -483,7 +497,7 @@
         }
 
         window.hideNotification = function () {
-       chatNotification.classList.add('hidden');
+            chatNotification.classList.add('hidden');
             chatNotification.classList.remove('notification-animate');
             if (notificationTimeout) clearTimeout(notificationTimeout);
         };
