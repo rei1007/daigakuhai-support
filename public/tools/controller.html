@@ -117,7 +117,7 @@
             </div>
         </section>
 
-        <section class="pb-8">
+        <section id="trouble-section" class="pb-8">
             <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">トラブル対応</h2>
             <div id="trouble-selector" class="grid grid-cols-3 gap-3 md:gap-4">
                 <div class="controller-tile tile-inactive" data-group="trouble" data-value="lag" data-message="ラグ対応中">
@@ -152,6 +152,7 @@
         const broadcastRef = doc(db, "state", "broadcast");
 
         // UI要素
+        const troubleSection = document.getElementById('trouble-section');
         const troubleTiles = document.querySelectorAll('.controller-tile[data-group="trouble"]');
         const mainOpTiles = document.querySelectorAll('.controller-tile[data-group="main-op"]');
         const subOpBtns = document.querySelectorAll('.sub-op-btn');
@@ -167,10 +168,31 @@
             scriptIndex: 0
         };
 
+        // ユーザー設定保持用
+        let currentUser = { name: '', role: '' };
+
+        // --- 親フレームからの設定受け取り ---
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'settings-update') {
+                currentUser = event.data.user;
+                updateRoleBasedUI();
+            }
+        });
+
+        function updateRoleBasedUI() {
+            const role = currentUser.role;
+            // 実況・解説の場合はトラブル対応を非表示
+            if (role === '実況' || role === '解説') {
+                troubleSection.classList.add('hidden');
+            } else {
+                troubleSection.classList.remove('hidden');
+            }
+        }
+
+        // --- Firestore書き込み ---
         async function updateState(updates) {
             try {
                 if (updates.mainOp) {
-                    // main-bravo に変更
                     if (updates.mainOp === 'main-alpha' || updates.mainOp === 'main-bravo') {
                         updates.subOp = 'details';
                     } else if (updates.mainOp === 'main-stage') {
@@ -181,13 +203,13 @@
             } catch (e) { console.error("Error: ", e); }
         }
 
+        // --- UI更新 ---
         function renderUI(state) {
             currentState = state;
 
             updateTileGroup(troubleTiles, state.trouble);
             updateTileGroup(mainOpTiles, state.mainOp);
 
-            // main-bravo に変更
             const isTeam = (state.mainOp === 'main-alpha' || state.mainOp === 'main-bravo');
             const isStage = (state.mainOp === 'main-stage');
 

@@ -1,66 +1,234 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大学杯 配信ツール</title>
-    <link rel="icon" href="../icons/favicon.ico">
+    <title>大学杯 配信サポート</title>
+    <link rel="icon" href="icons/favicon.ico">
+
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
 
     <style>
-        body { font-family: 'Kosugi Maru', sans-serif; overflow: hidden; background-color: #F3F4F6; }
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48; font-size: 28px; }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6B7280; transition: all 0.2s; padding: 0.5rem; border-radius: 0.75rem; }
-        .nav-btn.active { color: #111827; background-color: #E5E7EB; }
-        .nav-btn.active .material-symbols-rounded { color: #111827; }
-        iframe { border: none; width: 100%; height: 100%; background-color: #F3F4F6; }
-        
-        #header-trouble-status { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.75rem; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 600; background-color: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; transition: all 0.2s ease-in-out; }
-        #header-trouble-status.hidden { display: none !important; }
-        #header-trouble-status .material-symbols-rounded { font-size: 1.125rem; font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20; color: #D97706; }
+        body {
+            font-family: 'Kosugi Maru', sans-serif;
+            overflow: hidden;
+            background-color: #F3F4F6;
+        }
 
-        @keyframes slideInDown { from { transform: translate(-50%, -120%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        .notification-animate { animation: slideInDown 0.3s ease-out forwards; }
-        .close-notification-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: #9CA3AF; cursor: pointer; transition: color 0.2s; }
-        .close-notification-btn:hover { color: #6B7280; }
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+            font-size: 28px;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6B7280;
+            transition: all 0.2s;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+        }
+
+        .nav-btn.active {
+            color: #111827;
+            background-color: #E5E7EB;
+        }
+
+        .nav-btn.active .material-symbols-rounded {
+            color: #111827;
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            background-color: #F3F4F6;
+        }
+
+        /* 変更: トラブルステータスの位置を右端に設定 */
+        #header-trouble-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: #FEF3C7;
+            color: #D97706;
+            border: 1px solid #FDE68A;
+            transition: all 0.2s ease-in-out;
+            
+            position: absolute; /* absoluteを維持 */
+            right: 1rem;       /* 右端に配置 */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #header-trouble-status.hidden {
+            display: none !important;
+        }
+
+        #header-trouble-status .material-symbols-rounded {
+            font-size: 1.125rem;
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            color: #D97706;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translate(-50%, -120%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        .notification-animate {
+            animation: slideInDown 0.3s ease-out forwards;
+        }
+
+        .close-notification-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: #9CA3AF;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-notification-btn:hover {
+            color: #6B7280;
+        }
+
+        /* 変更: 設定ボタンの位置を左端に設定 */
+        #global-settings-btn {
+            position: absolute;
+            left: 1rem; /* 左端に配置 */
+            right: auto; /* 既存のright: 1remを無効化 */
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.5rem;
+            border-radius: 9999px;
+            color: #6B7280;
+            transition: all 0.2s;
+        }
+
+        #global-settings-btn:hover {
+            background-color: #F3F4F6;
+            color: #111827;
+        }
     </style>
 </head>
+
 <body class="text-gray-900">
 
-    <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-2xl p-3 pr-8 cursor-pointer flex items-center gap-4 hover:bg-gray-50 transition-colors">
-        <div class="flex-shrink-0 bg-blue-100 text-blue-600 p-2.5 rounded-full flex items-center justify-center"><span class="material-symbols-rounded !text-2xl">chat</span></div>
+    <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] 
+                bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-2xl p-3 pr-8 cursor-pointer 
+                flex items-center gap-4 hover:bg-gray-50 transition-colors relative">
+
+        <div class="flex-shrink-0 bg-blue-100 text-blue-600 p-2.5 rounded-full flex items-center justify-center">
+            <span class="material-symbols-rounded !text-2xl">chat</span>
+        </div>
+
         <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center mb-0.5"><p id="notif-sender" class="text-sm font-bold text-gray-500 truncate">Sender</p><p class="text-xs text-gray-400">今</p></div>
+            <div class="flex justify-between items-center mb-0.5">
+                <p id="notif-sender" class="text-sm font-bold text-gray-500 truncate">Sender</p>
+                <p class="text-xs text-gray-400">今</p>
+            </div>
             <p id="notif-text" class="text-base font-medium text-gray-800 truncate">Message content</p>
         </div>
-        <button class="close-notification-btn" onclick="event.stopPropagation(); hideNotification();"><span class="material-symbols-rounded !text-lg">close</span></button>
+
+        <button class="close-notification-btn" onclick="event.stopPropagation(); hideNotification();">
+            <span class="material-symbols-rounded !text-lg">close</span>
+        </button>
+    </div>
+
+    <div id="settings-modal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+            <div class="border-b border-gray-300 p-5">
+                <h2 class="text-xl font-bold">ユーザー設定</h2>
+            </div>
+            <div class="p-5 space-y-5">
+                <div>
+                    <label for="username-input" class="block text-sm font-medium mb-1.5">名前</label>
+                    <input type="text" id="username-input" placeholder="名前を入力"
+                        class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5">ロール</label>
+                    <select id="role-select"
+                        class="w-full p-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:border-gray-700">
+                        <option value="運営">運営</option>
+                        <option value="配信担当">配信担当</option>
+                        <option value="実況">実況</option>
+                        <option value="解説">解説</option>
+                    </select>
+                </div>
+            </div>
+            <div class="border-t border-gray-300 p-4 flex justify-end">
+                <button id="save-settings-btn"
+                    class="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors">保存する</button>
+            </div>
+        </div>
     </div>
 
     <div class="max-w-[1080px] mx-auto flex flex-col h-screen bg-gray-100 shadow-xl relative">
         <header class="bg-white border-b border-gray-300 shadow-sm flex-shrink-0 z-20">
-            <div class="flex justify-between items-center p-4 relative">
+            <div class="flex justify-center items-center p-4 relative">
+                <button id="global-settings-btn" title="ユーザー設定"><span
+                        class="material-symbols-rounded">settings</span></button>
+                        
                 <h1 id="header-title" class="text-xl font-bold transition-all duration-300">配信画面コントローラー</h1>
-                <div id="header-trouble-status" class="hidden"><span class="material-symbols-rounded">error</span><span id="trouble-message"></span></div>
+                
+                <div id="header-trouble-status" class="hidden"><span
+                        class="material-symbols-rounded">error</span><span id="trouble-message"></span></div>
             </div>
         </header>
 
         <main class="flex-1 relative overflow-hidden bg-gray-100">
             <iframe id="frame-chat" src="chat.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-controller" src="controller.html" class="absolute top-0 left-0 w-full h-full"></iframe>
-            <iframe id="frame-match" src="match-setting.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
+            <iframe id="frame-match" src="match-setting.html"
+                class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-team" src="team-viewer.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-script" src="script.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
         </main>
 
         <nav class="bg-white border-t border-gray-300 flex-shrink-0 pb-safe z-20">
             <div class="grid grid-cols-5 h-16">
-                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')"><span class="material-symbols-rounded mb-0.5">chat</span><span class="text-[10px] font-bold">チャット</span></button>
-                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')"><span class="material-symbols-rounded mb-0.5">gamepad</span><span class="text-[10px] font-bold">操作</span></button>
-                <button class="nav-btn" data-target="match" onclick="switchTab('match')"><span class="material-symbols-rounded mb-0.5">tune</span><span class="text-[10px] font-bold">対戦設定</span></button>
-                <button class="nav-btn" data-target="team" onclick="switchTab('team')"><span class="material-symbols-rounded mb-0.5">groups</span><span class="text-[10px] font-bold">チーム</span></button>
-                <button class="nav-btn" data-target="script" onclick="switchTab('script')"><span class="material-symbols-rounded mb-0.5">description</span><span class="text-[10px] font-bold">台本</span></button>
+                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')"><span
+                        class="material-symbols-rounded mb-0.5">chat</span><span
+                        class="text-[10px] font-bold">チャット</span></button>
+                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')"><span
+                        class="material-symbols-rounded mb-0.5">gamepad</span><span
+                        class="text-[10px] font-bold">操作</span></button>
+                <button class="nav-btn" data-target="match" onclick="switchTab('match')"><span
+                        class="material-symbols-rounded mb-0.5">tune</span><span
+                        class="text-[10px] font-bold" id="match-nav-text">対戦設定</span></button>
+                <button class="nav-btn" data-target="team" onclick="switchTab('team')"><span
+                        class="material-symbols-rounded mb-0.5">groups</span><span
+                        class="text-[10px] font-bold">チーム</span></button>
+                <button class="nav-btn" data-target="script" onclick="switchTab('script')"><span
+                        class="material-symbols-rounded mb-0.5">description</span><span
+                        class="text-[10px] font-bold">台本</span></button>
             </div>
         </nav>
     </div>
@@ -82,15 +250,92 @@
         const db = getFirestore(app);
         const broadcastRef = doc(db, "state", "broadcast");
         const messagesRef = collection(db, "messages");
+
+        // --- ユーザー設定管理 ---
+        const settingsModal = document.getElementById('settings-modal');
+        const usernameInput = document.getElementById('username-input');
+        const roleSelect = document.getElementById('role-select');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        const globalSettingsBtn = document.getElementById('global-settings-btn');
+        const matchNavText = document.getElementById('match-nav-text'); // 追加: ナビゲーションの「対戦設定」テキスト要素
+
+        let currentUser = {
+            name: localStorage.getItem('app_user_name') || '',
+            role: localStorage.getItem('app_user_role') || '実況',
+            uid: localStorage.getItem('app_user_uid') || crypto.randomUUID()
+        };
+        if (!localStorage.getItem('app_user_uid')) localStorage.setItem('app_user_uid', currentUser.uid);
         
+        // 読み込み時にナビゲーションテキストを更新
+        updateMatchNavText(); 
+
+        function openSettings() {
+            usernameInput.value = currentUser.name;
+            roleSelect.value = currentUser.role;
+            settingsModal.classList.remove('hidden');
+        }
+        function closeSettings() { settingsModal.classList.add('hidden'); }
+
+        saveSettingsBtn.addEventListener('click', () => {
+            const newName = usernameInput.value.trim();
+            if (newName) {
+                currentUser.name = newName;
+                currentUser.role = roleSelect.value;
+                localStorage.setItem('app_user_name', currentUser.name);
+                localStorage.setItem('app_user_role', currentUser.role);
+                updateMatchNavText(); // ユーザーロール変更後にナビゲーションテキストを更新
+                notifyIframesOfSettings();
+                closeSettings();
+            } else {
+                alert("名前を入力してください");
+            }
+        });
+        globalSettingsBtn.addEventListener('click', openSettings);
+
+        if (!currentUser.name) openSettings();
+
+        // 【修正】 ロールに基づいてナビゲーションの「対戦設定」テキストを変更する関数。
+        //         ヘッダーのタイトル設定のために文字列をreturnするように変更。
+        function updateMatchNavText() {
+            let newText;
+            if (currentUser.role === '実況' || currentUser.role === '解説') {
+                newText = '対戦情報';
+            } else {
+                newText = '対戦設定';
+            }
+            // ナビゲーションボタンのテキストを更新
+            matchNavText.textContent = newText;
+            // ヘッダータイトルの設定のために値を返す
+            return newText; 
+        }
+
+        function notifyIframesOfSettings() {
+            const frames = ['frame-chat', 'frame-controller', 'frame-match', 'frame-team', 'frame-script'];
+            frames.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.contentWindow) {
+                    el.contentWindow.postMessage({ type: 'settings-update', user: currentUser }, '*');
+                }
+            });
+        }
+
+        document.querySelectorAll('iframe').forEach(frame => {
+            frame.addEventListener('load', () => {
+                frame.contentWindow.postMessage({ type: 'settings-update', user: currentUser }, '*');
+            });
+        });
+
+
+        // --- 既存ロジック ---
         const headerTroubleStatus = document.getElementById('header-trouble-status');
         const troubleMessage = document.getElementById('trouble-message');
         const chatNotification = document.getElementById('chat-notification');
         const notifSender = document.getElementById('notif-sender');
         const notifText = document.getElementById('notif-text');
         let notificationTimeout;
-        let currentTab = 'controller'; 
-        let lastMessageTimestamp = Date.now(); 
+
+        let currentTab = 'controller';
+        let lastMessageTimestamp = Date.now();
 
         const troubleMessages = { 'lag': 'ラグ対応', 'stream': '配信トラブル', 'admin': '運営トラブル' };
 
@@ -108,58 +353,74 @@
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const data = change.doc.data();
-                    const myUid = localStorage.getItem('chat_uid');
-                    if (data.timestamp > lastMessageTimestamp && data.uid !== myUid && currentTab !== 'chat') {
-                        showNotification(data.name, data.text);
+
+                    if (data.timestamp > lastMessageTimestamp && data.uid !== currentUser.uid && currentTab !== 'chat') {
+                        const isStaffMsg = data.isStaffOnly;
+                        const amIStaff = (currentUser.role === '運営' || currentUser.role === '配信担当');
+
+                        if (!isStaffMsg || (isStaffMsg && amIStaff)) {
+                            showNotification(data.name, data.text, isStaffMsg);
+                        }
                     }
                     if (data.timestamp > lastMessageTimestamp) { lastMessageTimestamp = data.timestamp; }
                 }
             });
         });
 
-        function showNotification(sender, text) {
+        function showNotification(sender, text, isStaffOnly) {
             if (notificationTimeout) clearTimeout(notificationTimeout);
-            notifSender.textContent = sender;
+            notifSender.textContent = sender; // (Staff) は表示しない
             notifText.textContent = text;
+
+            // 青色に変更
+            if (isStaffOnly) {
+                chatNotification.classList.add('border-blue-300', 'bg-blue-50');
+            } else {
+                chatNotification.classList.remove('border-blue-300', 'bg-blue-50');
+            }
+
             chatNotification.classList.remove('hidden');
             chatNotification.classList.add('notification-animate');
             chatNotification.onclick = (e) => {
                 if (!e.target.closest('.close-notification-btn')) { switchTab('chat'); hideNotification(); }
             };
-            notificationTimeout = setTimeout(() => { hideNotification(); }, 5000); 
+            notificationTimeout = setTimeout(() => { hideNotification(); }, 5000);
         }
 
-        window.hideNotification = function() {
+        window.hideNotification = function () {
             chatNotification.classList.add('hidden');
             chatNotification.classList.remove('notification-animate');
-            if (notificationTimeout) clearTimeout(notificationTimeout); 
+            if (notificationTimeout) clearTimeout(notificationTimeout);
         };
 
-        window.switchTab = function(targetName) {
-            currentTab = targetName; 
-            
-            // ローカルストレージに現在のタブを保存
+        window.switchTab = function (targetName) {
+            currentTab = targetName;
             localStorage.setItem('tools_activeTab', targetName);
-
             if (targetName === 'chat') { hideNotification(); }
+            
+            // ロールに基づいて動的にタイトルを決定し、ナビゲーションテキストも更新
+            const matchTitle = updateMatchNavText(); // updateMatchNavTextは文字列を返すよう修正済み
 
             const titles = {
                 chat: "配信メンバーチャット",
                 controller: "配信画面コントローラー",
-                match: "対戦設定",
+                match: matchTitle, // updateMatchNavText()の戻り値を使用
                 team: "チーム情報閲覧",
                 script: "配信台本表示"
             };
             
+            // 【修正】不要になった2回目のupdateMatchNavText()の呼び出しを削除しました。
+            // updateMatchNavText(); 
+
             document.querySelectorAll('iframe').forEach(el => { el.classList.add('hidden'); });
             const targetFrame = document.getElementById(`frame-${targetName}`);
             if (targetFrame) {
                 targetFrame.classList.remove('hidden');
                 if (targetName === 'script') {
                     if (targetFrame.contentWindow.document.readyState === 'complete') {
-                         targetFrame.contentWindow.postMessage('scroll-to-current', '*');
+                        targetFrame.contentWindow.postMessage('scroll-to-current', '*');
                     } else {
-                         targetFrame.onload = () => { targetFrame.contentWindow.postMessage('scroll-to-current', '*'); };
+                        targetFrame.onload = () => { targetFrame.contentWindow.postMessage('scroll-to-current', '*'); };
                     }
                 }
             }
@@ -174,21 +435,24 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
                 const icon = btn.querySelector('.material-symbols-rounded');
-                if(icon) icon.style.fontVariationSettings = "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48";
+                if (icon) icon.style.fontVariationSettings = "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48";
             });
 
             const activeBtn = document.querySelector(`.nav-btn[data-target="${targetName}"]`);
             if (activeBtn) {
                 activeBtn.classList.add('active');
                 const icon = activeBtn.querySelector('.material-symbols-rounded');
-                if(icon) icon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48";
+                if (icon) icon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48";
             }
         };
-        
-        // 初期化: ローカルストレージからタブを復元、なければcontroller
+
         const savedTab = localStorage.getItem('tools_activeTab');
         window.switchTab(savedTab || 'controller');
+        
+        // ユーザー設定の初期ロードが完了したら、iframeにも通知
+        notifyIframesOfSettings();
 
     </script>
 </body>
+
 </html>

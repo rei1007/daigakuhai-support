@@ -19,16 +19,40 @@
             background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 1.25rem; 
             padding: 1.25rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease-in-out; opacity: 0.9;
         }
+        
+        /* 変更: 読み取り専用モード時のカーソルをデフォルトに戻す */
+        body.read-only-mode .script-paragraph {
+            cursor: default;
+        }
+        body.read-only-mode .script-paragraph:hover {
+            opacity: 0.9; /* ホバー効果を無効化 */
+            background-color: #F9FAFB;
+        }
+        
         .paragraph-future { background-color: #F9FAFB; border-color: #E5E7EB; opacity: 0.9; }
         .paragraph-future:hover { background-color: #F3F4F6; border-color: #D1D5DB; }
+        
+        /* 変更: 読み取り専用モードではhover時の変化を抑える */
+        body.read-only-mode .paragraph-future:hover {
+            background-color: #F9FAFB; 
+            border-color: #E5E7EB;
+        }
+        
         .paragraph-past { background-color: #F9FAFB; border-color: #E5E7EB; opacity: 0.45; }
         .paragraph-past:hover { opacity: 0.7; }
-        
+
         /* アクティブな段落 (強調) */
         .paragraph-active {
             background-color: #ffffff; border-color: #111827; 
             box-shadow: 0 4px 10px -1px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.1);
             opacity: 1; transform: scale(1.02);
+        }
+        
+        /* 【修正点】読み取り専用モードでも強調効果(transform, shadow)を維持する */
+        body.read-only-mode .paragraph-active {
+            /* transform: none; ← 削除 */
+            /* box-shadow: none; ← 削除 */
+            border-color: #111827; 
         }
 
         .speaker-name {
@@ -40,9 +64,6 @@
         .line-text { 
             color: #1F2937; 
             line-height: 1.8; 
-            /* innerHTML使用時でも改行コード(\n)を反映させたい場合は pre-line を維持しますが、
-               <br>タグを主に使用する場合は normal でも構いません。
-               両方対応できるよう pre-line にしておきます。 */
             white-space: pre-line; 
         }
         .paragraph-past .line-text { color: #4B5563; }
@@ -81,6 +102,31 @@
         
         // 現在のアクティブな行番号を保持
         let currentActiveIndex = 0;
+        
+        // --- 追加: ユーザー情報と権限管理 ---
+        let currentUser = { name: '', role: '' };
+        let isReadOnly = true; 
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'settings-update') {
+                currentUser = event.data.user;
+                applyRoleRestrictions();
+            }
+        });
+
+        function applyRoleRestrictions() {
+            // 配信担当者のみが編集可能（読み取り専用ではない）
+            isReadOnly = (currentUser.role !== '配信担当');
+            
+            if (isReadOnly) {
+                document.body.classList.add('read-only-mode');
+            } else {
+                document.body.classList.remove('read-only-mode');
+            }
+            // スタイル変更はCSSで行うため、ここではクラス制御のみ
+        }
+        // ------------------------------------
+
 
         // --- JSON読み込み処理 ---
         async function loadScript() {
@@ -123,8 +169,6 @@
                 
                 const lineText = document.createElement('p');
                 lineText.className = 'line-text';
-                // 【修正】textContent から innerHTML に変更
-                // これにより <br> や <span> などのタグが有効になります
                 lineText.innerHTML = item.line; 
 
                 tile.appendChild(speakerName);
@@ -178,6 +222,9 @@
 
         // --- クリック時の更新 ---
         scriptContainer.addEventListener('click', async (e) => {
+            // 【変更】配信担当者以外は処理を中断
+            if (isReadOnly) return;
+            
             const clickedTile = e.target.closest('.script-paragraph');
             if (clickedTile) {
                 const newIndex = parseInt(clickedTile.dataset.index, 10);

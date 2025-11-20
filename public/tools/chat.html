@@ -41,7 +41,6 @@
             color: #F9FAFB;
         }
         
-        /* 削除ボタンのスタイル */
         .delete-btn {
             opacity: 0;
             transition: opacity 0.2s;
@@ -61,10 +60,6 @@
         <footer class="bg-white border-t border-gray-300 p-4 sticky bottom-0 z-10">
             <div class="flex items-end gap-2">
                 
-                <button id="settings-button" class="flex items-center justify-center w-[52px] h-[52px] text-gray-500 hover:bg-gray-100 hover:text-gray-800 rounded-full transition-colors flex-shrink-0" title="ユーザー設定">
-                    <span class="material-symbols-rounded !text-3xl">settings</span>
-                </button>
-
                 <textarea id="chat-input" rows="1" placeholder="メッセージを入力 (Shift+Enterで改行)" 
                           class="flex-1 p-3 bg-gray-100 border border-gray-300 rounded-2xl resize-none transition-all duration-100 min-h-[52px] max-h-[150px] leading-relaxed"></textarea>
                 
@@ -76,34 +71,6 @@
 
     </div>
     
-    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <div class="border-b border-gray-300 p-5">
-                <h2 class="text-xl font-bold">ユーザー設定</h2>
-            </div>
-            <div class="p-5 space-y-5">
-                <div>
-                    <label for="username-input" class="block text-sm font-medium mb-1.5">名前</label>
-                    <input type="text" id="username-input" placeholder="名前を入力" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-700 focus:shadow-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5">ロール</label>
-                    <select id="role-select" class="w-full p-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:border-gray-700 focus:shadow-sm">
-                        <option value="運営">運営</option>
-                        <option value="配信担当">配信担当</option>
-                        <option value="実況">実況</option>
-                        <option value="解説">解説</option>
-                    </select>
-                </div>
-            </div>
-            <div class="border-t border-gray-300 p-4 flex justify-end">
-                <button id="save-settings-btn" class="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-700 active:bg-gray-900 transition-colors">
-                    保存する
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, writeBatch, doc, query, orderBy, onSnapshot, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -121,103 +88,56 @@
         const db = getFirestore(app);
         const messagesRef = collection(db, "messages");
 
-        // DOM要素
-        const settingsModal = document.getElementById('settings-modal');
-        const settingsButton = document.getElementById('settings-button');
-        const saveSettingsBtn = document.getElementById('save-settings-btn');
-        
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-button');
         const chatMessages = document.getElementById('chat-messages');
 
-        const usernameInput = document.getElementById('username-input');
-        const roleSelect = document.getElementById('role-select');
+        let currentUser = { name: '', role: '', uid: '' };
 
-        // ユーザー設定
-        let currentUser = {
-            name: localStorage.getItem('chat_name') || '',
-            role: localStorage.getItem('chat_role') || '実況',
-            uid: localStorage.getItem('chat_uid') || crypto.randomUUID()
-        };
-        
-        if (!localStorage.getItem('chat_uid')) {
-            localStorage.setItem('chat_uid', currentUser.uid);
-        }
-
-        // --- モーダル制御 ---
-        function openModal() {
-            usernameInput.value = currentUser.name;
-            roleSelect.value = currentUser.role;
-            settingsModal.classList.remove('hidden');
-        }
-        function closeModal() { settingsModal.classList.add('hidden'); }
-
-        if (!currentUser.name) openModal();
-
-        // 設定ボタンのイベントリスナー (再配置したボタンに適用)
-        settingsButton.addEventListener('click', openModal);
-        
-        saveSettingsBtn.addEventListener('click', () => {
-            const newName = usernameInput.value.trim();
-            if (newName) {
-                currentUser.name = newName;
-                currentUser.role = roleSelect.value;
-                localStorage.setItem('chat_name', currentUser.name);
-                localStorage.setItem('chat_role', currentUser.role);
-                closeModal();
-            } else {
-                console.warn("名前が入力されていません");
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'settings-update') {
+                currentUser = event.data.user;
             }
         });
-        settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeModal(); });
 
-        // --- テキストエリアの高さ自動調整 ---
         chatInput.addEventListener('input', () => {
             chatInput.style.height = 'auto';
             chatInput.style.height = (chatInput.scrollHeight) + 'px';
         });
 
-        // --- 全メッセージ削除 (/allclear) ---
         async function clearAllMessages() {
             try {
-                const q = query(messagesRef); 
+                const q = query(messagesRef);
                 const snapshot = await getDocs(q);
-                
                 if (snapshot.empty) return;
-
                 const batch = writeBatch(db);
-                snapshot.docs.forEach((doc) => {
-                    batch.delete(doc.ref);
-                });
-                
+                snapshot.docs.forEach((doc) => { batch.delete(doc.ref); });
                 await batch.commit();
-                console.log("全てのメッセージを削除しました。");
             } catch (error) {
-                console.error("全削除中にエラーが発生しました:", error);
+                console.error("全削除エラー:", error);
                 alert("全削除に失敗しました。");
             }
         }
 
-        // --- メッセージ個別削除 ---
         async function deleteMessage(messageId) {
             if (!confirm("このメッセージを削除しますか？")) return;
-            try {
-                await deleteDoc(doc(db, "messages", messageId));
-            } catch (error) {
-                console.error("削除エラー:", error);
-            }
+            try { await deleteDoc(doc(db, "messages", messageId)); } 
+            catch (error) { console.error("削除エラー:", error); }
         }
 
-        // --- チャット送信 ---
         async function sendMessage() {
-            const messageText = chatInput.value.trim();
+            let messageText = chatInput.value.trim();
             
             if (!messageText) return;
-            if (!currentUser.name) { openModal(); return; }
+            if (!currentUser.name) { 
+                alert("ユーザー設定が読み込まれていません。親画面をリロードしてください。"); 
+                return; 
+            }
 
-            // コマンド処理: /allclear
+            const isStaff = (currentUser.role === "運営" || currentUser.role === "配信担当");
+
             if (messageText === "/allclear") {
-                if (currentUser.role === "運営") {
+                if (isStaff) {
                     if (confirm("【警告】すべてのチャット履歴を削除します。\n本当によろしいですか？")) {
                         await clearAllMessages();
                         chatInput.value = '';
@@ -225,19 +145,33 @@
                     }
                     return;
                 } else {
-                    alert("このコマンドは「運営」ロールのみ実行可能です。");
+                    alert("このコマンドは「運営」「配信担当」のみ実行可能です。");
                     return;
                 }
             }
 
-            // 通常メッセージ送信
+            let isStaffOnly = false;
+            if (messageText.startsWith("/staff ")) {
+                if (isStaff) {
+                    isStaffOnly = true;
+                    messageText = messageText.replace("/staff ", "");
+                } else {
+                    alert("スタッフ限定チャットは使用できません。");
+                    return;
+                }
+            } else if (messageText === "/staff") {
+                alert("メッセージを入力してください。例: /staff テスト");
+                return;
+            }
+
             try {
                 await addDoc(messagesRef, {
                     text: messageText,
                     name: currentUser.name,
                     role: currentUser.role,
                     uid: currentUser.uid,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    isStaffOnly: isStaffOnly
                 });
 
                 chatInput.value = '';
@@ -257,32 +191,46 @@
             }
         });
 
-        // --- チャット受信 ---
         const q = query(messagesRef, orderBy("timestamp", "desc"), limit(100));
 
         onSnapshot(q, (snapshot) => {
             chatMessages.innerHTML = '';
             snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                const messageId = docSnap.id; 
+                const messageId = docSnap.id;
                 const isMe = data.uid === currentUser.uid;
                 
-                const messageElement = createMessageHTML(messageId, data.name, data.role, data.text, isMe);
-                chatMessages.appendChild(messageElement);
+                const isStaffMsg = data.isStaffOnly;
+                const amIStaff = (currentUser.role === "運営" || currentUser.role === "配信担当");
+                
+                if (!isStaffMsg || (isStaffMsg && amIStaff)) {
+                    const messageElement = createMessageHTML(messageId, data.name, data.role, data.text, isMe, isStaffMsg);
+                    chatMessages.appendChild(messageElement);
+                }
             });
         });
 
-        function createMessageHTML(id, name, role, text, isMe) {
+        function createMessageHTML(id, name, role, text, isMe, isStaffMsg) {
             let roleBadgeStyle = 'bg-gray-200 text-gray-700';
             if (role === '運営' || role === '配信担当') roleBadgeStyle = 'bg-gray-900 text-white';
 
             let messageBubbleStyle = 'bg-white border-gray-200 rounded-bl-none';
             
+            // スタッフ限定メッセージのスタイル (青色に変更)
+            if (isStaffMsg) {
+                messageBubbleStyle = 'bg-blue-50 border-blue-200 rounded-bl-none';
+            }
+
             const wrapper = document.createElement('div');
             wrapper.className = `flex ${isMe ? 'justify-end' : ''}`;
             
             if (isMe) {
                 messageBubbleStyle = 'bg-gray-800 border-gray-700 rounded-br-none message-bubble-me relative group';
+                if (isStaffMsg) {
+                    // 自分のスタッフメッセージ (濃い青)
+                    messageBubbleStyle = 'bg-blue-900 border-blue-800 rounded-br-none message-bubble-me relative group';
+                }
+
                 if (role === '運営' || role === '配信担当') roleBadgeStyle = 'bg-gray-600 text-white'; 
                 else roleBadgeStyle = 'bg-gray-500 text-white'; 
             }
@@ -290,13 +238,13 @@
             const bubble = document.createElement('div');
             bubble.className = `p-3 rounded-2xl shadow-sm max-w-[85%] border ${messageBubbleStyle}`;
 
-            // ヘッダー
             const header = document.createElement('div');
             header.className = 'flex items-center gap-2 mb-1.5';
             
             const nameSpan = document.createElement('span');
             nameSpan.className = 'font-bold text-sm';
-            nameSpan.textContent = name;
+            // (Staff) の表示を削除
+            nameSpan.textContent = name; 
             
             const roleSpan = document.createElement('span');
             roleSpan.className = `text-xs font-medium ${roleBadgeStyle} px-2 py-0.5 rounded-full`;
@@ -305,7 +253,6 @@
             header.appendChild(nameSpan);
             header.appendChild(roleSpan);
 
-            // 削除ボタン (自分のみ)
             if (isMe) {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn absolute top-[-8px] left-[-8px] bg-gray-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-sm hover:bg-red-600 cursor-pointer';
@@ -315,7 +262,6 @@
                 bubble.appendChild(deleteBtn);
             }
 
-            // 本文
             const textP = document.createElement('p');
             textP.className = 'text-gray-800 whitespace-pre-wrap';
             textP.textContent = text;

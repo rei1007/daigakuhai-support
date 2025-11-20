@@ -27,7 +27,9 @@
         .team-circle { font-size: 1.3rem; font-weight: 600; color: #6B7280; transition: color 0.2s; }
         .team-circle.clickable:hover { color: #2563EB; text-decoration: underline; cursor: pointer; }
         
-        .kana-text { font-size: 0.95rem; font-weight: 500; color: #4B5563; }
+        /* 変更: ふりがなを大きく */
+        .kana-text { font-size: 1.1rem; font-weight: 500; color: #4B5563; }
+        
         .avg-xp-pill { display: inline-block; padding: 0.25rem 1rem; border-radius: 9999px; font-weight: 800; font-size: 1.1rem; margin-top: 0.75rem; border-width: 2px; border-style: solid; letter-spacing: 0.05em; }
         .xp-pill-alpha { background-color: #FFFBEB; color: #d0be08; border-color: #d0be08; }
         .xp-pill-bravo { background-color: #F0F5FF; color: #3a0ccd; border-color: #3a0ccd; }
@@ -84,9 +86,9 @@
                         <p id="alpha-circle-kana" class="kana-text"></p>
                     </div>
                     <div class="space-y-4 text-sm mb-4 border-y border-gray-100 py-4 bg-alpha-light rounded-md px-3">
-                        <div id="alpha-records" class="detail-text"><strong class="text-alpha">実績</strong><p class="detail-content">-</p></div>
-                        <div id="alpha-tactics" class="detail-text"><strong class="text-alpha">作戦</strong><p class="detail-content">-</p></div>
                         <div id="alpha-comment" class="detail-text"><strong class="text-alpha">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
+                        <div id="alpha-records" class="detail-text"><strong class="text-alpha">実績</strong><p class="detail-content">-</p></div>
+                        <div id="alpha-tactics" class="detail-text"><strong class="text-alpha">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
                     </div>
                     <ul id="alpha-members" class="member-list"><li class="text-gray-400 justify-center text-center p-3">チームを選択してください</li></ul>
                 </div>
@@ -102,9 +104,9 @@
                         <p id="bravo-circle-kana" class="kana-text"></p>
                     </div>
                     <div class="space-y-4 text-sm mb-4 border-y border-gray-100 py-4 bg-bravo-light rounded-md px-3">
-                        <div id="bravo-records" class="detail-text"><strong class="text-bravo">実績</strong><p class="detail-content">-</p></div>
-                        <div id="bravo-tactics" class="detail-text"><strong class="text-bravo">作戦</strong><p class="detail-content">-</p></div>
                         <div id="bravo-comment" class="detail-text"><strong class="text-bravo">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
+                        <div id="bravo-records" class="detail-text"><strong class="text-bravo">実績</strong><p class="detail-content">-</p></div>
+                        <div id="bravo-tactics" class="detail-text"><strong class="text-bravo">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
                     </div>
                     <ul id="bravo-members" class="member-list"><li class="text-gray-400 justify-center text-center p-3">チームを選択してください</li></ul>
                 </div>
@@ -113,10 +115,10 @@
         </main>
 
         <button id="sync-match-btn" class="hidden fixed bottom-24 left-1/2 transform -translate-x-1/2 z-40 
-                                           bg-gray-900 text-white font-bold py-3 px-6 rounded-full shadow-lg 
+                                           bg-gray-900 text-white font-bold py-2.5 px-5 rounded-full shadow-lg text-base
                                            flex items-center gap-2 hover:bg-gray-800 transition-colors">
             <span class="material-symbols-rounded !text-xl">sync_alt</span>
-            <span>対戦設定中のカードに戻る</span>
+            <span>対戦チームに戻す</span>
         </button>
 
         <footer class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-300 p-4 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
@@ -207,14 +209,24 @@
                 alpha: {
                     name: document.getElementById('alpha-name'), kana: document.getElementById('alpha-name-kana'), avgXp: document.getElementById('alpha-avg-xp'),
                     univ: document.getElementById('alpha-univ'), circle: document.getElementById('alpha-circle'), circleKana: document.getElementById('alpha-circle-kana'),
-                    records: document.getElementById('alpha-records').querySelector('.detail-content'), tactics: document.getElementById('alpha-tactics').querySelector('.detail-content'),
-                    comment: document.getElementById('alpha-comment').querySelector('.detail-content'), members: document.getElementById('alpha-members')
+                    
+                    // 変更: ID取得を意図した要素に変更
+                    records: document.getElementById('alpha-records').querySelector('.detail-content'), 
+                    tactics: document.getElementById('alpha-tactics').querySelector('.detail-content'),
+                    comment: document.getElementById('alpha-comment').querySelector('.detail-content'), 
+                    
+                    members: document.getElementById('alpha-members')
                 },
                 bravo: {
                     name: document.getElementById('bravo-name'), kana: document.getElementById('bravo-name-kana'), avgXp: document.getElementById('bravo-avg-xp'),
                     univ: document.getElementById('bravo-univ'), circle: document.getElementById('bravo-circle'), circleKana: document.getElementById('bravo-circle-kana'),
-                    records: document.getElementById('bravo-records').querySelector('.detail-content'), tactics: document.getElementById('bravo-tactics').querySelector('.detail-content'),
-                    comment: document.getElementById('bravo-comment').querySelector('.detail-content'), members: document.getElementById('bravo-members')
+                    
+                    // 変更: ID取得を意図した要素に変更
+                    records: document.getElementById('bravo-records').querySelector('.detail-content'), 
+                    tactics: document.getElementById('bravo-tactics').querySelector('.detail-content'),
+                    comment: document.getElementById('bravo-comment').querySelector('.detail-content'), 
+                    
+                    members: document.getElementById('bravo-members')
                 }
             };
 
@@ -254,10 +266,12 @@
             }
 
             function formatKana(kana) {
+                // kana-textクラスのCSSがfont-size: 1.1rem;に設定されています
                 return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="kana-text ml-1">(${kana})</span>` : '';
             }
             function formatPlayerKana(kana) {
-                return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="text-sm font-medium text-gray-500 ml-2">(${kana})</span>` : '';
+                // 変更: text-sm (0.875rem) から text-base (1.0rem) に変更
+                return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="text-base font-medium text-gray-500 ml-2">(${kana})</span>` : '';
             }
 
             function updateTeamDisplay(side, teamId) {
@@ -287,23 +301,81 @@
                     }
 
                     el.circleKana.innerHTML = formatKana(team.circle_kana);
-                    el.records.textContent = team.records || 'なし'; el.tactics.textContent = team.tactics || 'なし'; el.comment.textContent = team.comment || 'なし';
+                    
+                    // 変更: 意気込み -> 実績 -> 作戦 の順に内容をセット
+                    el.comment.textContent = team.comment || 'なし'; 
+                    el.records.textContent = team.records || 'なし'; 
+                    el.tactics.textContent = team.tactics || 'なし'; 
+
+                    // 変更点1: 最大XPプレイヤーを特定し、目印を付けるロジックを実装
+                    let maxXP = -1;
+                    const players = [];
+
+                    for (let i = 1; i <= 4; i++) {
+                        const xpStr = team[`p${i}_xp`];
+                        let xp = -1;
+                        if (xpStr && xpStr.trim() !== '----') {
+                            // XPを数値としてパース
+                            xp = parseInt(xpStr);
+                            if (isNaN(xp)) xp = -1; 
+                        }
+                        
+                        const player = {
+                            name: team[`p${i}_name`],
+                            nameKana: team[`p${i}_name_kana`],
+                            xp: xp,
+                            xpStr: (xp === -1 && xpStr) ? xpStr : (xp === -1 ? 'N/A' : String(xp)),
+                            weapon: team[`p${i}_weapon`]
+                        };
+
+                        // 有効なプレイヤー名がある場合のみリストに追加
+                        if (player.name && player.name.trim() !== '----') {
+                            players.push(player);
+                            // 最大XPを更新
+                            if (xp > maxXP) {
+                                maxXP = xp;
+                            }
+                        }
+                    }
 
                     el.members.innerHTML = '';
                     let memberCount = 0;
-                    for (let i = 1; i <= 4; i++) {
-                        const playerName = team[`p${i}_name`];
-                        if (playerName && playerName.trim() !== '----') {
+                    
+                    players.forEach(player => {
+                        // 有効なXPの中で最大値を持つプレイヤーを特定 (N/A等は除外)
+                        const isMaxXP = (maxXP > 0 && player.xp === maxXP); 
+                        
+                        if (player.name && player.name.trim() !== '----') {
                             memberCount++;
-                            const playerKana = formatPlayerKana(team[`p${i}_name_kana`]);
-                            const playerXp = team[`p${i}_xp`] && team[`p${i}_xp`] !== '----' ? team[`p${i}_xp`] : 'N/A';
-                            const playerWeapon = team[`p${i}_weapon`];
+                            const playerKana = formatPlayerKana(player.nameKana);
+                            const playerXp = player.xpStr;
+                            const playerWeapon = player.weapon;
+                            
+                            // 最大XPプレイヤーに目印の星アイコンを付与
+                            const marker = isMaxXP 
+                                ? `<span class="material-symbols-rounded text-yellow-500 mr-2 !text-lg" style="font-variation-settings: 'FILL' 1, 'wght' 700; line-height: 1;">star</span>`
+                                : '';
+                                
+                            // 最大XPプレイヤーの名前を強調
+                            const nameClass = isMaxXP ? 'font-black text-gray-900' : 'text-gray-900';
+                            
                             const li = document.createElement('li');
                             li.className = `player-item bg-gray-50 p-3 shadow-sm`; li.style.borderLeft = `3px solid ${baseColor}`; 
-                            li.innerHTML = `<div class="flex justify-between w-full items-center"><span class="player-name-main text-gray-900 flex flex-row items-baseline"><span>${playerName}</span>${playerKana}</span><span class="player-xp-main text-white ${xpBgColor} px-2 py-1 rounded-full shadow-md flex-shrink-0">XP ${playerXp}</span></div><div class="player-weapon-main text-gray-700 mt-2">${playerWeapon || 'ブキ情報なし'}</div>`;
+                            li.innerHTML = `
+                                <div class="flex justify-between w-full items-center">
+                                    <span class="player-name-main ${nameClass} flex flex-row items-baseline">
+                                        ${marker}
+                                        <span>${player.name}</span>
+                                        ${playerKana}
+                                    </span>
+                                    <span class="player-xp-main text-white ${xpBgColor} px-2 py-1 rounded-full shadow-md flex-shrink-0">XP ${playerXp}</span>
+                                </div>
+                                <div class="player-weapon-main text-gray-700 mt-2">${playerWeapon || 'ブキ情報なし'}</div>
+                            `;
                             el.members.appendChild(li);
                         }
-                    }
+                    });
+                    
                     if (memberCount === 0) el.members.innerHTML = '<li class="text-gray-400 justify-center text-center p-3">メンバー情報なし</li>';
                 } else {
                     el.name.textContent = '未選択'; el.kana.innerHTML = ''; el.avgXp.textContent = '平均XP: -'; el.avgXp.classList.add('hidden');

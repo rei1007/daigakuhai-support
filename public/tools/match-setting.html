@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>対戦設定</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <style>
         /* カスタムカラー定義 */
@@ -18,50 +15,34 @@
             --color-alpha: #d0be08;
             --color-bravo: #3a0ccd;
         }
-
+        
         body {
             font-family: 'Kosugi Maru', sans-serif;
             background-color: #F3F4F6;
-            /* bg-gray-100 */
             color: #1F2937;
             scroll-behavior: smooth;
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #D1D5DB;
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #9CA3AF;
-        }
-
-        /* コントローラー準拠のスタイル */
         .material-symbols-rounded {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
             font-size: 24px;
         }
 
-        /* パネルスタイル */
         .setting-panel {
             background-color: #ffffff;
             padding: 1.5rem;
             border-radius: 1rem;
             border: 1px solid #D1D5DB;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: opacity 0.3s;
         }
 
-        /* フォーム要素 */
-        .custom-input,
-        .custom-select {
+        .custom-input, .custom-select {
             width: 100%;
             padding: 0.75rem;
             border-radius: 0.5rem;
@@ -69,17 +50,39 @@
             background-color: #F9FAFB;
             font-family: inherit;
             transition: all 0.2s;
+            color: #1F2937; /* デフォルト色指定 */
         }
-
-        .custom-input:focus,
-        .custom-select:focus {
+        .custom-input:focus, .custom-select:focus {
             outline: none;
             border-color: #111827;
             background-color: #ffffff;
             box-shadow: 0 0 0 1px #111827;
         }
+        
+        /* 通常の無効化スタイル */
+        .custom-input:disabled, .custom-select:disabled {
+            background-color: #F3F4F6;
+            color: #9CA3AF;
+            cursor: not-allowed;
+        }
 
-        /* ステージタイル */
+        /* 【修正】読み取り専用モード時の特例スタイル (グレーアウトさせない) */
+        body.read-only-mode .custom-input:disabled,
+        body.read-only-mode .custom-select:disabled {
+            background-color: #ffffff; /* 白背景 */
+            color: #1F2937; /* 通常の黒文字 */
+            border-color: #D1D5DB; /* 枠線はそのまま */
+            cursor: default;
+            opacity: 1;
+            -webkit-text-fill-color: #1F2937; /* iOS対策 */
+        }
+        
+        /* 読み取り専用時のセレクトボックスは矢印を消してテキストっぽくする */
+        body.read-only-mode .custom-select:disabled {
+            background-image: none;
+            padding-right: 0.75rem;
+        }
+
         .stage-tile {
             position: relative;
             border-radius: 0.75rem;
@@ -90,18 +93,24 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .stage-tile:hover {
             border-color: #9CA3AF;
         }
-
         .stage-tile img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        /* 勝者選択ボタン */
+        
+        /* 読み取り専用時のステージタイル */
+        .read-only .stage-tile {
+            cursor: default;
+            pointer-events: none;
+        }
+        .read-only .stage-tile:hover {
+            border-color: #E5E7EB;
+        }
+        
         .winner-btn {
             flex: 1;
             padding: 0.5rem;
@@ -111,64 +120,29 @@
             transition: all 0.2s;
             border: 1px solid #E5E7EB;
         }
-
-        .winner-btn:first-child {
-            border-radius: 0.5rem 0 0 0.5rem;
+        .winner-btn:first-child { border-radius: 0.5rem 0 0 0.5rem; }
+        .winner-btn:last-child { border-radius: 0 0.5rem 0.5rem 0; }
+        
+        .winner-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
         }
+        
+        .btn-alpha.active { background-color: var(--color-alpha); color: white; border-color: var(--color-alpha); }
+        .btn-bravo.active { background-color: var(--color-bravo); color: white; border-color: var(--color-bravo); }
+        .btn-none.active { background-color: #4B5563; color: white; border-color: #4B5563; }
 
-        .winner-btn:last-child {
-            border-radius: 0 0.5rem 0.5rem 0;
-        }
-
-        .btn-alpha.active {
-            background-color: var(--color-alpha);
-            color: white;
-            border-color: var(--color-alpha);
-        }
-
-        .btn-bravo.active {
-            background-color: var(--color-bravo);
-            color: white;
-            border-color: var(--color-bravo);
-        }
-
-        .btn-none.active {
-            background-color: #4B5563;
-            color: white;
-            border-color: #4B5563;
-        }
-
-        /* モーダル */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
+            position: fixed; inset: 0; background-color: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s;
         }
-
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
         .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background: white; width: 90%; max-width: 800px; max-height: 80vh;
+            border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column;
         }
-
-        /* モーダル内のステージ画像タイル */
+        
         .modal-stage-item {
             cursor: pointer;
             border-radius: 0.5rem;
@@ -176,20 +150,26 @@
             border: 2px solid transparent;
             transition: all 0.2s;
         }
-
         .modal-stage-item:hover {
             border-color: #111827;
             transform: scale(1.02);
         }
+        
+        /* 読み取り専用モードの表示調整 (全体を薄くするのはやめて、入力欄をはっきりさせる) */
+        /* body.read-only-mode .setting-panel { opacity: 0.9; } */
+        
+        /* 読み取り専用時にホバー効果を消す */
+        body.read-only-mode .stage-tile .absolute {
+            display: none;
+        }
     </style>
 </head>
-
 <body class="bg-gray-100 text-gray-900">
 
     <div class="max-w-[1080px] mx-auto p-4 md:p-6 min-h-screen pb-32">
-
+        
         <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">
+            <h2 id="section-round-title" class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">
                 ラウンド設定
             </h2>
             <div class="setting-panel">
@@ -201,10 +181,8 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1">形式</label>
                         <div class="flex bg-gray-100 p-1 rounded-lg border border-gray-300">
-                            <button id="bo3-btn"
-                                class="flex-1 py-2 rounded-md text-sm font-bold transition-colors bg-white shadow-sm text-gray-900">BO3</button>
-                            <button id="bo5-btn"
-                                class="flex-1 py-2 rounded-md text-sm font-bold transition-colors text-gray-500 hover:bg-gray-200">BO5</button>
+                            <button id="bo3-btn" class="flex-1 py-2 rounded-md text-sm font-bold transition-colors bg-white shadow-sm text-gray-900">BO3</button>
+                            <button id="bo5-btn" class="flex-1 py-2 rounded-md text-sm font-bold transition-colors text-gray-500 hover:bg-gray-200">BO5</button>
                         </div>
                     </div>
                 </div>
@@ -212,21 +190,19 @@
         </section>
 
         <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">
+            <h2 id="section-team-title" class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">
                 対戦チーム選択
             </h2>
             <div class="setting-panel">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="p-4 border-l-4 bg-gray-50 rounded-r-lg" style="border-left-color: var(--color-alpha);">
-                        <label class="block text-xs font-bold mb-2" style="color: var(--color-alpha);">ALPHA
-                            TEAM</label>
+                        <label class="block text-xs font-bold mb-2" style="color: var(--color-alpha);">ALPHA TEAM</label>
                         <select id="alpha-select" class="custom-select bg-white">
                             <option value="">選択してください</option>
                         </select>
                     </div>
                     <div class="p-4 border-l-4 bg-gray-50 rounded-r-lg" style="border-left-color: var(--color-bravo);">
-                        <label class="block text-xs font-bold mb-2" style="color: var(--color-bravo);">BRAVO
-                            TEAM</label>
+                        <label class="block text-xs font-bold mb-2" style="color: var(--color-bravo);">BRAVO TEAM</label>
                         <select id="bravo-select" class="custom-select bg-white">
                             <option value="">選択してください</option>
                         </select>
@@ -236,13 +212,13 @@
         </section>
 
         <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">
+            <h2 id="section-game-title" class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">
                 ステージ・勝敗設定
             </h2>
-
+            
             <div class="setting-panel">
-                <div id="games-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                </div>
+                <div id="games-container" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    </div>
             </div>
         </section>
 
@@ -258,7 +234,7 @@
             </div>
             <div class="p-4 overflow-y-auto bg-gray-100" style="max-height: 60vh;">
                 <div id="modal-stage-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -287,15 +263,20 @@
         const alphaSelect = document.getElementById('alpha-select');
         const bravoSelect = document.getElementById('bravo-select');
         const gamesContainer = document.getElementById('games-container');
-
+        
         const stageModal = document.getElementById('stage-modal');
         const modalStageGrid = document.getElementById('modal-stage-grid');
         let currentEditingGameIndex = null;
+        
+        // --- 追加: 見出し要素の取得 ---
+        const sectionRoundTitle = document.getElementById('section-round-title');
+        const sectionTeamTitle = document.getElementById('section-team-title');
+        const sectionGameTitle = document.getElementById('section-game-title');
+        // ------------------------------
 
         let teamsData = [];
         let stagesData = [];
-
-        // 初期状態
+        
         let currentState = {
             roundName: "本戦第一試合",
             boType: "BO3",
@@ -304,18 +285,87 @@
             games: createResetGames('BO3')
         };
 
-        // --- ヘルパー関数: ゲーム状態のリセット生成 ---
+        // ユーザー設定
+        let currentUser = { name: '', role: '' };
+        let isReadOnly = false;
+
+        // --- 親フレームからの設定受け取り ---
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'settings-update') {
+                currentUser = event.data.user;
+                applyRoleRestrictions();
+            }
+        });
+
+        function applyRoleRestrictions() {
+            const role = currentUser.role;
+            // 実況・解説は読み取り専用
+            if (role === '実況' || role === '解説') {
+                isReadOnly = true;
+                document.body.classList.add('read-only-mode');
+                
+                // --- 追加: 見出しの変更 ---
+                if (sectionRoundTitle) sectionRoundTitle.textContent = 'ラウンド情報';
+                if (sectionTeamTitle) sectionTeamTitle.textContent = '対戦チーム情報';
+                if (sectionGameTitle) sectionGameTitle.textContent = 'ステージ・勝敗情報';
+                // --------------------------
+                
+                // 入力フォーム無効化 (HTML属性)
+                roundNameInput.disabled = true;
+                alphaSelect.disabled = true;
+                bravoSelect.disabled = true;
+                
+                // ボタン無効化
+                bo3Btn.disabled = true;
+                bo5Btn.disabled = true;
+                
+                // コンテナ制御
+                gamesContainer.classList.add('read-only');
+                
+                disableGameButtons();
+            } else {
+                isReadOnly = false;
+                document.body.classList.remove('read-only-mode');
+                
+                // --- 追加: 見出しを元に戻す ---
+                if (sectionRoundTitle) sectionRoundTitle.textContent = 'ラウンド設定';
+                if (sectionTeamTitle) sectionTeamTitle.textContent = '対戦チーム選択';
+                if (sectionGameTitle) sectionGameTitle.textContent = 'ステージ・勝敗設定';
+                // ------------------------------
+                
+                roundNameInput.disabled = false;
+                alphaSelect.disabled = false;
+                bravoSelect.disabled = false;
+                bo3Btn.disabled = false;
+                bo5Btn.disabled = false;
+                gamesContainer.classList.remove('read-only');
+                enableGameButtons();
+            }
+            renderUI();
+        }
+
+        function disableGameButtons() {
+            const buttons = document.querySelectorAll('.winner-btn');
+            buttons.forEach(btn => btn.disabled = true);
+        }
+
+        function enableGameButtons() {
+            const buttons = document.querySelectorAll('.winner-btn');
+            buttons.forEach(btn => btn.disabled = false);
+        }
+
+        // --- ヘルパー関数 ---
         function createResetGames(boType) {
             const count = boType === 'BO5' ? 5 : 3;
             return Array(count).fill(null).map(() => ({ stage: "未決定", winner: "none" }));
         }
 
-        // --- データロード処理 ---
+        // --- データロード ---
         async function loadData() {
             try {
                 const teamsRes = await fetch('../json/teams.json');
                 teamsData = await teamsRes.json();
-
+                
                 const stagesRes = await fetch('../json/stages.json');
                 stagesData = await stagesRes.json();
 
@@ -343,17 +393,8 @@
             stagesData.forEach(stageName => {
                 const div = document.createElement('div');
                 div.className = 'modal-stage-item bg-gray-200 relative';
-                // アスペクト比を 40:31 に合わせる (padding-top: 77.5%)
-                div.style.paddingTop = '77.5%';
-
-                div.innerHTML = `
-                    <img src="../stage-image/${stageName}.png" 
-                         class="absolute top-0 left-0 w-full h-full object-cover" 
-                         alt="${stageName}" 
-                         onerror="this.src='../stage-image/未決定.png'">
-                `;
-                // ステージ名表示は削除しました
-
+                div.style.paddingTop = '77.5%'; 
+                div.innerHTML = `<img src="../stage-image/${stageName}.png" class="absolute top-0 left-0 w-full h-full object-cover" alt="${stageName}" onerror="this.src='../stage-image/未決定.png'">`;
                 div.onclick = () => selectStage(stageName);
                 modalStageGrid.appendChild(div);
             });
@@ -362,8 +403,7 @@
         // --- UI描画 ---
         function renderUI() {
             roundNameInput.value = currentState.roundName;
-
-            // BOボタンのスタイル切り替え
+            
             if (currentState.boType === 'BO3') {
                 bo3Btn.className = "flex-1 py-2 rounded-md text-sm font-bold transition-colors bg-white shadow-sm text-gray-900 border border-gray-200";
                 bo5Btn.className = "flex-1 py-2 rounded-md text-sm font-bold transition-colors text-gray-500 hover:bg-gray-200";
@@ -382,11 +422,8 @@
 
                 let imagePath = `../stage-image/${game.stage}.png`;
                 if (game.stage !== '未決定') {
-                    if (game.winner === 'alpha') {
-                        imagePath = `../stage-alpha/${game.stage}.png`;
-                    } else if (game.winner === 'bravo') {
-                        imagePath = `../stage-bravo/${game.stage}.png`;
-                    }
+                    if (game.winner === 'alpha') imagePath = `../stage-alpha/${game.stage}.png`;
+                    else if (game.winner === 'bravo') imagePath = `../stage-bravo/${game.stage}.png`;
                 }
 
                 gameEl.innerHTML = `
@@ -394,14 +431,12 @@
                         <span class="text-sm font-bold text-gray-500">GAME ${index + 1}</span>
                         <span class="text-sm font-bold">${game.stage}</span>
                     </div>
-                    
                     <div class="stage-tile group" onclick="openModal(${index})">
                         <img src="${imagePath}" alt="${game.stage}" onerror="this.src='../stage-image/未決定.png'">
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center">
                             <span class="material-symbols-rounded text-white opacity-0 group-hover:opacity-100 bg-black bg-opacity-50 rounded-full p-2">edit</span>
                         </div>
                     </div>
-
                     <div class="flex rounded-lg overflow-hidden border border-gray-300">
                         <button class="winner-btn btn-alpha ${game.winner === 'alpha' ? 'active' : 'bg-white text-gray-500 hover:bg-gray-50'}" 
                                 onclick="setWinner(${index}, 'alpha')">A</button>
@@ -413,42 +448,52 @@
                 `;
                 gamesContainer.appendChild(gameEl);
             });
+
+            if (isReadOnly) {
+                bo3Btn.disabled = true;
+                bo5Btn.disabled = true;
+                disableGameButtons();
+                gamesContainer.classList.add('read-only');
+            } else {
+                bo3Btn.disabled = false;
+                bo5Btn.disabled = false;
+                enableGameButtons();
+                gamesContainer.classList.remove('read-only');
+            }
         }
 
         // --- アクション ---
 
-        // 1. BO形式変更 -> リセット
         window.setBO = (type) => {
-            if (currentState.boType === type) return;
+            if (isReadOnly || currentState.boType === type) return;
             const newGames = createResetGames(type);
             saveState({ boType: type, games: newGames });
         };
-
+        
         bo3Btn.onclick = () => setBO('BO3');
         bo5Btn.onclick = () => setBO('BO5');
 
-        // 2. チーム変更 -> リセット
         function handleTeamChange(key, value) {
-            if (currentState[key] === value) return;
+            if (isReadOnly || currentState[key] === value) return;
             const newGames = createResetGames(currentState.boType);
             saveState({ [key]: value, games: newGames });
         }
 
         alphaSelect.addEventListener('change', (e) => handleTeamChange('alphaTeamId', e.target.value));
         bravoSelect.addEventListener('change', (e) => handleTeamChange('bravoTeamId', e.target.value));
+        roundNameInput.addEventListener('change', (e) => {
+            if (!isReadOnly) saveState({ roundName: e.target.value });
+        });
 
-        // 3. ラウンド名変更
-        roundNameInput.addEventListener('change', (e) => saveState({ roundName: e.target.value }));
-
-
-        // --- 勝者・ステージ設定 ---
         window.setWinner = (index, winner) => {
+            if (isReadOnly) return;
             const newGames = [...currentState.games];
             newGames[index].winner = winner;
             saveState({ games: newGames });
         };
 
         window.openModal = (index) => {
+            if (isReadOnly) return;
             currentEditingGameIndex = index;
             stageModal.classList.add('show');
         };
@@ -465,11 +510,10 @@
             }
         };
 
-        // --- Firestore連携 ---
         async function saveState(updates) {
             currentState = { ...currentState, ...updates };
             renderUI();
-            try { await setDoc(matchRef, currentState, { merge: true }); }
+            try { await setDoc(matchRef, currentState, { merge: true }); } 
             catch (e) { console.error("Save error:", e); }
         }
 
@@ -477,12 +521,10 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 currentState = { ...currentState, ...data };
-
-                // 整合性チェック (BO3で要素が5つある場合など、表示用に調整)
                 if (currentState.boType === 'BO3' && currentState.games.length > 3) {
                     currentState.games = currentState.games.slice(0, 3);
                 } else if (currentState.boType === 'BO5' && currentState.games.length < 5) {
-                    while (currentState.games.length < 5) currentState.games.push({ stage: "未決定", winner: "none" });
+                     while(currentState.games.length < 5) currentState.games.push({ stage: "未決定", winner: "none" });
                 }
                 renderUI();
             } else {
@@ -494,5 +536,4 @@
 
     </script>
 </body>
-
 </html>
