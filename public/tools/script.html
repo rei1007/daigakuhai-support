@@ -37,7 +37,14 @@
         }
         .paragraph-active .speaker-name { background-color: #111827; color: #F9FAFB; border-color: #111827; }
         
-        .line-text { color: #1F2937; line-height: 1.8; white-space: pre-line; }
+        .line-text { 
+            color: #1F2937; 
+            line-height: 1.8; 
+            /* innerHTML使用時でも改行コード(\n)を反映させたい場合は pre-line を維持しますが、
+               <br>タグを主に使用する場合は normal でも構いません。
+               両方対応できるよう pre-line にしておきます。 */
+            white-space: pre-line; 
+        }
         .paragraph-past .line-text { color: #4B5563; }
 
         .speaker-memo .speaker-name { background-color: #FEF3C7; border-color: #FDE68A; color: #92400E; font-style: italic; }
@@ -78,7 +85,6 @@
         // --- JSON読み込み処理 ---
         async function loadScript() {
             try {
-                // 相対パスでJSONを取得
                 const response = await fetch('../json/script.json');
                 
                 if (!response.ok) {
@@ -102,7 +108,7 @@
 
         // --- 初期化処理 ---
         function initializeScript(data) {
-            scriptContainer.innerHTML = ''; // ローディング表示をクリア
+            scriptContainer.innerHTML = ''; 
 
             data.forEach((item, index) => {
                 const tile = document.createElement('div');
@@ -117,7 +123,9 @@
                 
                 const lineText = document.createElement('p');
                 lineText.className = 'line-text';
-                lineText.textContent = item.line; 
+                // 【修正】textContent から innerHTML に変更
+                // これにより <br> や <span> などのタグが有効になります
+                lineText.innerHTML = item.line; 
 
                 tile.appendChild(speakerName);
                 tile.appendChild(lineText);
@@ -138,10 +146,9 @@
 
         // --- 表示更新ロジック ---
         function updateScriptView(activeIndex) {
-            currentActiveIndex = activeIndex; // 最新の状態を保存
+            currentActiveIndex = activeIndex; 
             const allTiles = document.querySelectorAll('.script-paragraph');
             
-            // まだDOMが生成されていない場合はスキップ
             if (allTiles.length === 0) return;
 
             let activeTile = null;
@@ -185,7 +192,6 @@
             }
         });
 
-        // 実行
         loadScript();
 
     </script>

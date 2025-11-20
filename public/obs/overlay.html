@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>バトルオーバーレイ - 真打スタイル (Firebase連携)</title>
+    <title>バトルオーバーレイ - 真打スタイル (Firebase連携版)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,14 +16,14 @@
             --color-main-bg: #dfd3b2;
             --color-accent: #6d5d38;
             --color-black: #000000;
-            --color-alpha: #b0b32c;
-            --color-bravo: #9054c2;
+            --color-alpha: #d0be08; /* team-viewer.htmlの色に合わせ調整 */
+            --color-bravo: #3a0ccd; /* team-viewer.htmlの色に合わせ調整 */
             
             --font-yuji: "Yuji Syuku", serif;
             --font-WDXL: "WDXL Lubrifont JP N", sans-serif;
             --font-zen-antique: "Zen Antique Soft", serif;
             --font-kosugi: "Kosugi", sans-serif;
-            --font-shippori-mincho: "Shippori Mincho B1", serif;
+            --font-shippori-mincho: "Shippori Mincho B1", sans-serif;
         }
 
         * {
@@ -163,6 +163,14 @@
             gap: 5px;
         }
         
+        /* 行（名前+hr）の制御用 */
+        .member-row {
+            display: block;
+        }
+        .member-row.hidden {
+            display: none;
+        }
+
         .member {
             font-family: var(--font-shippori-mincho);
             font-size: 32px;
@@ -170,6 +178,7 @@
             line-height: 1.2;
             color: #333;
             white-space: nowrap;
+            display: block;
         }
         
         hr {
@@ -238,17 +247,17 @@
         <div id="round">---</div>
 
         <div id="alpha-members">
-            <h2 id="alpha-member1" class="member">-</h2><hr>
-            <h2 id="alpha-member2" class="member">-</h2><hr>
-            <h2 id="alpha-member3" class="member">-</h2><hr>
-            <h2 id="alpha-member4" class="member">-</h2>
+            <div id="alpha-row1" class="member-row"><h2 id="alpha-member1" class="member">-</h2><hr></div>
+            <div id="alpha-row2" class="member-row"><h2 id="alpha-member2" class="member">-</h2><hr></div>
+            <div id="alpha-row3" class="member-row"><h2 id="alpha-member3" class="member">-</h2><hr></div>
+            <div id="alpha-row4" class="member-row"><h2 id="alpha-member4" class="member">-</h2></div>
         </div>
 
         <div id="bravo-members">
-            <h2 id="bravo-member1" class="member">-</h2><hr>
-            <h2 id="bravo-member2" class="member">-</h2><hr>
-            <h2 id="bravo-member3" class="member">-</h2><hr>
-            <h2 id="bravo-member4" class="member">-</h2>
+            <div id="bravo-row1" class="member-row"><h2 id="bravo-member1" class="member">-</h2><hr></div>
+            <div id="bravo-row2" class="member-row"><h2 id="bravo-member2" class="member">-</h2><hr></div>
+            <div id="bravo-row3" class="member-row"><h2 id="bravo-member3" class="member">-</h2><hr></div>
+            <div id="bravo-row4" class="member-row"><h2 id="bravo-member4" class="member">-</h2></div>
         </div>
     </main>
 
@@ -270,21 +279,19 @@
 
         let teamsData = [];
 
-        // チームデータの読み込み (main.htmlと同様にjsonから取得)
+        // チームデータの読み込み
         async function loadTeamsData() {
             try {
                 const response = await fetch('../json/teams.json');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 teamsData = await response.json();
-                console.log("Teams data loaded:", teamsData.length);
+                console.log("Teams loaded:", teamsData.length);
             } catch (e) {
                 console.error("Failed to load teams.json:", e);
-                // 失敗時は空配列で続行（表示は---になる）
             }
         }
 
-        // メイン処理
         loadTeamsData().then(() => {
-            // state/match ドキュメントを監視
             onSnapshot(doc(db, "state", "match"), (docSnap) => {
                 if (docSnap.exists()) {
                     updateOverlay(docSnap.data());
@@ -293,9 +300,7 @@
         });
 
         function updateOverlay(matchData) {
-            console.log("Updating overlay with Firebase data...", matchData);
-
-            // 1. スコアの計算
+            // --- スコア計算 ---
             let alphaScore = 0;
             let bravoScore = 0;
             if (matchData.games && Array.isArray(matchData.games)) {
@@ -304,32 +309,25 @@
                     if (game.winner === 'bravo') bravoScore++;
                 });
             }
-
-            // 2. 表示の更新（CSS変数）
             document.documentElement.style.setProperty('--alpha-score', `"${alphaScore}"`);
             document.documentElement.style.setProperty('--bravo-score', `"${bravoScore}"`);
 
-            // 3. ラウンド情報の更新
+            // --- ラウンド情報 ---
             const roundName = matchData.roundName || '試合情報なし';
-            const boType = matchData.boType || 'BO3'; // BO3, BO5など
+            const boType = matchData.boType || 'BO3';
             document.getElementById('round').textContent = `${roundName} ${boType}`;
 
-            // 4. チーム情報の更新
+            // --- チーム情報更新 ---
             updateTeamInfo('alpha', matchData.alphaTeamId);
             updateTeamInfo('bravo', matchData.bravoTeamId);
 
-            // 5. ポイントバー（勝利数インジケータ）の更新
+            // --- ポイントバー（勝利数インジケータ） ---
             const pointsContainer = document.getElementById('points');
             pointsContainer.innerHTML = '';
-            
-            // BO数に応じてバーの数を決定 (BO3なら3つ, BO5なら5つ)
             const maxGames = (boType === 'BO5') ? 5 : 3; 
-
             for (let i = 0; i < maxGames; i++) {
                 const pointDiv = document.createElement('div');
                 pointDiv.className = 'point';
-
-                // 試合結果があれば色付け
                 if (matchData.games && matchData.games[i]) {
                     const winner = matchData.games[i].winner;
                     if (winner === 'alpha') pointDiv.classList.add('alpha');
@@ -340,31 +338,43 @@
         }
 
         function updateTeamInfo(side, teamId) {
+            // IDを文字列化して検索
             const team = teamsData.find(t => String(t.id) === String(teamId));
             
-            // 要素の取得
             const elUniv = document.getElementById(`${side}-univ`);
             const elName = document.getElementById(`${side}-team-name`);
 
+            // チームが見つからない場合のリセット
             if (!team) {
-                // チーム未選択時
                 elUniv.textContent = "---";
                 elName.textContent = "Waiting...";
                 for (let i = 1; i <= 4; i++) {
-                    document.getElementById(`${side}-member${i}`).textContent = "-";
+                    const row = document.getElementById(`${side}-row${i}`);
+                    if(row) row.classList.add('hidden');
                 }
                 return;
             }
 
-            // テキスト更新
+            // チーム名・大学名のセット
             elUniv.textContent = `${team.university || ''} ${team.circle || ''}`;
             elName.textContent = team.teamName;
 
-            // メンバー更新
+            // メンバー名のセット (team-viewer.htmlのロジックを採用)
             for (let i = 1; i <= 4; i++) {
-                const memberName = team[`p${i}_name`];
-                const elMember = document.getElementById(`${side}-member${i}`);
-                elMember.textContent = (memberName && memberName !== '----') ? memberName : '';
+                const row = document.getElementById(`${side}-row${i}`);
+                const memberEl = document.getElementById(`${side}-member${i}`);
+                
+                // プロパティキーは `p1_name` の形式
+                const memberKey = `p${i}_name`;
+                const memberName = team[memberKey];
+
+                // 名前が存在し、かつ '----' ではない場合のみ表示
+                if (memberName && memberName.trim() !== '' && memberName.trim() !== '----') {
+                    memberEl.textContent = memberName;
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden'); // 名前がない場合は行(hr含む)を消す
+                }
             }
         }
     </script>
