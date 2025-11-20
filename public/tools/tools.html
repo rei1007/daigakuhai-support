@@ -4,231 +4,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大学杯 配信サポート</title>
-    <link rel="icon" href="icons/favicon.ico">
+    <title>大学杯 配信ツール</title>
+    <link rel="icon" href="../icons/favicon.ico">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet" />
 
     <style>
+        /* --- テーマ定義 (Friendly Brutalism) --- */
+        :root {
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #D1D5DB;
+            --color-warning-bg: #FEF08A; /* yellow-200 */
+            --color-warning-text: #854D0E; /* yellow-800 */
+            --color-warning-border: #EAB308; /* yellow-500 */
+        }
+
         body {
-            font-family: 'Kosugi Maru', sans-serif;
-            overflow: hidden;
-            background-color: #F3F4F6;
+            font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
+            background-color: var(--color-bg); /* アプリ外側の背景色 */
+            color: var(--color-main);
+            overflow: hidden; 
+            display: flex;
+            justify-content: center; /* 中央寄せ */
+            height: 100vh;
+        }
+
+        /* アプリ本体のコンテナ */
+        #app-container {
+            width: 100%;
+            max-width: 1080px; /* 1080pxで固定 */
+            background-color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); /* 境界をわかりやすくするための影 */
+            position: relative;
         }
 
         .material-symbols-rounded {
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-            font-size: 28px;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+            font-size: 24px;
         }
 
+        /* --- ナビゲーションボタン --- */
         .nav-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #6B7280;
-            transition: all 0.2s;
-            padding: 0.5rem;
-            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+            background-color: #FFFFFF;
+            border-right: 2px solid var(--color-main); 
+            height: 100%;
+            position: relative;
+        }
+        .nav-btn:last-child {
+            border-right: none; 
         }
 
+        .nav-btn:hover {
+            background-color: #F3F4F6;
+            color: var(--color-main);
+        }
+
+        /* アクティブ状態 */
         .nav-btn.active {
-            color: #111827;
-            background-color: #E5E7EB;
+            background-color: var(--color-main);
+            color: #FFFFFF;
         }
-
         .nav-btn.active .material-symbols-rounded {
-            color: #111827;
+            color: #FFFFFF;
+        }
+        .nav-btn.active .nav-label {
+            color: #FFFFFF;
         }
 
+        .nav-label {
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        /* --- メインコンテンツエリア --- */
         iframe {
             border: none;
             width: 100%;
             height: 100%;
-            background-color: #F3F4F6;
+            background-color: #F9FAFB; 
         }
 
-        /* 変更: トラブルステータスの位置を右端に設定 */
+        /* --- ヘッダー要素 --- */
+        .header-icon-btn {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--color-main);
+            background: #fff;
+            color: var(--color-main);
+            transition: all 0.2s;
+            border-radius: 0.5rem;
+        }
+        .header-icon-btn:hover {
+            background: var(--color-main);
+            color: #fff;
+        }
+
         #header-trouble-status {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
             font-size: 0.875rem;
-            font-weight: 600;
-            background-color: #FEF3C7;
-            color: #D97706;
-            border: 1px solid #FDE68A;
-            transition: all 0.2s ease-in-out;
-            
-            position: absolute; /* absoluteを維持 */
-            right: 1rem;       /* 右端に配置 */
-            top: 50%;
-            transform: translateY(-50%);
+            font-weight: 700;
+            background-color: var(--color-warning-bg); 
+            color: var(--color-warning-text);
+            border: 2px solid var(--color-main); 
+            border-radius: 0.5rem;
+        }
+        #header-trouble-status.hidden { display: none !important; }
+        
+        /* --- モーダル --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; 
+        }
+        .modal-content {
+            background: #FFFFFF; 
+            width: 90%; max-width: 480px;
+            border: 2px solid var(--color-main);
+            box-shadow: 8px 8px 0 var(--color-main); 
+            padding: 0;
+            border-radius: 1rem;
         }
 
-        #header-trouble-status.hidden {
-            display: none !important;
+        .input-brutal {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #D1D5DB;
+            background-color: #F9FAFB;
+            font-weight: 700;
+            color: var(--color-main);
+            transition: border-color 0.2s;
+            border-radius: 0.5rem;
+        }
+        .input-brutal:focus {
+            outline: none;
+            border-color: var(--color-main);
+            background-color: #FFF;
+            box-shadow: 2px 2px 0 var(--color-shadow);
         }
 
-        #header-trouble-status .material-symbols-rounded {
-            font-size: 1.125rem;
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-            color: #D97706;
-        }
-
-        @keyframes slideInDown {
-            from {
-                transform: translate(-50%, -120%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-        }
-
-        .notification-animate {
-            animation: slideInDown 0.3s ease-out forwards;
-        }
-
-        .close-notification-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: none;
-            border: none;
-            color: #9CA3AF;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .close-notification-btn:hover {
-            color: #6B7280;
-        }
-
-        /* 変更: 設定ボタンの位置を左端に設定 */
-        #global-settings-btn {
-            position: absolute;
-            left: 1rem; /* 左端に配置 */
-            right: auto; /* 既存のright: 1remを無効化 */
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 0.5rem;
-            border-radius: 9999px;
-            color: #6B7280;
+        .btn-brutal {
+            background-color: var(--color-main);
+            color: white;
+            font-weight: 900;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--color-main);
             transition: all 0.2s;
+            border-radius: 0.5rem;
+            box-shadow: 2px 2px 0 var(--color-shadow);
+        }
+        .btn-brutal:hover {
+            background-color: white;
+            color: var(--color-main);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--color-shadow);
         }
 
-        #global-settings-btn:hover {
-            background-color: #F3F4F6;
-            color: #111827;
+        /* --- 通知バナー --- */
+        #chat-notification {
+            border: 2px solid var(--color-main);
+            background: #FFFFFF;
+            box-shadow: 4px 4px 0 var(--color-shadow);
+            border-radius: 0.75rem; 
         }
+        
+        @keyframes slideInDown {
+            from { transform: translate(-50%, -120%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .notification-animate { animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
     </style>
 </head>
 
-<body class="text-gray-900">
+<body>
 
     <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] 
-                bg-white/95 backdrop-blur-sm border border-gray-200 shadow-xl rounded-2xl p-3 pr-8 cursor-pointer 
-                flex items-center gap-4 hover:bg-gray-50 transition-colors relative">
-
-        <div class="flex-shrink-0 bg-blue-100 text-blue-600 p-2.5 rounded-full flex items-center justify-center">
-            <span class="material-symbols-rounded !text-2xl">chat</span>
+                p-4 cursor-pointer flex items-start gap-4 transition-transform">
+        
+        <div class="flex-shrink-0 text-blue-600 mt-1">
+            <span class="material-symbols-rounded">chat</span>
         </div>
 
         <div class="flex-1 min-w-0">
-            <div class="flex justify-between items-center mb-0.5">
-                <p id="notif-sender" class="text-sm font-bold text-gray-500 truncate">Sender</p>
-                <p class="text-xs text-gray-400">今</p>
+            <div class="flex justify-between items-baseline mb-1">
+                <p id="notif-sender" class="text-sm font-black text-gray-900 uppercase tracking-wider">Sender</p>
+                <p class="text-xs font-bold text-gray-400">NOW</p>
             </div>
-            <p id="notif-text" class="text-base font-medium text-gray-800 truncate">Message content</p>
+            <p id="notif-text" class="text-base font-bold text-gray-700 leading-snug line-clamp-2">Message content</p>
         </div>
 
-        <button class="close-notification-btn" onclick="event.stopPropagation(); hideNotification();">
-            <span class="material-symbols-rounded !text-lg">close</span>
+        <button class="close-notification-btn text-gray-400 hover:text-gray-900" onclick="event.stopPropagation(); hideNotification();">
+            <span class="material-symbols-rounded">close</span>
         </button>
     </div>
 
-    <div id="settings-modal"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <div class="border-b border-gray-300 p-5">
-                <h2 class="text-xl font-bold">ユーザー設定</h2>
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="p-6 border-b-2 border-gray-100">
+                <h2 class="text-2xl font-black tracking-tight">USER SETTINGS</h2>
+                <p class="text-xs font-bold text-gray-400 mt-1">表示名とロールの設定</p>
             </div>
-            <div class="p-5 space-y-5">
+            <div class="p-6 space-y-6">
                 <div>
-                    <label for="username-input" class="block text-sm font-medium mb-1.5">名前</label>
-                    <input type="text" id="username-input" placeholder="名前を入力"
-                        class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-700">
+                    <label for="username-input" class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">DISPLAY NAME</label>
+                    <input type="text" id="username-input" placeholder="名前を入力" class="input-brutal">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1.5">ロール</label>
-                    <select id="role-select"
-                        class="w-full p-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:border-gray-700">
-                        <option value="運営">運営</option>
-                        <option value="配信担当">配信担当</option>
-                        <option value="実況">実況</option>
-                        <option value="解説">解説</option>
-                    </select>
+                    <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">ROLE</label>
+                    <div class="relative">
+                        <select id="role-select" class="input-brutal appearance-none cursor-pointer">
+                            <option value="運営">運営</option>
+                            <option value="配信担当">配信担当</option>
+                            <option value="実況">実況</option>
+                            <option value="解説">解説</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                            <span class="material-symbols-rounded">expand_more</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="border-t border-gray-300 p-4 flex justify-end">
-                <button id="save-settings-btn"
-                    class="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-700 transition-colors">保存する</button>
+            <div class="p-4 bg-gray-50 border-t-2 border-gray-100 flex justify-end rounded-b-2xl">
+                <button id="save-settings-btn" class="btn-brutal w-full md:w-auto">SAVE CHANGES</button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-[1080px] mx-auto flex flex-col h-screen bg-gray-100 shadow-xl relative">
-        <header class="bg-white border-b border-gray-300 shadow-sm flex-shrink-0 z-20">
-            <div class="flex justify-center items-center p-4 relative">
-                <button id="global-settings-btn" title="ユーザー設定"><span
-                        class="material-symbols-rounded">settings</span></button>
-                        
-                <h1 id="header-title" class="text-xl font-bold transition-all duration-300">配信画面コントローラー</h1>
+    <div id="app-container">
+        <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 z-20">
+            <div class="flex justify-between items-center px-4 py-3 h-16 relative">
                 
-                <div id="header-trouble-status" class="hidden"><span
-                        class="material-symbols-rounded">error</span><span id="trouble-message"></span></div>
+                <div class="flex gap-2">
+                    <a href="../index.html" class="header-icon-btn" title="ホームに戻る">
+                        <span class="material-symbols-rounded">home</span>
+                    </a>
+                    <button id="global-settings-btn" class="header-icon-btn" title="ユーザー設定">
+                        <span class="material-symbols-rounded">settings</span>
+                    </button>
+                </div>
+
+                <h1 id="header-title" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                                        text-xl md:text-2xl font-black text-gray-900 tracking-tight whitespace-nowrap transition-opacity duration-300">
+                    配信画面コントローラー
+                </h1>
+
+                <div class="flex items-center justify-end min-w-[88px]"> <div id="header-trouble-status" class="hidden">
+                        <span class="material-symbols-rounded mr-1 !text-xl">error</span>
+                        <span id="trouble-message">トラブル対応中</span>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <main class="flex-1 relative overflow-hidden bg-gray-100">
+        <main class="flex-1 relative overflow-hidden bg-white">
             <iframe id="frame-chat" src="chat.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-controller" src="controller.html" class="absolute top-0 left-0 w-full h-full"></iframe>
-            <iframe id="frame-match" src="match-setting.html"
-                class="absolute top-0 left-0 w-full h-full hidden"></iframe>
+            <iframe id="frame-match" src="match-setting.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-team" src="team-viewer.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
             <iframe id="frame-script" src="script.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
         </main>
 
-        <nav class="bg-white border-t border-gray-300 flex-shrink-0 pb-safe z-20">
-            <div class="grid grid-cols-5 h-16">
-                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')"><span
-                        class="material-symbols-rounded mb-0.5">chat</span><span
-                        class="text-[10px] font-bold">チャット</span></button>
-                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')"><span
-                        class="material-symbols-rounded mb-0.5">gamepad</span><span
-                        class="text-[10px] font-bold">操作</span></button>
-                <button class="nav-btn" data-target="match" onclick="switchTab('match')"><span
-                        class="material-symbols-rounded mb-0.5">tune</span><span
-                        class="text-[10px] font-bold" id="match-nav-text">対戦設定</span></button>
-                <button class="nav-btn" data-target="team" onclick="switchTab('team')"><span
-                        class="material-symbols-rounded mb-0.5">groups</span><span
-                        class="text-[10px] font-bold">チーム</span></button>
-                <button class="nav-btn" data-target="script" onclick="switchTab('script')"><span
-                        class="material-symbols-rounded mb-0.5">description</span><span
-                        class="text-[10px] font-bold">台本</span></button>
+        <nav class="flex-shrink-0 bg-white border-t-2 border-gray-900 z-20 pb-safe">
+            <div class="flex h-20"> 
+                <button class="nav-btn flex-1" data-target="chat" onclick="switchTab('chat')">
+                    <span class="material-symbols-rounded">chat</span>
+                    <span class="nav-label">CHAT</span>
+                </button>
+                <button class="nav-btn active flex-1" data-target="controller" onclick="switchTab('controller')">
+                    <span class="material-symbols-rounded">gamepad</span>
+                    <span class="nav-label">CONTROL</span>
+                </button>
+                <button class="nav-btn flex-1" data-target="match" onclick="switchTab('match')">
+                    <span class="material-symbols-rounded">tune</span>
+                    <span class="nav-label" id="match-nav-text">MATCH SET</span>
+                </button>
+                <button class="nav-btn flex-1" data-target="team" onclick="switchTab('team')">
+                    <span class="material-symbols-rounded">groups</span>
+                    <span class="nav-label">TEAMS</span>
+                </button>
+                <button class="nav-btn flex-1" data-target="script" onclick="switchTab('script')">
+                    <span class="material-symbols-rounded">description</span>
+                    <span class="nav-label">SCRIPT</span>
+                </button>
             </div>
         </nav>
     </div>
@@ -257,7 +340,7 @@
         const roleSelect = document.getElementById('role-select');
         const saveSettingsBtn = document.getElementById('save-settings-btn');
         const globalSettingsBtn = document.getElementById('global-settings-btn');
-        const matchNavText = document.getElementById('match-nav-text'); // 追加: ナビゲーションの「対戦設定」テキスト要素
+        const matchNavText = document.getElementById('match-nav-text');
 
         let currentUser = {
             name: localStorage.getItem('app_user_name') || '',
@@ -266,7 +349,7 @@
         };
         if (!localStorage.getItem('app_user_uid')) localStorage.setItem('app_user_uid', currentUser.uid);
         
-        // 読み込み時にナビゲーションテキストを更新
+        // 初期ロード
         updateMatchNavText(); 
 
         function openSettings() {
@@ -275,6 +358,10 @@
             settingsModal.classList.remove('hidden');
         }
         function closeSettings() { settingsModal.classList.add('hidden'); }
+        
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) closeSettings();
+        });
 
         saveSettingsBtn.addEventListener('click', () => {
             const newName = usernameInput.value.trim();
@@ -283,7 +370,7 @@
                 currentUser.role = roleSelect.value;
                 localStorage.setItem('app_user_name', currentUser.name);
                 localStorage.setItem('app_user_role', currentUser.role);
-                updateMatchNavText(); // ユーザーロール変更後にナビゲーションテキストを更新
+                updateMatchNavText(); 
                 notifyIframesOfSettings();
                 closeSettings();
             } else {
@@ -294,18 +381,14 @@
 
         if (!currentUser.name) openSettings();
 
-        // 【修正】 ロールに基づいてナビゲーションの「対戦設定」テキストを変更する関数。
-        //         ヘッダーのタイトル設定のために文字列をreturnするように変更。
         function updateMatchNavText() {
             let newText;
             if (currentUser.role === '実況' || currentUser.role === '解説') {
-                newText = '対戦情報';
+                newText = 'MATCH INFO';
             } else {
-                newText = '対戦設定';
+                newText = 'MATCH SET';
             }
-            // ナビゲーションボタンのテキストを更新
-            matchNavText.textContent = newText;
-            // ヘッダータイトルの設定のために値を返す
+            matchNavText.textContent = newText; 
             return newText; 
         }
 
@@ -337,14 +420,15 @@
         let currentTab = 'controller';
         let lastMessageTimestamp = Date.now();
 
-        const troubleMessages = { 'lag': 'ラグ対応', 'stream': '配信トラブル', 'admin': '運営トラブル' };
+        // 日本語メッセージに変更
+        const troubleMessages = { 'lag': 'ラグ対応中', 'stream': '配信トラブル', 'admin': '運営トラブル' };
 
         onSnapshot(broadcastRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 const troubleState = data.trouble || 'none';
                 if (troubleState === 'none') { headerTroubleStatus.classList.add('hidden'); }
-                else { troubleMessage.textContent = troubleMessages[troubleState] || 'トラブル'; headerTroubleStatus.classList.remove('hidden'); }
+                else { troubleMessage.textContent = troubleMessages[troubleState] || 'トラブル対応中'; headerTroubleStatus.classList.remove('hidden'); }
             }
         });
 
@@ -369,14 +453,15 @@
 
         function showNotification(sender, text, isStaffOnly) {
             if (notificationTimeout) clearTimeout(notificationTimeout);
-            notifSender.textContent = sender; // (Staff) は表示しない
+            notifSender.textContent = sender; 
             notifText.textContent = text;
 
-            // 青色に変更
             if (isStaffOnly) {
-                chatNotification.classList.add('border-blue-300', 'bg-blue-50');
+                chatNotification.style.borderColor = '#2563EB';
+                chatNotification.style.backgroundColor = '#EFF6FF';
             } else {
-                chatNotification.classList.remove('border-blue-300', 'bg-blue-50');
+                chatNotification.style.borderColor = '#111827';
+                chatNotification.style.backgroundColor = '#FFFFFF';
             }
 
             chatNotification.classList.remove('hidden');
@@ -398,20 +483,16 @@
             localStorage.setItem('tools_activeTab', targetName);
             if (targetName === 'chat') { hideNotification(); }
             
-            // ロールに基づいて動的にタイトルを決定し、ナビゲーションテキストも更新
-            const matchTitle = updateMatchNavText(); // updateMatchNavTextは文字列を返すよう修正済み
+            const matchTitle = updateMatchNavText(); 
 
             const titles = {
                 chat: "配信メンバーチャット",
                 controller: "配信画面コントローラー",
-                match: matchTitle, // updateMatchNavText()の戻り値を使用
+                match: matchTitle === 'MATCH INFO' ? "対戦情報" : "対戦設定", 
                 team: "チーム情報閲覧",
                 script: "配信台本表示"
             };
             
-            // 【修正】不要になった2回目のupdateMatchNavText()の呼び出しを削除しました。
-            // updateMatchNavText(); 
-
             document.querySelectorAll('iframe').forEach(el => { el.classList.add('hidden'); });
             const targetFrame = document.getElementById(`frame-${targetName}`);
             if (targetFrame) {
@@ -434,22 +515,17 @@
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
-                const icon = btn.querySelector('.material-symbols-rounded');
-                if (icon) icon.style.fontVariationSettings = "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48";
             });
 
             const activeBtn = document.querySelector(`.nav-btn[data-target="${targetName}"]`);
             if (activeBtn) {
                 activeBtn.classList.add('active');
-                const icon = activeBtn.querySelector('.material-symbols-rounded');
-                if (icon) icon.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48";
             }
         };
 
         const savedTab = localStorage.getItem('tools_activeTab');
         window.switchTab(savedTab || 'controller');
         
-        // ユーザー設定の初期ロードが完了したら、iframeにも通知
         notifyIframesOfSettings();
 
     </script>

@@ -6,128 +6,261 @@
     <title>配信画面コントローラー</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <style>
+        /* --- テーマ定義 (match-setting.htmlと共通) --- */
+        :root {
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #D1D5DB;
+            --color-warning-bg: #FEF08A; /* yellow-200 */
+            --color-warning-text: #854D0E; /* yellow-800 */
+            --color-warning-border: #EAB308; /* yellow-500 */
+        }
+
         body {
-            font-family: 'Kosugi Maru', sans-serif;
+            font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-main);
             scroll-behavior: smooth;
         }
+
         .material-symbols-rounded {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-            font-size: 36px;
+            font-size: 32px;
         }
-        
-        /* タイル共通 */
+
+        /* --- セクションヘッダー --- */
+        .section-header {
+            margin-bottom: 1rem;
+            display: flex; align-items: baseline; gap: 0.75rem;
+            border-left: 6px solid var(--color-main);
+            padding-left: 1rem;
+        }
+        .section-title {
+            font-size: 1.25rem; font-weight: 900; color: var(--color-main);
+        }
+        .section-subtitle {
+            font-size: 0.75rem; font-weight: 700; color: #6B7280; letter-spacing: 0.05em;
+        }
+
+        /* --- コントローラータイル (共通) --- */
         .controller-tile {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 1.5rem; border-radius: 1.25rem; cursor: pointer; transition: all 0.2s ease-in-out;
-            border: 1px solid #D1D5DB; text-align: center; min-height: 120px;
+            padding: 1.5rem; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            border: 2px solid var(--color-main);
+            border-radius: 0.75rem;
+            text-align: center; 
+            min-height: 120px;
+            background-color: var(--color-panel);
+            box-shadow: 4px 4px 0 0 var(--color-shadow);
+            position: relative;
         }
-        .tile-inactive {
-            background-color: #ffffff; color: #1F2937; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        
+        .controller-tile:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
-        .tile-inactive:hover {
-            background-color: #F9FAFB; border-color: #9CA3AF;
-        }
-        .tile-active {
-            background-color: #111827; color: #F9FAFB; border-color: #111827;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .tile-active .material-symbols-rounded { color: #F9FAFB; }
-        .tile-inactive .material-symbols-rounded { color: #374151; }
 
-        /* サブオプションボタン */
+        /* テキストラベル */
+        .tile-label-en {
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #6B7280;
+            margin-bottom: 0.25rem;
+        }
+        .tile-label-ja {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        /* --- トラブルタイル (コンパクト版) --- */
+        .trouble-tile {
+            min-height: auto;
+            padding: 1rem 1.25rem;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 1rem;
+            text-align: left;
+        }
+        .trouble-tile .material-symbols-rounded {
+            font-size: 28px;
+            margin-bottom: 0;
+        }
+        .trouble-tile .tile-label-en {
+            margin-bottom: 0;
+            line-height: 1;
+        }
+        .trouble-tile .tile-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 状態クラス --- */
+        .tile-inactive {
+            background-color: var(--color-panel); 
+            color: var(--color-main);
+        }
+        
+        .tile-active {
+            background-color: var(--color-main) !important; 
+            color: #FFFFFF !important;
+            border-color: var(--color-main);
+        }
+        .tile-active .tile-label-en { color: #9CA3AF; }
+        .tile-active .material-symbols-rounded { color: #FFFFFF; }
+
+        /* トラブル用アクティブスタイル */
+        .trouble-active {
+            background-color: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+            border-color: var(--color-warning-border);
+        }
+        .trouble-active .tile-label-en { color: #B45309; }
+        .trouble-active .material-symbols-rounded { color: var(--color-warning-text); }
+
+
+        /* --- サブオプションボタン --- */
+        .sub-ops-container {
+            background-color: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #E5E7EB;
+            margin-top: 1.5rem;
+        }
+        .sub-ops-header {
+            font-size: 0.75rem; font-weight: 700; color: #9CA3AF; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+
         .sub-op-btn {
-            flex: 1; padding: 0.75rem; text-align: center; font-weight: 700; font-size: 0.9rem;
-            transition: all 0.2s; border-radius: 0.5rem; cursor: pointer;
+            flex: 1; padding: 0.6rem; text-align: center; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--color-shadow);
+            border-radius: 0.5rem;
+            background-color: #FFFFFF;
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
         }
-        .sub-op-active {
-            background-color: #111827; color: white; shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        .sub-op-inactive {
-            background-color: white; color: #4B5563; border: 1px solid #E5E7EB;
-        }
-        .sub-op-inactive:hover {
+        
+        .sub-op-btn:hover {
             background-color: #F3F4F6;
+            border-color: var(--color-main);
         }
+        
+        .sub-op-active { 
+            background-color: var(--color-main) !important; 
+            color: white !important; 
+            border-color: var(--color-main) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sub-op-inactive { 
+            color: #4B5563; 
+        }
+
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="text-gray-900">
 
-    <div class="max-w-[1080px] mx-auto p-4 md:p-6 min-h-screen">
+    <div class="max-w-[1080px] mx-auto p-4 md:p-8 min-h-screen">
         
-        <section class="mb-8">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">画面内操作</h2>
+        <section class="mb-12">
+            <div class="section-header">
+                <h2 class="section-title">画面内表示切り替え</h2>
+                <span class="section-subtitle">SCENE CONTROL</span>
+            </div>
             
-            <div class="bg-white p-6 rounded-2xl border border-gray-300 shadow-sm">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-                    
-                    <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-matchup">
-                        <span class="material-symbols-rounded mb-2">swords</span>
-                        <span class="font-medium text-sm">対戦情報</span>
-                    </div>
-                    
-                    <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-alpha">
-                        <span class="material-symbols-rounded mb-2">group</span>
-                        <span class="font-medium text-sm">アルファ詳細</span>
-                    </div>
-                    
-                    <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-bravo">
-                        <span class="material-symbols-rounded mb-2">groups</span>
-                        <span class="font-medium text-sm">ブラボー詳細</span>
-                    </div>
-                    
-                    <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-stage">
-                        <span class="material-symbols-rounded mb-2">map</span>
-                        <span class="font-medium text-sm">ステージ</span>
-                    </div>
-
+                <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-matchup">
+                    <span class="tile-label-en">MATCH INFO</span>
+                    <span class="material-symbols-rounded mb-2">swords</span>
+                    <span class="tile-label-ja">対戦情報</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-alpha">
+                    <span class="tile-label-en">TEAM ALPHA</span>
+                    <span class="material-symbols-rounded mb-2">group</span>
+                    <span class="tile-label-ja">アルファ詳細</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-bravo">
+                    <span class="tile-label-en">TEAM BRAVO</span>
+                    <span class="material-symbols-rounded mb-2">groups</span>
+                    <span class="tile-label-ja">ブラボー詳細</span>
+                </div>
+                
+                <div class="controller-tile tile-inactive" data-group="main-op" data-value="main-stage">
+                    <span class="tile-label-en">STAGE INFO</span>
+                    <span class="material-symbols-rounded mb-2">map</span>
+                    <span class="tile-label-ja">ステージ</span>
                 </div>
 
-                <div id="sub-ops-area" class="border-t border-gray-200 pt-4 hidden">
-                    <p class="text-xs font-bold text-gray-500 mb-2">表示切替</p>
-                    
-                    <div id="sub-ops-team" class="flex gap-2 hidden">
-                        <div class="sub-op-btn sub-op-active" data-group="sub-op" data-value="details">
-                            <span class="material-symbols-rounded !text-xl">id_card</span>
-                            メンバー詳細
-                        </div>
-                        <div class="sub-op-btn sub-op-inactive" data-group="sub-op" data-value="circle">
-                            <span class="material-symbols-rounded !text-xl">diversity_3</span>
-                            サークル情報
-                        </div>
-                    </div>
+            </div>
 
-                    <div id="sub-ops-stage" class="flex gap-2 hidden">
-                        <div class="sub-op-btn sub-op-active" data-group="sub-op" data-value="image">
-                            <span class="material-symbols-rounded !text-xl">image</span>
-                            ステージ画像
-                        </div>
-                        <div class="sub-op-btn sub-op-inactive" data-group="sub-op" data-value="list">
-                            <span class="material-symbols-rounded !text-xl">view_list</span>
-                            ステージ一覧
-                        </div>
+            <div id="sub-ops-area" class="sub-ops-container hidden">
+                <div class="sub-ops-header">
+                    <span class="material-symbols-rounded !text-lg">subdirectory_arrow_right</span>
+                    <span>DISPLAY OPTIONS</span>
+                </div>
+                
+                <div id="sub-ops-team" class="grid grid-cols-2 gap-4 hidden">
+                    <div class="sub-op-btn sub-op-active" data-group="sub-op" data-value="details">
+                        <span class="material-symbols-rounded !text-xl">id_card</span>
+                        メンバー詳細
+                    </div>
+                    <div class="sub-op-btn sub-op-inactive" data-group="sub-op" data-value="circle">
+                        <span class="material-symbols-rounded !text-xl">diversity_3</span>
+                        サークル情報
                     </div>
                 </div>
 
+                <div id="sub-ops-stage" class="grid grid-cols-2 gap-4 hidden">
+                    <div class="sub-op-btn sub-op-active" data-group="sub-op" data-value="image">
+                        <span class="material-symbols-rounded !text-xl">image</span>
+                        ステージ画像
+                    </div>
+                    <div class="sub-op-btn sub-op-inactive" data-group="sub-op" data-value="list">
+                        <span class="material-symbols-rounded !text-xl">view_list</span>
+                        ステージ一覧
+                    </div>
+                </div>
             </div>
         </section>
 
         <section id="trouble-section" class="pb-8">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-400 pb-2">トラブル対応</h2>
-            <div id="trouble-selector" class="grid grid-cols-3 gap-3 md:gap-4">
-                <div class="controller-tile tile-inactive" data-group="trouble" data-value="lag" data-message="ラグ対応中">
-                    <span class="material-symbols-rounded mb-2">network_check</span><span class="font-medium">ラグ対応</span>
+            <div class="section-header" style="border-color: #EF4444;">
+                <h2 class="section-title text-red-700">トラブル対応モード</h2>
+                <span class="section-subtitle text-red-400">EMERGENCY</span>
+            </div>
+
+            <div id="trouble-selector" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="controller-tile trouble-tile tile-inactive" data-group="trouble" data-value="lag">
+                    <span class="material-symbols-rounded">network_check</span>
+                    <div class="tile-content">
+                        <span class="tile-label-en">LAGGING</span>
+                        <span class="tile-label-ja">ラグ対応</span>
+                    </div>
                 </div>
-                <div class="controller-tile tile-inactive" data-group="trouble" data-value="stream" data-message="配信トラブル対応中">
-                    <span class="material-symbols-rounded mb-2">settings_input_antenna</span><span class="font-medium">配信トラブル</span>
+                <div class="controller-tile trouble-tile tile-inactive" data-group="trouble" data-value="stream">
+                    <span class="material-symbols-rounded">settings_input_antenna</span>
+                    <div class="tile-content">
+                        <span class="tile-label-en">STREAM ERR</span>
+                        <span class="tile-label-ja">配信トラブル</span>
+                    </div>
                 </div>
-                <div class="controller-tile tile-inactive" data-group="trouble" data-value="admin" data-message="運営トラブル対応中">
-                    <span class="material-symbols-rounded mb-2">admin_panel_settings</span><span class="font-medium">運営トラブル</span>
+                <div class="controller-tile trouble-tile tile-inactive" data-group="trouble" data-value="admin">
+                    <span class="material-symbols-rounded">admin_panel_settings</span>
+                    <div class="tile-content">
+                        <span class="tile-label-en">ADMIN ERR</span>
+                        <span class="tile-label-ja">運営トラブル</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -168,7 +301,6 @@
             scriptIndex: 0
         };
 
-        // ユーザー設定保持用
         let currentUser = { name: '', role: '' };
 
         // --- 親フレームからの設定受け取り ---
@@ -207,8 +339,8 @@
         function renderUI(state) {
             currentState = state;
 
-            updateTileGroup(troubleTiles, state.trouble);
-            updateTileGroup(mainOpTiles, state.mainOp);
+            updateTileGroup(troubleTiles, state.trouble, true); // true for trouble styling
+            updateTileGroup(mainOpTiles, state.mainOp, false);
 
             const isTeam = (state.mainOp === 'main-alpha' || state.mainOp === 'main-bravo');
             const isStage = (state.mainOp === 'main-stage');
@@ -230,12 +362,20 @@
             }
         }
 
-        function updateTileGroup(tiles, activeValue) {
+        function updateTileGroup(tiles, activeValue, isTroubleGroup) {
             tiles.forEach(tile => {
-                if (tile.dataset.value === activeValue) {
-                    tile.classList.remove('tile-inactive'); tile.classList.add('tile-active');
+                const isActive = tile.dataset.value === activeValue;
+                
+                if (isActive) {
+                    tile.classList.remove('tile-inactive');
+                    if (isTroubleGroup) {
+                        tile.classList.add('trouble-active');
+                    } else {
+                        tile.classList.add('tile-active');
+                    }
                 } else {
-                    tile.classList.remove('tile-active'); tile.classList.add('tile-inactive');
+                    tile.classList.remove('tile-active', 'trouble-active');
+                    tile.classList.add('tile-inactive');
                 }
             });
         }

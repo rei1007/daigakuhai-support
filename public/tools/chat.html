@@ -9,66 +9,294 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
     
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <style>
+        /* --- テーマ定義 (共通) --- */
+        :root {
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #D1D5DB;
+            
+            --color-staff-bg-other: #EFF6FF;
+            --color-staff-border-other: #2563EB;
+            --color-staff-bg-me: #1E40AF;
+        }
+
         body {
-            font-family: 'Kosugi Maru', sans-serif;
-            scroll-behavior: smooth;
+            font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-main);
             overflow: hidden;
         }
 
         .material-symbols-rounded {
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-            font-size: 28px;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+            font-size: 24px;
         }
         
+        /* カスタムスクロールバー */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
+        /* --- メッセージバブル --- */
+        .msg-bubble {
+            background-color: var(--color-panel);
+            border: 2px solid var(--color-main);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            max-width: 90%;
+            position: relative;
+            box-shadow: 4px 4px 0 0 var(--color-shadow); /* ハードシャドウ */
+            transition: transform 0.2s;
+        }
+
+        /* 自分のメッセージ */
+        .msg-me {
+            background-color: var(--color-main);
+            color: #FFFFFF;
+            margin-left: auto;
+            border-color: var(--color-main);
+            /* 自分のメッセージは影なし、または濃い影にするなどの調整も可能ですが、統一感を優先 */
+        }
+        .msg-me .msg-text { color: #FFFFFF; }
+        .msg-me .msg-name { color: #D1D5DB; }
+        .msg-me .role-badge { 
+            background-color: #FFFFFF; 
+            color: var(--color-main); 
+            border-color: #FFFFFF;
+        }
+        
+        /* 相手のメッセージ */
+        .msg-other {
+            background-color: #FFFFFF;
+            color: var(--color-main);
+            margin-right: auto;
+        }
+
+        /* スタッフ限定メッセージ（相手） */
+        .msg-staff-other {
+            background-color: var(--color-staff-bg-other); 
+            border-color: var(--color-staff-border-other);     
+            color: #1E3A8A;
+        }
+        .msg-staff-other .role-badge {
+            background-color: var(--color-staff-border-other);
+            color: white;
+            border-color: var(--color-staff-border-other);
+        }
+
+        /* スタッフ限定メッセージ（自分） */
+        .msg-staff-me {
+            background-color: var(--color-staff-bg-me); 
+            border-color: var(--color-staff-bg-me);
+            color: #FFFFFF;
+        }
+        .msg-staff-me .msg-text { color: #FFFFFF !important; }
+        .msg-staff-me .msg-name { color: #BFDBFE !important; }
+        .msg-staff-me .role-badge {
+            background-color: #FFFFFF;
+            color: var(--color-staff-bg-me);
+            border-color: #FFFFFF;
+        }
+        
+        /* ロールバッジ */
+        .role-badge {
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 0.15rem 0.6rem;
+            border: 2px solid var(--color-main); /* 枠線を少し太く */
+            border-radius: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+        }
+        .msg-other .role-badge {
+            background-color: var(--color-main);
+            color: #FFFFFF;
+        }
+
+        /* 本文テキスト */
+        .msg-text {
+            font-size: 1.125rem;
+            line-height: 1.75;
+            font-weight: 500;
+        }
+
+        /* --- 入力エリア --- */
+        .input-area {
+            background-color: var(--color-panel);
+            border-top: 2px solid var(--color-main);
+            padding: 1rem;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        textarea {
+            border: 2px solid var(--color-main);
+            border-radius: 0.75rem;
+            background-color: #F9FAFB;
+            font-family: inherit;
+            color: var(--color-main);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
         textarea:focus {
             outline: none;
-            border-color: #374151;
-            box-shadow: 0 0 0 2px rgba(55, 65, 81, 0.2);
+            background-color: #FFFFFF;
+            box-shadow: 4px 4px 0 0 var(--color-shadow);
+            transform: translate(-2px, -2px);
         }
 
-        .message-bubble-me p,
-        .message-bubble-me .font-bold {
-            color: #F9FAFB;
+        /* 送信ボタン */
+        #send-button {
+            background-color: var(--color-main);
+            color: #FFFFFF;
+            border: 2px solid var(--color-main);
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
-        
+        #send-button:hover {
+            background-color: #FFFFFF;
+            color: var(--color-main);
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 0 var(--color-shadow);
+        }
+        #send-button:active {
+            transform: translate(0, 0);
+            box-shadow: none;
+        }
+        #send-button:disabled {
+            background-color: #E5E7EB;
+            border-color: #D1D5DB;
+            color: #9CA3AF;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* 削除ボタン */
         .delete-btn {
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            background-color: #EF4444;
+            color: white;
+            border: 2px solid var(--color-main);
+            border-radius: 0.5rem;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            z-index: 10;
+            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.1);
         }
-        .message-bubble-me:hover .delete-btn {
+        .msg-bubble:hover .delete-btn {
             opacity: 1;
         }
+        .delete-btn:hover {
+            background-color: #DC2626;
+            transform: scale(1.1);
+        }
+
+        /* --- モーダル (Friendly Brutalism) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        
+        .modal-box {
+            background: #FFFFFF; 
+            width: 90%; max-width: 400px;
+            border: 2px solid var(--color-main);
+            border-radius: 1rem;
+            box-shadow: 8px 8px 0 0 var(--color-main);
+            padding: 2rem;
+            display: flex; flex-direction: column; gap: 1.5rem;
+            transform: scale(0.95); transition: transform 0.2s;
+        }
+        .modal-overlay.show .modal-box { transform: scale(1); }
+
+        .modal-title { font-size: 1.25rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; color: var(--color-main); }
+        .modal-msg { font-size: 1rem; font-weight: 500; line-height: 1.6; color: #374151; }
+        
+        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; }
+        
+        .btn-modal {
+            padding: 0.5rem 1.5rem; font-weight: 700; 
+            border: 2px solid var(--color-main); 
+            border-radius: 0.5rem;
+            transition: all 0.1s;
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
+        }
+        .btn-modal:active { transform: translate(2px, 2px); box-shadow: none; }
+
+        .btn-cancel { background: white; color: var(--color-main); }
+        .btn-cancel:hover { background: #F3F4F6; }
+        
+        .btn-ok { background: var(--color-main); color: white; }
+        .btn-ok:hover { background: #374151; }
+        
+        .btn-danger { background: #EF4444; color: white; border-color: var(--color-main); }
+        .btn-danger:hover { background: #DC2626; }
+
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-50 text-gray-900">
 
-    <div class="max-w-[1080px] mx-auto bg-gray-100 flex flex-col h-screen">
+    <div class="max-w-[1080px] mx-auto flex flex-col h-screen border-x-0 md:border-x-2 md:border-gray-200">
         
-        <main id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col-reverse gap-4">
+        <main id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col-reverse gap-6">
             </main>
 
-        <footer class="bg-white border-t border-gray-300 p-4 sticky bottom-0 z-10">
-            <div class="flex items-end gap-2">
-                
+        <footer class="input-area">
+            <div class="flex items-end gap-3">
                 <textarea id="chat-input" rows="1" placeholder="メッセージを入力 (Shift+Enterで改行)" 
-                          class="flex-1 p-3 bg-gray-100 border border-gray-300 rounded-2xl resize-none transition-all duration-100 min-h-[52px] max-h-[150px] leading-relaxed"></textarea>
+                          class="flex-1 p-4 resize-none min-h-[60px] max-h-[150px] leading-relaxed placeholder-gray-400"></textarea>
                 
-                <button id="send-button" class="flex items-center justify-center w-[52px] h-[52px] bg-gray-900 text-white rounded-full hover:bg-gray-700 active:bg-gray-900 transition-colors disabled:bg-gray-400 flex-shrink-0">
-                    <span class="material-symbols-rounded !text-2xl" style="margin-left: 4px;">send</span>
+                <button id="send-button" class="flex items-center justify-center w-[60px] h-[60px] flex-shrink-0">
+                    <span class="material-symbols-rounded !text-3xl" style="margin-left: 2px;">send</span>
                 </button>
             </div>
         </footer>
+    </div>
 
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="modal-title" id="alert-title">
+                <span class="material-symbols-rounded text-yellow-500">info</span>
+                NOTICE
+            </h3>
+            <p class="modal-msg" id="alert-msg">メッセージ</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-ok" onclick="closeAlert()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="modal-title" id="confirm-title">
+                <span class="material-symbols-rounded text-red-500">warning</span>
+                CONFIRM
+            </h3>
+            <p class="modal-msg" id="confirm-msg">本当に実行しますか？</p>
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeConfirm(false)">CANCEL</button>
+                <button class="btn-modal btn-danger" id="confirm-ok-btn">EXECUTE</button>
+            </div>
+        </div>
     </div>
     
     <script type="module">
@@ -94,6 +322,45 @@
 
         let currentUser = { name: '', role: '', uid: '' };
 
+        // --- モーダル制御 ---
+        const alertModal = document.getElementById('alert-modal');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMsg = document.getElementById('alert-msg');
+
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMsg = document.getElementById('confirm-msg');
+        const confirmOkBtn = document.getElementById('confirm-ok-btn');
+        let confirmCallback = null;
+
+        window.showAlert = (title, msg) => {
+            alertTitle.innerHTML = `<span class="material-symbols-rounded text-yellow-500">info</span> ${title}`;
+            alertMsg.textContent = msg;
+            alertModal.classList.add('show');
+        };
+
+        window.closeAlert = () => {
+            alertModal.classList.remove('show');
+        };
+
+        window.showConfirm = (title, msg, callback) => {
+            confirmTitle.innerHTML = `<span class="material-symbols-rounded text-red-500">warning</span> ${title}`;
+            confirmMsg.textContent = msg;
+            confirmCallback = callback;
+            confirmModal.classList.add('show');
+        };
+
+        window.closeConfirm = (isOk) => {
+            confirmModal.classList.remove('show');
+            if (isOk && confirmCallback) {
+                confirmCallback();
+            }
+            confirmCallback = null;
+        };
+
+        confirmOkBtn.onclick = () => closeConfirm(true);
+        // --------------------
+
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'settings-update') {
                 currentUser = event.data.user;
@@ -115,14 +382,15 @@
                 await batch.commit();
             } catch (error) {
                 console.error("全削除エラー:", error);
-                alert("全削除に失敗しました。");
+                showAlert("ERROR", "全削除に失敗しました。");
             }
         }
 
-        async function deleteMessage(messageId) {
-            if (!confirm("このメッセージを削除しますか？")) return;
-            try { await deleteDoc(doc(db, "messages", messageId)); } 
-            catch (error) { console.error("削除エラー:", error); }
+        function deleteMessage(messageId) {
+            showConfirm("DELETE MESSAGE", "このメッセージを削除しますか？\n(取り消せません)", async () => {
+                try { await deleteDoc(doc(db, "messages", messageId)); } 
+                catch (error) { console.error("削除エラー:", error); }
+            });
         }
 
         async function sendMessage() {
@@ -130,7 +398,7 @@
             
             if (!messageText) return;
             if (!currentUser.name) { 
-                alert("ユーザー設定が読み込まれていません。親画面をリロードしてください。"); 
+                showAlert("USER SETTING ERROR", "ユーザー設定が読み込まれていません。親画面をリロードしてください。"); 
                 return; 
             }
 
@@ -138,14 +406,14 @@
 
             if (messageText === "/allclear") {
                 if (isStaff) {
-                    if (confirm("【警告】すべてのチャット履歴を削除します。\n本当によろしいですか？")) {
+                    showConfirm("CLEAR ALL HISTORY", "【警告】すべてのチャット履歴を削除します。\n本当によろしいですか？", async () => {
                         await clearAllMessages();
                         chatInput.value = '';
                         chatInput.style.height = 'auto';
-                    }
+                    });
                     return;
                 } else {
-                    alert("このコマンドは「運営」「配信担当」のみ実行可能です。");
+                    showAlert("PERMISSION DENIED", "このコマンドは「運営」「配信担当」のみ実行可能です。");
                     return;
                 }
             }
@@ -156,11 +424,11 @@
                     isStaffOnly = true;
                     messageText = messageText.replace("/staff ", "");
                 } else {
-                    alert("スタッフ限定チャットは使用できません。");
+                    showAlert("PERMISSION DENIED", "スタッフ限定チャットは使用できません。");
                     return;
                 }
             } else if (messageText === "/staff") {
-                alert("メッセージを入力してください。例: /staff テスト");
+                showAlert("INPUT ERROR", "メッセージを入力してください。\n例: /staff テスト");
                 return;
             }
 
@@ -211,59 +479,48 @@
         });
 
         function createMessageHTML(id, name, role, text, isMe, isStaffMsg) {
-            let roleBadgeStyle = 'bg-gray-200 text-gray-700';
-            if (role === '運営' || role === '配信担当') roleBadgeStyle = 'bg-gray-900 text-white';
-
-            let messageBubbleStyle = 'bg-white border-gray-200 rounded-bl-none';
-            
-            // スタッフ限定メッセージのスタイル (青色に変更)
-            if (isStaffMsg) {
-                messageBubbleStyle = 'bg-blue-50 border-blue-200 rounded-bl-none';
-            }
-
             const wrapper = document.createElement('div');
-            wrapper.className = `flex ${isMe ? 'justify-end' : ''}`;
+            wrapper.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
+            
+            const bubble = document.createElement('div');
+            let bubbleClass = 'msg-bubble';
             
             if (isMe) {
-                messageBubbleStyle = 'bg-gray-800 border-gray-700 rounded-br-none message-bubble-me relative group';
-                if (isStaffMsg) {
-                    // 自分のスタッフメッセージ (濃い青)
-                    messageBubbleStyle = 'bg-blue-900 border-blue-800 rounded-br-none message-bubble-me relative group';
-                }
-
-                if (role === '運営' || role === '配信担当') roleBadgeStyle = 'bg-gray-600 text-white'; 
-                else roleBadgeStyle = 'bg-gray-500 text-white'; 
+                bubbleClass += isStaffMsg ? ' msg-staff-me' : ' msg-me';
+            } else {
+                bubbleClass += isStaffMsg ? ' msg-staff-other' : ' msg-other';
             }
+            
+            bubble.className = bubbleClass;
 
-            const bubble = document.createElement('div');
-            bubble.className = `p-3 rounded-2xl shadow-sm max-w-[85%] border ${messageBubbleStyle}`;
-
+            // ヘッダー (名前 + ロール)
             const header = document.createElement('div');
-            header.className = 'flex items-center gap-2 mb-1.5';
+            header.className = 'flex items-baseline gap-2 mb-2';
             
             const nameSpan = document.createElement('span');
-            nameSpan.className = 'font-bold text-sm';
-            // (Staff) の表示を削除
-            nameSpan.textContent = name; 
+            nameSpan.className = 'font-bold text-sm msg-name uppercase tracking-wider';
+            nameSpan.textContent = name;
             
             const roleSpan = document.createElement('span');
-            roleSpan.className = `text-xs font-medium ${roleBadgeStyle} px-2 py-0.5 rounded-full`;
+            roleSpan.className = 'role-badge';
             roleSpan.textContent = role;
             
             header.appendChild(nameSpan);
             header.appendChild(roleSpan);
 
+            // 削除ボタン (自分のメッセージのみ)
             if (isMe) {
                 const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn absolute top-[-8px] left-[-8px] bg-gray-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-sm hover:bg-red-600 cursor-pointer';
-                deleteBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 14px;">close</span>';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 20px;">close</span>';
                 deleteBtn.title = '削除';
                 deleteBtn.onclick = () => deleteMessage(id);
                 bubble.appendChild(deleteBtn);
             }
 
+            // 本文
             const textP = document.createElement('p');
-            textP.className = 'text-gray-800 whitespace-pre-wrap';
+            textP.className = 'msg-text whitespace-pre-wrap leading-relaxed';
             textP.textContent = text;
 
             bubble.appendChild(header);

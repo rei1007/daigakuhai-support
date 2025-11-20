@@ -5,81 +5,211 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配信台本表示</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    
     <style>
-        body { font-family: 'Kosugi Maru', sans-serif; scroll-behavior: smooth; }
+        /* --- テーマ定義 (共通) --- */
+        :root {
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #D1D5DB;
+            --color-accent: #1F2937;
+        }
+
+        body { 
+            font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif; 
+            background-color: var(--color-bg);
+            color: var(--color-main);
+            scroll-behavior: smooth; 
+        }
+
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        /* 台本タイルスタイル */
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+            font-size: 24px;
+        }
+
+        /* --- 台本タイルスタイル --- */
         .script-paragraph {
-            background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 1.25rem; 
-            padding: 1.25rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease-in-out; opacity: 0.9;
+            background-color: var(--color-panel); 
+            border: 2px solid var(--color-main); 
+            border-radius: 0.75rem; 
+            padding: 1.5rem; 
+            margin-bottom: 1.25rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            box-shadow: 4px 4px 0 0 var(--color-shadow); /* ハードシャドウ */
+            position: relative;
+            opacity: 0.9;
+        }
+
+        /* ホバー時の挙動 */
+        .script-paragraph:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
         
-        /* 変更: 読み取り専用モード時のカーソルをデフォルトに戻す */
+        /* 過去の段落 */
+        .paragraph-past { 
+            background-color: #E5E7EB; 
+            border-color: #9CA3AF; 
+            color: #6B7280;
+            opacity: 0.6; 
+            box-shadow: none;
+        }
+        .paragraph-past:hover { opacity: 0.8; transform: none; }
+
+        /* アクティブな段落 (強調) */
+        .paragraph-active {
+            background-color: var(--color-main); 
+            border-color: var(--color-main);
+            color: white;
+            opacity: 1; 
+            transform: scale(1.02);
+            box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .paragraph-active:hover {
+            transform: scale(1.02); /* アクティブ時は動かさない */
+            box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
+        }
+
+        /* 読み取り専用モード (ロック中かつ権限なし) */
         body.read-only-mode .script-paragraph {
             cursor: default;
         }
         body.read-only-mode .script-paragraph:hover {
-            opacity: 0.9; /* ホバー効果を無効化 */
-            background-color: #F9FAFB;
+            transform: none;
+            box-shadow: 4px 4px 0 0 var(--color-shadow); /* 元の影のまま */
         }
-        
-        .paragraph-future { background-color: #F9FAFB; border-color: #E5E7EB; opacity: 0.9; }
-        .paragraph-future:hover { background-color: #F3F4F6; border-color: #D1D5DB; }
-        
-        /* 変更: 読み取り専用モードではhover時の変化を抑える */
-        body.read-only-mode .paragraph-future:hover {
-            background-color: #F9FAFB; 
-            border-color: #E5E7EB;
-        }
-        
-        .paragraph-past { background-color: #F9FAFB; border-color: #E5E7EB; opacity: 0.45; }
-        .paragraph-past:hover { opacity: 0.7; }
-
-        /* アクティブな段落 (強調) */
-        .paragraph-active {
-            background-color: #ffffff; border-color: #111827; 
-            box-shadow: 0 4px 10px -1px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.1);
-            opacity: 1; transform: scale(1.02);
-        }
-        
-        /* 【修正点】読み取り専用モードでも強調効果(transform, shadow)を維持する */
+        /* 読み取り専用でもアクティブ表示は維持 */
         body.read-only-mode .paragraph-active {
-            /* transform: none; ← 削除 */
-            /* box-shadow: none; ← 削除 */
-            border-color: #111827; 
+            box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
         }
 
+
+        /* --- 話者ラベル --- */
         .speaker-name {
-            display: inline-block; font-weight: 600; margin-bottom: 0.75rem; font-size: 1.125rem; 
-            background-color: #F3F4F6; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #D1D5DB;
+            display: inline-block; 
+            font-weight: 900; 
+            font-size: 0.9rem; 
+            margin-bottom: 0.5rem; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 9999px; 
+            border: 2px solid var(--color-main);
+            background-color: #F3F4F6;
+            color: var(--color-main);
         }
-        .paragraph-active .speaker-name { background-color: #111827; color: #F9FAFB; border-color: #111827; }
         
+        /* アクティブ時の話者ラベル */
+        .paragraph-active .speaker-name { 
+            background-color: white; 
+            color: var(--color-main); 
+            border-color: white; 
+        }
+        
+        /* 特殊な話者スタイル */
+        .speaker-memo .speaker-name { 
+            background-color: #FEF3C7; 
+            border-color: #D97706; 
+            color: #92400E; 
+        }
+        .paragraph-active.speaker-memo .speaker-name { 
+            background-color: #FBBF24; 
+            color: #78350F; 
+            border-color: #FBBF24; 
+        }
+
+        .speaker-action .speaker-name { 
+            background-color: transparent; 
+            border-color: transparent; 
+            color: #4B5563; 
+            font-style: italic; 
+        }
+        .paragraph-active.speaker-action .speaker-name { 
+            color: #D1D5DB; 
+        }
+
+        /* --- 本文 --- */
         .line-text { 
-            color: #1F2937; 
+            font-size: 1.1rem;
             line-height: 1.8; 
             white-space: pre-line; 
+            font-weight: 500;
         }
-        .paragraph-past .line-text { color: #4B5563; }
-
-        .speaker-memo .speaker-name { background-color: #FEF3C7; border-color: #FDE68A; color: #92400E; font-style: italic; }
-        .paragraph-active.speaker-memo .speaker-name { background-color: #D97706; color: #ffffff; border-color: #D97706; }
         
-        .speaker-action .speaker-name { background-color: transparent; border-color: transparent; color: #4B5563; font-style: italic; font-weight: 500; font-size: 1rem; }
-        .paragraph-active.speaker-action .speaker-name { background-color: transparent; border-color: transparent; color: #111827; font-weight: 600; }
+        /* --- ロックボタン --- */
+        #lock-btn-container {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 50;
+            display: none; /* デフォルト非表示（権限チェック後に表示） */
+        }
+        
+        .lock-btn {
+            width: 64px; height: 64px;
+            border-radius: 9999px;
+            border: 2px solid var(--color-main);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 4px 4px 0 0 rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        
+        .lock-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2); }
+        .lock-btn:active { transform: translate(0, 0); box-shadow: none; }
+
+        /* ロック状態 */
+        .btn-locked {
+            background-color: #EF4444; /* Red */
+            color: white;
+            border-color: #991B1B;
+        }
+        /* アンロック状態 */
+        .btn-unlocked {
+            background-color: #10B981; /* Green */
+            color: white;
+            border-color: #065F46;
+        }
+
+        /* ステータスインジケータ (全員に見える) */
+        #lock-status-indicator {
+            position: fixed; top: 1rem; right: 1rem;
+            background-color: #EF4444; color: white;
+            padding: 0.5rem 1rem; border-radius: 0.5rem;
+            font-weight: 900; font-size: 0.8rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.2);
+            border: 2px solid #991B1B;
+            z-index: 40;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #lock-status-indicator.show { opacity: 1; }
+
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="text-gray-900">
+    
+    <div id="lock-status-indicator">
+        <span class="material-symbols-rounded" style="font-size: 18px;">lock</span>
+        LOCKED
+    </div>
+
     <div class="max-w-[1080px] mx-auto">
-        <main id="script-container" class="p-4 md:p-6">
-            <div class="text-center text-gray-500 py-10">台本データを読み込み中...</div>
+        <main id="script-container" class="p-4 md:p-8 pb-32">
+            <div class="text-center text-gray-500 py-10 font-bold">台本データを読み込み中...</div>
         </main>
+    </div>
+    
+    <div id="lock-btn-container">
+        <button id="lock-toggle-btn" class="lock-btn btn-unlocked" title="操作ロック切替">
+            <span class="material-symbols-rounded" id="lock-icon">lock_open</span>
+        </button>
     </div>
     
     <script type="module">
@@ -100,59 +230,75 @@
         const broadcastRef = doc(db, "state", "broadcast");
         const scriptContainer = document.getElementById('script-container');
         
-        // 現在のアクティブな行番号を保持
+        // ロック機能用要素
+        const lockBtnContainer = document.getElementById('lock-btn-container');
+        const lockToggleBtn = document.getElementById('lock-toggle-btn');
+        const lockIcon = document.getElementById('lock-icon');
+        const lockStatusIndicator = document.getElementById('lock-status-indicator');
+
         let currentActiveIndex = 0;
         
-        // --- 追加: ユーザー情報と権限管理 ---
+        // 状態管理
         let currentUser = { name: '', role: '' };
-        let isReadOnly = true; 
+        let isScriptLocked = false; // Firestoreからの値
+        let canControl = false;     // 現在のユーザーが操作可能か
 
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'settings-update') {
                 currentUser = event.data.user;
-                applyRoleRestrictions();
+                updatePermissions();
             }
         });
 
-        function applyRoleRestrictions() {
-            // 配信担当者のみが編集可能（読み取り専用ではない）
-            isReadOnly = (currentUser.role !== '配信担当');
+        // 権限とUIの更新
+        function updatePermissions() {
+            const isBroadcaster = (currentUser.role === '配信担当');
             
-            if (isReadOnly) {
-                document.body.classList.add('read-only-mode');
+            // 配信担当だけがロックボタンを見える
+            if (isBroadcaster) {
+                lockBtnContainer.style.display = 'block';
             } else {
-                document.body.classList.remove('read-only-mode');
+                lockBtnContainer.style.display = 'none';
             }
-            // スタイル変更はCSSで行うため、ここではクラス制御のみ
-        }
-        // ------------------------------------
 
+            // 操作可能かどうかの判定
+            // 1. 配信担当は常に操作可能 (ロック中でも)
+            // 2. それ以外は、ロックされていない場合のみ操作可能
+            if (isBroadcaster) {
+                canControl = true;
+            } else {
+                canControl = !isScriptLocked;
+            }
+
+            updateReadOnlyStyle();
+        }
+
+        function updateReadOnlyStyle() {
+            if (canControl) {
+                document.body.classList.remove('read-only-mode');
+            } else {
+                document.body.classList.add('read-only-mode');
+            }
+        }
 
         // --- JSON読み込み処理 ---
         async function loadScript() {
             try {
                 const response = await fetch('../json/script.json');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const scriptData = await response.json();
                 initializeScript(scriptData);
-                
             } catch (error) {
                 console.error("台本データの読み込みに失敗しました:", error);
                 scriptContainer.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-center">
-                        <p class="font-bold mb-2">読み込みエラー</p>
-                        <p class="text-sm">script.jsonが見つからないか、形式が正しくありません。</p>
-                        <p class="text-xs mt-2 text-gray-500">${error.message}</p>
+                    <div class="bg-red-50 border-2 border-red-500 text-red-700 p-6 rounded-xl text-center shadow-md">
+                        <p class="font-black mb-2 text-lg">ERROR</p>
+                        <p class="font-bold">台本データの読み込みに失敗しました。</p>
                     </div>
                 `;
             }
         }
 
-        // --- 初期化処理 ---
         function initializeScript(data) {
             scriptContainer.innerHTML = ''; 
 
@@ -175,12 +321,9 @@
                 tile.appendChild(lineText);
                 scriptContainer.appendChild(tile);
             });
-
-            // データ読み込み完了後に現在の位置を反映
             updateScriptView(currentActiveIndex);
         }
 
-        // --- スクロール関数 ---
         function scrollToActive(element) {
             const target = element || document.querySelector('.paragraph-active');
             if (target) {
@@ -188,11 +331,9 @@
             }
         }
 
-        // --- 表示更新ロジック ---
         function updateScriptView(activeIndex) {
             currentActiveIndex = activeIndex; 
             const allTiles = document.querySelectorAll('.script-paragraph');
-            
             if (allTiles.length === 0) return;
 
             let activeTile = null;
@@ -206,7 +347,6 @@
                 } 
                 else { tile.classList.add('paragraph-future'); }
             });
-            
             if (activeTile) { scrollToActive(activeTile); }
         }
 
@@ -214,16 +354,48 @@
         onSnapshot(broadcastRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
+                
+                // 台本位置の更新
                 if (data.scriptIndex !== undefined) { 
                     updateScriptView(data.scriptIndex); 
                 }
+                
+                // ロック状態の更新
+                isScriptLocked = !!data.scriptLocked;
+                updateLockUI();
+                updatePermissions(); // ロック状態が変わったので操作権限も再評価
             }
         });
 
-        // --- クリック時の更新 ---
+        function updateLockUI() {
+            // ボタンの見た目更新
+            if (isScriptLocked) {
+                lockToggleBtn.classList.remove('btn-unlocked');
+                lockToggleBtn.classList.add('btn-locked');
+                lockIcon.textContent = 'lock';
+                lockStatusIndicator.classList.add('show'); // インジケータ表示
+            } else {
+                lockToggleBtn.classList.remove('btn-locked');
+                lockToggleBtn.classList.add('btn-unlocked');
+                lockIcon.textContent = 'lock_open';
+                lockStatusIndicator.classList.remove('show'); // インジケータ非表示
+            }
+        }
+
+        // --- アクション: ロック切り替え ---
+        lockToggleBtn.addEventListener('click', async () => {
+            const newState = !isScriptLocked;
+            try {
+                await setDoc(broadcastRef, { scriptLocked: newState }, { merge: true });
+            } catch (e) {
+                console.error("Lock update failed:", e);
+            }
+        });
+
+        // --- アクション: 台本進行 ---
         scriptContainer.addEventListener('click', async (e) => {
-            // 【変更】配信担当者以外は処理を中断
-            if (isReadOnly) return;
+            // 操作権限がない場合は中断
+            if (!canControl) return;
             
             const clickedTile = e.target.closest('.script-paragraph');
             if (clickedTile) {
@@ -232,7 +404,6 @@
             }
         });
 
-        // --- 親フレームからのスクロール指示 ---
         window.addEventListener('message', (event) => {
             if (event.data === 'scroll-to-current') {
                 scrollToActive();

@@ -8,123 +8,293 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <style>
-        :root { --color-alpha: #d0be08; --color-bravo: #3a0ccd; }
-        .text-alpha { color: var(--color-alpha); } .border-alpha { border-color: var(--color-alpha); } .bg-alpha-light { background-color: #FFFBEB; } .bg-alpha-dark { background-color: #3f3902; } 
-        .text-bravo { color: var(--color-bravo); } .border-bravo { border-color: var(--color-bravo); } .bg-bravo-light { background-color: #F0F5FF; } .bg-bravo-dark { background-color: #17054f; } 
-        body { font-family: 'Kosugi Maru', sans-serif; background-color: #F3F4F6; color: #1F2937; overflow: hidden; }
-        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #f1f1f1; } ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 6px; } ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+        /* --- テーマ定義 (共通) --- */
+        :root {
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #D1D5DB;
+            
+            --color-alpha: #d0be08;
+            --color-bravo: #3a0ccd;
+            
+            --color-alpha-bg: #FEFCE8; /* yellow-50 */
+            --color-bravo-bg: #EFF6FF; /* blue-50 */
+        }
 
-        .team-card { background-color: #ffffff; border-radius: 1.25rem; padding: 1.5rem; border: 1px solid #E5E7EB; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); height: 100%; display: flex; flex-direction: column; }
-        .team-header { padding-bottom: 1rem; margin-bottom: 1rem; text-align: center; }
-        .team-title { font-size: 2.5rem; font-weight: 900; line-height: 1.1; }
-        .team-subtitle { font-size: 1.5rem; font-weight: 700; color: #374151; margin-top: 0.5rem; }
+        body { 
+            font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
+            background-color: var(--color-bg); 
+            color: var(--color-main); 
+            overflow: hidden; 
+        }
         
-        /* サークル名 (クリッカブル) */
-        .team-circle { font-size: 1.3rem; font-weight: 600; color: #6B7280; transition: color 0.2s; }
-        .team-circle.clickable:hover { color: #2563EB; text-decoration: underline; cursor: pointer; }
-        
-        /* 変更: ふりがなを大きく */
-        .kana-text { font-size: 1.1rem; font-weight: 500; color: #4B5563; }
-        
-        .avg-xp-pill { display: inline-block; padding: 0.25rem 1rem; border-radius: 9999px; font-weight: 800; font-size: 1.1rem; margin-top: 0.75rem; border-width: 2px; border-style: solid; letter-spacing: 0.05em; }
-        .xp-pill-alpha { background-color: #FFFBEB; color: #d0be08; border-color: #d0be08; }
-        .xp-pill-bravo { background-color: #F0F5FF; color: #3a0ccd; border-color: #3a0ccd; }
-        .detail-text strong { display: block; font-size: 1.1rem; margin-bottom: 0.3rem; font-weight: 800; }
-        .detail-content { font-size: 1.1rem; line-height: 1.6; color: #1F2937; padding: 0.3rem 0; font-weight: 500; min-height: 2.5em; }
-        .player-name-main { font-size: 1.5rem; font-weight: 800; }
-        .player-weapon-main { font-size: 1.1rem; font-weight: 600; color: #4B5563; }
-        .player-xp-main { font-size: 0.95rem; font-weight: 700; }
-        .team-select { width: 100%; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #D1D5DB; background-color: #ffffff; font-family: 'Kosugi Maru', sans-serif; font-size: 0.875rem; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
-        .team-select:focus { outline: none; border-color: #111827; box-shadow: 0 0 0 1px #111827; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-        /* 復帰ボタンアニメーション */
-        .sync-btn-enter { animation: fadeInUp 0.3s ease-out forwards; }
-        .sync-btn-exit { animation: fadeOutDown 0.3s ease-in forwards; }
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+            font-size: 24px;
+        }
+
+        /* --- チームカード --- */
+        .team-card { 
+            background-color: var(--color-panel); 
+            border-radius: 1rem; 
+            padding: 1.5rem; 
+            border: 2px solid var(--color-main); 
+            box-shadow: 6px 6px 0 0 var(--color-shadow);
+            height: 100%; 
+            display: flex; flex-direction: column; 
+        }
+        
+        .border-alpha { border-top: 8px solid var(--color-alpha); }
+        .border-bravo { border-top: 8px solid var(--color-bravo); }
+        
+        .text-alpha { color: var(--color-alpha); }
+        .text-bravo { color: var(--color-bravo); }
+
+        .team-header { padding-bottom: 1.5rem; margin-bottom: 1.5rem; text-align: center; border-bottom: 2px dashed #E5E7EB; }
+        .team-title { font-size: 2.5rem; font-weight: 900; line-height: 1.2; margin-bottom: 0.5rem; }
+        .team-subtitle { font-size: 1.2rem; font-weight: 700; color: #4B5563; margin-top: 0.5rem; }
+        
+        .team-circle { 
+            font-size: 1.25rem; font-weight: 700; color: #6B7280; 
+            transition: all 0.2s; display: inline-block;
+        }
+        .team-circle.clickable:hover { 
+            color: #2563EB; text-decoration: underline; cursor: pointer; 
+        }
+        
+        .kana-text { font-size: 1rem; font-weight: 500; color: #9CA3AF; }
+        
+        /* 平均XPバッジ */
+        .avg-xp-pill { 
+            display: inline-block; 
+            padding: 0.3rem 1.2rem; 
+            border-radius: 9999px; 
+            font-weight: 900; 
+            font-size: 1.1rem; 
+            margin-top: 0.75rem; 
+            border-width: 2px; 
+            border-style: solid; 
+            letter-spacing: 0.05em; 
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+        .xp-pill-alpha { 
+            background-color: var(--color-alpha); 
+            color: white; 
+            border-color: var(--color-alpha); 
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        .xp-pill-bravo { 
+            background-color: var(--color-bravo); 
+            color: white; 
+            border-color: var(--color-bravo); 
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+
+        
+        /* 詳細情報エリア */
+        .detail-box {
+            margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 0.75rem;
+            border: 1px solid transparent;
+        }
+        .bg-alpha-light { background-color: var(--color-alpha-bg); border-color: #FEF08A; } 
+        .bg-bravo-light { background-color: var(--color-bravo-bg); border-color: #BFDBFE; } 
+        
+        .detail-text strong { display: block; font-size: 0.9rem; margin-bottom: 0.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
+        .detail-content { font-size: 1.15rem; line-height: 1.6; color: #374151; font-weight: 500; min-height: 1.5em; }
+
+        /* プレイヤーリスト */
+        .member-list { list-style: none; padding: 0; }
+        .player-item {
+            padding: 1rem; 
+            background-color: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-left-width: 5px;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            transition: transform 0.1s;
+        }
+        .player-item:hover { transform: translateX(2px); }
+        
+        .player-name-main { font-size: 1.4rem; font-weight: 700; color: #1F2937; }
+        .player-weapon-main { font-size: 1.1rem; font-weight: 500; color: #6B7280; margin-top: 0.25rem; }
+        
+        .player-xp-badge {
+            font-size: 0.9rem; font-weight: 900; color: white;
+            padding: 0.25rem 0.75rem; border-radius: 9999px;
+            box-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        }
+        .bg-alpha-dark { background-color: #A16207; }
+        .bg-bravo-dark { background-color: #1D4ED8; }
+
+        /* チーム選択フッター (レイアウト修正: flex-shrink-0) */
+        .footer-select-area {
+            flex-shrink: 0; /* 固定サイズ */
+            background-color: var(--color-panel);
+            border-top: 2px solid var(--color-main);
+            padding: 1.5rem; 
+            z-index: 30;
+            width: 100%; 
+            /* absolute, bottom:0 を削除し、flexフローに参加させる */
+        }
+        .team-select { 
+            width: 100%; padding: 1rem; border-radius: 0.5rem; 
+            border: 2px solid var(--color-main); 
+            background-color: #F9FAFB; 
+            font-weight: 700; color: var(--color-main); font-size: 1rem;
+            cursor: pointer; appearance: none; 
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231F2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); 
+            background-position: right 1rem center; background-repeat: no-repeat; background-size: 1.25em 1.25em;
+        }
+        .team-select:focus { outline: none; background-color: white; box-shadow: 2px 2px 0 0 var(--color-shadow); }
+
+        /* 同期ボタン (絶対配置でフロートさせる) */
+        #sync-match-btn {
+            position: absolute; /* container内での絶対配置 */
+            bottom: 7rem; /* フッターの高さ分 + マージン */
+            left: 50%; transform: translateX(-50%); z-index: 40;
+            background-color: var(--color-main); color: white;
+            font-weight: 900; padding: 1rem 2rem;
+            border-radius: 9999px;
+            border: 2px solid var(--color-main);
+            box-shadow: 4px 4px 0 0 rgba(0,0,0,0.2);
+            display: flex; items-center; gap: 0.75rem;
+            transition: all 0.2s;
+            opacity: 0; pointer-events: none;
+        }
+        #sync-match-btn.show {
+            opacity: 1; pointer-events: auto;
+            animation: fadeInUp 0.3s ease-out forwards;
+        }
+        #sync-match-btn:hover {
+            background-color: white; color: var(--color-main);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
+        }
+        #sync-match-btn span { font-size: 1.25rem; }
+
         @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-        @keyframes fadeOutDown { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, 20px); } }
 
         /* モーダル */
-        .modal-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(2px); }
+        .modal-overlay { 
+            position: fixed; inset: 0; background-color: rgba(255,255,255,0.8); 
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; 
+        }
         .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .modal-content { background: white; width: 90%; max-width: 600px; max-height: 85vh; border-radius: 1.5rem; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: scale(0.95); transition: transform 0.2s; }
+        
+        .modal-content { 
+            background: white; width: 90%; max-width: 600px; max-height: 85vh; 
+            border-radius: 1rem; 
+            border: 2px solid var(--color-main);
+            box-shadow: 8px 8px 0 0 var(--color-main);
+            overflow: hidden; display: flex; flex-direction: column; 
+            transform: scale(0.95); transition: transform 0.2s; 
+        }
         .modal-overlay.show .modal-content { transform: scale(1); }
 
-        /* モバイル用タブボタン */
-        .mobile-tab-btn { flex: 1; padding: 0.75rem; font-weight: 800; text-align: center; border-radius: 0.75rem; transition: all 0.2s; border: 2px solid transparent; }
-        .tab-active-alpha { background-color: var(--color-alpha); color: white; border-color: var(--color-alpha); }
+        /* モバイルタブ */
+        .mobile-tab-btn { flex: 1; padding: 0.75rem; font-weight: 900; text-align: center; border-radius: 0.5rem; transition: all 0.2s; border: 2px solid transparent; }
+        .tab-active-alpha { background-color: var(--color-alpha); color: white; border-color: var(--color-main); }
         .tab-inactive-alpha { background-color: white; color: var(--color-alpha); border-color: var(--color-alpha); }
-        .tab-active-bravo { background-color: var(--color-bravo); color: white; border-color: var(--color-bravo); }
+        .tab-active-bravo { background-color: var(--color-bravo); color: white; border-color: var(--color-main); }
         .tab-inactive-bravo { background-color: white; color: var(--color-bravo); border-color: var(--color-bravo); }
     </style>
 </head>
 <body>
 
-    <div class="max-w-[1080px] mx-auto flex flex-col h-screen bg-gray-100 relative">
+    <div class="max-w-[1080px] mx-auto flex flex-col h-screen border-x-0 md:border-x-2 border-gray-200 relative">
         
-        <div class="md:hidden px-4 pt-4 pb-2 bg-gray-100 flex-shrink-0 z-10">
+        <div class="md:hidden px-4 pt-4 pb-2 flex-shrink-0 z-10">
             <div class="flex gap-3">
                 <button id="tab-btn-alpha" class="mobile-tab-btn tab-active-alpha" onclick="switchMobileTab('alpha')">ALPHA TEAM</button>
                 <button id="tab-btn-bravo" class="mobile-tab-btn tab-inactive-bravo" onclick="switchMobileTab('bravo')">BRAVO TEAM</button>
             </div>
         </div>
 
-        <main class="flex-1 overflow-y-auto p-4 pt-2 pb-32"> 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <main class="flex-1 overflow-y-auto p-4 md:p-6"> 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
                 
-                <div id="alpha-card" class="team-card border-t-4 border-alpha md:block">
+                <div id="alpha-card" class="team-card border-alpha md:block">
                     <div class="team-header">
                         <span class="block text-xs font-black mb-1 tracking-widest text-alpha">ALPHA TEAM</span>
                         <h2 id="alpha-name" class="team-title text-gray-900">未選択</h2>
-                        <p id="alpha-name-kana" class="kana-text"></p>
-                        <div class="flex justify-center"><p id="alpha-avg-xp" class="avg-xp-pill xp-pill-alpha hidden">平均XP: -</p></div>
-                        <p id="alpha-univ" class="team-subtitle mt-4">-</p>
-                        <p id="alpha-circle" class="team-circle">-</p>
-                        <p id="alpha-circle-kana" class="kana-text"></p>
+                        <p id="alpha-name-kana" class="kana-text text-center"></p>
+                        
+                        <div class="flex flex-col items-center mt-4 gap-1">
+                            <p id="alpha-univ" class="team-subtitle">-</p>
+                            <p id="alpha-circle" class="team-circle">-</p>
+                            <p id="alpha-circle-kana" class="kana-text"></p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <p id="alpha-avg-xp" class="avg-xp-pill xp-pill-alpha hidden">平均XP: -</p>
+                        </div>
                     </div>
-                    <div class="space-y-4 text-sm mb-4 border-y border-gray-100 py-4 bg-alpha-light rounded-md px-3">
-                        <div id="alpha-comment" class="detail-text"><strong class="text-alpha">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
-                        <div id="alpha-records" class="detail-text"><strong class="text-alpha">実績</strong><p class="detail-content">-</p></div>
-                        <div id="alpha-tactics" class="detail-text"><strong class="text-alpha">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
+                    
+                    <div class="detail-box bg-alpha-light">
+                        <div id="alpha-comment" class="mb-4"><strong class="text-alpha">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
+                        <div id="alpha-records" class="mb-4"><strong class="text-alpha">実績</strong><p class="detail-content">-</p></div>
+                        <div id="alpha-tactics"><strong class="text-alpha">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
                     </div>
-                    <ul id="alpha-members" class="member-list"><li class="text-gray-400 justify-center text-center p-3">チームを選択してください</li></ul>
+                    
+                    <ul id="alpha-members" class="member-list"><li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li></ul>
                 </div>
 
-                <div id="bravo-card" class="team-card border-t-4 border-bravo hidden md:block">
+                <div id="bravo-card" class="team-card border-bravo hidden md:block">
                     <div class="team-header">
                         <span class="block text-xs font-black mb-1 tracking-widest text-bravo">BRAVO TEAM</span>
                         <h2 id="bravo-name" class="team-title text-gray-900">未選択</h2>
-                        <p id="bravo-name-kana" class="kana-text"></p>
-                        <div class="flex justify-center"><p id="bravo-avg-xp" class="avg-xp-pill xp-pill-bravo hidden">平均XP: -</p></div>
-                        <p id="bravo-univ" class="team-subtitle mt-4">-</p>
-                        <p id="bravo-circle" class="team-circle">-</p>
-                        <p id="bravo-circle-kana" class="kana-text"></p>
+                        <p id="bravo-name-kana" class="kana-text text-center"></p>
+                        
+                        <div class="flex flex-col items-center mt-4 gap-1">
+                            <p id="bravo-univ" class="team-subtitle">-</p>
+                            <p id="bravo-circle" class="team-circle">-</p>
+                            <p id="bravo-circle-kana" class="kana-text"></p>
+                        </div>
+
+                        <div class="mt-4">
+                            <p id="bravo-avg-xp" class="avg-xp-pill xp-pill-bravo hidden">平均XP: -</p>
+                        </div>
                     </div>
-                    <div class="space-y-4 text-sm mb-4 border-y border-gray-100 py-4 bg-bravo-light rounded-md px-3">
-                        <div id="bravo-comment" class="detail-text"><strong class="text-bravo">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
-                        <div id="bravo-records" class="detail-text"><strong class="text-bravo">実績</strong><p class="detail-content">-</p></div>
-                        <div id="bravo-tactics" class="detail-text"><strong class="text-bravo">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
+                    
+                    <div class="detail-box bg-bravo-light">
+                        <div id="bravo-comment" class="mb-4"><strong class="text-bravo">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
+                        <div id="bravo-records" class="mb-4"><strong class="text-bravo">実績</strong><p class="detail-content">-</p></div>
+                        <div id="bravo-tactics"><strong class="text-bravo">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
                     </div>
-                    <ul id="bravo-members" class="member-list"><li class="text-gray-400 justify-center text-center p-3">チームを選択してください</li></ul>
+                    
+                    <ul id="bravo-members" class="member-list"><li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li></ul>
                 </div>
 
             </div>
         </main>
 
-        <button id="sync-match-btn" class="hidden fixed bottom-24 left-1/2 transform -translate-x-1/2 z-40 
-                                           bg-gray-900 text-white font-bold py-2.5 px-5 rounded-full shadow-lg text-base
-                                           flex items-center gap-2 hover:bg-gray-800 transition-colors">
-            <span class="material-symbols-rounded !text-xl">sync_alt</span>
-            <span>対戦チームに戻す</span>
+        <button id="sync-match-btn">
+            <span class="material-symbols-rounded">sync_alt</span>
+            対戦チームに戻す
         </button>
 
-        <footer class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-300 p-4 z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <div class="grid grid-cols-2 gap-4 max-w-[1080px] mx-auto">
-                <div class="flex flex-col gap-1"><label for="alpha-select" class="text-xs font-bold text-gray-500 ml-1">ALPHA</label><select id="alpha-select" class="team-select"><option value="">選択してください</option></select></div>
-                <div class="flex flex-col gap-1"><label for="bravo-select" class="text-xs font-bold text-gray-500 ml-1">BRAVO</label><select id="bravo-select" class="team-select"><option value="">選択してください</option></select></div>
+        <footer class="footer-select-area shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)]">
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <div class="flex flex-col gap-1">
+                    <label for="alpha-select" class="text-xs font-black text-gray-500 ml-1">ALPHA</label>
+                    <select id="alpha-select" class="team-select"><option value="">選択してください</option></select>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="bravo-select" class="text-xs font-black text-gray-500 ml-1">BRAVO</label>
+                    <select id="bravo-select" class="team-select"><option value="">選択してください</option></select>
+                </div>
             </div>
         </footer>
 
@@ -132,26 +302,26 @@
 
     <div id="circle-modal" class="modal-overlay">
         <div class="modal-content bg-white">
-            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
-                    <span class="material-symbols-rounded text-blue-600">diversity_3</span>サークル情報
+            <div class="p-6 border-b-2 border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-black text-xl text-gray-800 flex items-center gap-2">
+                    <span class="material-symbols-rounded text-blue-600">diversity_3</span> CIRCLE INFO
                 </h3>
                 <button onclick="closeCircleModal()" class="p-2 hover:bg-gray-200 rounded-full transition-colors"><span class="material-symbols-rounded">close</span></button>
             </div>
-            <div class="p-6 overflow-y-auto bg-white">
-                <div class="flex flex-col items-center text-center mb-6">
-                    <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 shadow-sm mb-4">
+            <div class="p-8 overflow-y-auto bg-white">
+                <div class="flex flex-col items-center text-center mb-8">
+                    <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-900 shadow-md mb-4">
                         <img id="modal-circle-img" src="" alt="サークルアイコン" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23e5e7eb\' viewBox=\'0 0 24 24\'%3e%3cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/%3e%3c/svg%3e'">
                     </div>
-                    <p id="modal-circle-univ" class="text-sm text-gray-500 font-bold mb-1">大学名</p>
-                    <h2 id="modal-circle-name" class="text-2xl font-black text-gray-900 mb-3">サークル名</h2>
+                    <p id="modal-circle-univ" class="text-sm font-bold text-gray-500 mb-1 uppercase tracking-widest">UNIVERSITY</p>
+                    <h2 id="modal-circle-name" class="text-3xl font-black text-gray-900 mb-4">サークル名</h2>
                     <div class="flex flex-wrap justify-center gap-3 mb-4">
-                        <span id="modal-circle-id" class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-bold border border-blue-100"></span>
-                        <span id="modal-circle-win" class="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-sm font-bold border border-orange-100"></span>
+                        <span id="modal-circle-id" class="inline-flex items-center px-4 py-1.5 rounded-md bg-blue-50 text-blue-700 text-base font-bold border border-blue-200"></span>
+                        <span id="modal-circle-win" class="inline-flex items-center px-4 py-1.5 rounded-md bg-orange-50 text-orange-700 text-base font-bold border border-orange-200"></span>
                     </div>
                 </div>
-                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p id="modal-circle-comment" class="text-gray-700 leading-relaxed whitespace-pre-wrap font-medium"></p>
+                <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <p id="modal-circle-comment" class="text-gray-700 leading-relaxed whitespace-pre-wrap font-medium text-lg"></p>
                 </div>
             </div>
         </div>
@@ -209,23 +379,17 @@
                 alpha: {
                     name: document.getElementById('alpha-name'), kana: document.getElementById('alpha-name-kana'), avgXp: document.getElementById('alpha-avg-xp'),
                     univ: document.getElementById('alpha-univ'), circle: document.getElementById('alpha-circle'), circleKana: document.getElementById('alpha-circle-kana'),
-                    
-                    // 変更: ID取得を意図した要素に変更
                     records: document.getElementById('alpha-records').querySelector('.detail-content'), 
                     tactics: document.getElementById('alpha-tactics').querySelector('.detail-content'),
                     comment: document.getElementById('alpha-comment').querySelector('.detail-content'), 
-                    
                     members: document.getElementById('alpha-members')
                 },
                 bravo: {
                     name: document.getElementById('bravo-name'), kana: document.getElementById('bravo-name-kana'), avgXp: document.getElementById('bravo-avg-xp'),
                     univ: document.getElementById('bravo-univ'), circle: document.getElementById('bravo-circle'), circleKana: document.getElementById('bravo-circle-kana'),
-                    
-                    // 変更: ID取得を意図した要素に変更
                     records: document.getElementById('bravo-records').querySelector('.detail-content'), 
                     tactics: document.getElementById('bravo-tactics').querySelector('.detail-content'),
                     comment: document.getElementById('bravo-comment').querySelector('.detail-content'), 
-                    
                     members: document.getElementById('bravo-members')
                 }
             };
@@ -235,7 +399,6 @@
             let activeMatchState = { alphaId: "", bravoId: "" };
             let isSynced = true; 
 
-            // --- データのロード ---
             async function loadData() {
                 try {
                     const [teamsRes, circleRes] = await Promise.all([
@@ -247,7 +410,7 @@
                     if (circleRes.ok) circleData = await circleRes.json();
 
                     initSelects();
-                    restoreLocalState(); // データロード後に状態復元
+                    restoreLocalState(); 
                 } catch (error) {
                     console.error('Failed to load data:', error);
                 }
@@ -266,12 +429,10 @@
             }
 
             function formatKana(kana) {
-                // kana-textクラスのCSSがfont-size: 1.1rem;に設定されています
-                return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="kana-text ml-1">(${kana})</span>` : '';
+                return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="ml-1">(${kana})</span>` : '';
             }
             function formatPlayerKana(kana) {
-                // 変更: text-sm (0.875rem) から text-base (1.0rem) に変更
-                return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="text-base font-medium text-gray-500 ml-2">(${kana})</span>` : '';
+                return (kana && kana.trim() !== '----' && kana.trim().length > 0) ? `<span class="text-sm font-medium text-gray-400 ml-2">(${kana})</span>` : '';
             }
 
             function updateTeamDisplay(side, teamId) {
@@ -279,7 +440,7 @@
                 const el = els[side];
                 const isAlpha = side === 'alpha';
                 const xpBgColor = isAlpha ? 'bg-alpha-dark' : 'bg-bravo-dark';
-                const baseColor = isAlpha ? 'var(--color-alpha)' : 'var(--color-bravo)';
+                const borderColor = isAlpha ? '#d0be08' : '#3a0ccd'; 
 
                 if (team) {
                     el.name.textContent = team.teamName || 'チーム名なし';
@@ -302,12 +463,10 @@
 
                     el.circleKana.innerHTML = formatKana(team.circle_kana);
                     
-                    // 変更: 意気込み -> 実績 -> 作戦 の順に内容をセット
                     el.comment.textContent = team.comment || 'なし'; 
                     el.records.textContent = team.records || 'なし'; 
                     el.tactics.textContent = team.tactics || 'なし'; 
 
-                    // 変更点1: 最大XPプレイヤーを特定し、目印を付けるロジックを実装
                     let maxXP = -1;
                     const players = [];
 
@@ -315,7 +474,6 @@
                         const xpStr = team[`p${i}_xp`];
                         let xp = -1;
                         if (xpStr && xpStr.trim() !== '----') {
-                            // XPを数値としてパース
                             xp = parseInt(xpStr);
                             if (isNaN(xp)) xp = -1; 
                         }
@@ -328,10 +486,8 @@
                             weapon: team[`p${i}_weapon`]
                         };
 
-                        // 有効なプレイヤー名がある場合のみリストに追加
                         if (player.name && player.name.trim() !== '----') {
                             players.push(player);
-                            // 最大XPを更新
                             if (xp > maxXP) {
                                 maxXP = xp;
                             }
@@ -342,7 +498,6 @@
                     let memberCount = 0;
                     
                     players.forEach(player => {
-                        // 有効なXPの中で最大値を持つプレイヤーを特定 (N/A等は除外)
                         const isMaxXP = (maxXP > 0 && player.xp === maxXP); 
                         
                         if (player.name && player.name.trim() !== '----') {
@@ -351,16 +506,15 @@
                             const playerXp = player.xpStr;
                             const playerWeapon = player.weapon;
                             
-                            // 最大XPプレイヤーに目印の星アイコンを付与
                             const marker = isMaxXP 
-                                ? `<span class="material-symbols-rounded text-yellow-500 mr-2 !text-lg" style="font-variation-settings: 'FILL' 1, 'wght' 700; line-height: 1;">star</span>`
+                                ? `<span class="material-symbols-rounded text-yellow-500 mr-1 !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>`
                                 : '';
                                 
-                            // 最大XPプレイヤーの名前を強調
-                            const nameClass = isMaxXP ? 'font-black text-gray-900' : 'text-gray-900';
+                            const nameClass = isMaxXP ? 'font-black text-gray-900' : 'text-gray-700 font-bold';
                             
                             const li = document.createElement('li');
-                            li.className = `player-item bg-gray-50 p-3 shadow-sm`; li.style.borderLeft = `3px solid ${baseColor}`; 
+                            li.className = `player-item`; 
+                            li.style.borderLeftColor = borderColor;
                             li.innerHTML = `
                                 <div class="flex justify-between w-full items-center">
                                     <span class="player-name-main ${nameClass} flex flex-row items-baseline">
@@ -368,24 +522,23 @@
                                         <span>${player.name}</span>
                                         ${playerKana}
                                     </span>
-                                    <span class="player-xp-main text-white ${xpBgColor} px-2 py-1 rounded-full shadow-md flex-shrink-0">XP ${playerXp}</span>
+                                    <span class="player-xp-badge ${xpBgColor}">XP ${playerXp}</span>
                                 </div>
-                                <div class="player-weapon-main text-gray-700 mt-2">${playerWeapon || 'ブキ情報なし'}</div>
+                                <div class="player-weapon-main">${playerWeapon || 'ブキ情報なし'}</div>
                             `;
                             el.members.appendChild(li);
                         }
                     });
                     
-                    if (memberCount === 0) el.members.innerHTML = '<li class="text-gray-400 justify-center text-center p-3">メンバー情報なし</li>';
+                    if (memberCount === 0) el.members.innerHTML = '<li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">メンバー情報なし</li>';
                 } else {
                     el.name.textContent = '未選択'; el.kana.innerHTML = ''; el.avgXp.textContent = '平均XP: -'; el.avgXp.classList.add('hidden');
                     el.univ.textContent = '-'; el.circle.textContent = '-'; el.circle.classList.remove('clickable'); el.circle.onclick = null; el.circleKana.innerHTML = '';
                     el.records.textContent = '-'; el.tactics.textContent = '-'; el.comment.textContent = '-';
-                    el.members.innerHTML = '<li class="text-gray-400 justify-center text-center p-3">チームを選択してください</li>';
+                    el.members.innerHTML = '<li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li>';
                 }
             }
 
-            // --- 状態管理と同期 (復活) ---
             function saveLocalState() {
                 localStorage.setItem('tv_isSynced', isSynced);
                 localStorage.setItem('tv_alphaId', alphaSelect.value);
@@ -403,12 +556,9 @@
                     bravoSelect.value = savedBravo;
                     updateTeamDisplay('alpha', savedAlpha);
                     updateTeamDisplay('bravo', savedBravo);
-                    updateSyncButton();
+                    checkSyncStatus(); 
                 } else {
-                    // 同期モードならFirestoreからのデータを待つが、既にデータがあれば適用
-                    if (activeMatchState.alphaId || activeMatchState.bravoId) {
-                        syncToActiveMatch();
-                    }
+                    // 同期モードならFirestoreからのデータを待つ
                 }
             }
 
@@ -418,7 +568,7 @@
                 updateTeamDisplay('alpha', alphaSelect.value);
                 updateTeamDisplay('bravo', bravoSelect.value);
                 isSynced = true;
-                updateSyncButton();
+                checkSyncStatus();
                 saveLocalState();
             }
 
@@ -429,38 +579,48 @@
                 saveLocalState();
             }
 
+            // 同期状態とボタン表示のチェック
             function checkSyncStatus() {
                 const currentAlpha = alphaSelect.value;
                 const currentBravo = bravoSelect.value;
-                if (currentAlpha === (activeMatchState.alphaId || "") && currentBravo === (activeMatchState.bravoId || "")) {
+                const matchAlpha = activeMatchState.alphaId || "";
+                const matchBravo = activeMatchState.bravoId || "";
+
+                if (currentAlpha === matchAlpha && currentBravo === matchBravo) {
                     isSynced = true;
+                    localStorage.setItem('tv_isSynced', isSynced);
                 }
-                updateSyncButton();
-            }
 
-            function updateSyncButton() {
                 if (isSynced) {
-                    syncMatchBtn.classList.add('hidden'); syncMatchBtn.classList.remove('sync-btn-enter');
+                    syncMatchBtn.classList.remove('show');
                 } else {
-                    syncMatchBtn.classList.remove('hidden'); syncMatchBtn.classList.add('sync-btn-enter');
+                    syncMatchBtn.classList.add('show');
                 }
             }
 
-            // イベントリスナー
             alphaSelect.addEventListener('change', (e) => handleManualChange('alpha', e.target.value));
             bravoSelect.addEventListener('change', (e) => handleManualChange('bravo', e.target.value));
             syncMatchBtn.addEventListener('click', () => syncToActiveMatch());
 
-            // ロード実行
             loadData();
             
-            // 外部連携用フック
             window.teamViewerApp = {
                 updateTeamDisplay: updateTeamDisplay,
                 alphaSelect: alphaSelect,
                 bravoSelect: bravoSelect,
-                setSyncState: (state) => { isSynced = state; updateSyncButton(); saveLocalState(); },
-                setActiveMatch: (state) => { activeMatchState = state; },
+                setSyncState: (state) => { 
+                    isSynced = state; 
+                    checkSyncStatus(); 
+                    saveLocalState(); 
+                },
+                setActiveMatch: (state) => { 
+                    activeMatchState = state; 
+                    if (isSynced) {
+                        syncToActiveMatch();
+                    } else {
+                        checkSyncStatus();
+                    }
+                },
                 getSyncState: () => isSynced,
                 checkSync: checkSyncStatus
             };
@@ -489,25 +649,16 @@
                 const data = docSnap.data();
                 const newState = { alphaId: data.alphaTeamId, bravoId: data.bravoTeamId };
                 
-                const trySync = () => {
-                    if (window.teamViewerApp) {
-                        const appLogic = window.teamViewerApp;
-                        appLogic.setActiveMatch(newState);
-                        
-                        if (appLogic.getSyncState()) {
-                            appLogic.alphaSelect.value = newState.alphaId || "";
-                            appLogic.bravoSelect.value = newState.bravoId || "";
-                            appLogic.updateTeamDisplay('alpha', appLogic.alphaSelect.value);
-                            appLogic.updateTeamDisplay('bravo', appLogic.bravoSelect.value);
-                            appLogic.setSyncState(true);
-                        } else {
-                            appLogic.checkSync();
+                if (window.teamViewerApp) {
+                    window.teamViewerApp.setActiveMatch(newState);
+                } else {
+                    const checkApp = setInterval(() => {
+                        if (window.teamViewerApp) {
+                            window.teamViewerApp.setActiveMatch(newState);
+                            clearInterval(checkApp);
                         }
-                    } else {
-                        setTimeout(trySync, 100);
-                    }
-                };
-                trySync();
+                    }, 100);
+                }
             }
         });
     </script>
