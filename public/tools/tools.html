@@ -3,15 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>大学杯 配信ツール</title>
-    <link rel="icon" href="../icons/favicon.ico">
+    <link rel="icon" href="icons/favicon.ico">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap" rel="stylesheet">
 
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -24,30 +24,42 @@
             --color-bg: #F3F4F6;
             --color-panel: #FFFFFF;
             --color-shadow: #D1D5DB;
-            --color-warning-bg: #FEF08A; /* yellow-200 */
-            --color-warning-text: #854D0E; /* yellow-800 */
-            --color-warning-border: #EAB308; /* yellow-500 */
+            --color-warning-bg: #FEF08A;
+            --color-warning-text: #854D0E;
+            --color-warning-border: #EAB308;
         }
 
         body {
             font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
-            background-color: var(--color-bg); /* アプリ外側の背景色 */
+            background-color: var(--color-bg);
             color: var(--color-main);
             overflow: hidden; 
             display: flex;
-            justify-content: center; /* 中央寄せ */
-            height: 100vh;
+            justify-content: center;
+            
+            /* スマホのアドレスバー対策 */
+            height: 100vh; /* フォールバック */
+            height: 100dvh; /* Dynamic Viewport Height: アドレスバーを除いた実際の高さ */
+            width: 100%;
+        }
+
+        /* セーフエリア対応ユーティリティ (iPhone等のホームバー対策) */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        .pt-safe {
+            padding-top: env(safe-area-inset-top, 0px);
         }
 
         /* アプリ本体のコンテナ */
         #app-container {
             width: 100%;
-            max-width: 1080px; /* 1080pxで固定 */
+            max-width: 1080px;
             background-color: #FFFFFF;
             display: flex;
             flex-direction: column;
             height: 100%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1); /* 境界をわかりやすくするための影 */
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
             position: relative;
         }
 
@@ -68,6 +80,7 @@
             border-right: 2px solid var(--color-main); 
             height: 100%;
             position: relative;
+            flex: 1; /* 均等割り付け */
         }
         .nav-btn:last-child {
             border-right: none; 
@@ -206,11 +219,9 @@
 
     <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] 
                 p-4 cursor-pointer flex items-start gap-4 transition-transform">
-        
         <div class="flex-shrink-0 text-blue-600 mt-1">
             <span class="material-symbols-rounded">chat</span>
         </div>
-
         <div class="flex-1 min-w-0">
             <div class="flex justify-between items-baseline mb-1">
                 <p id="notif-sender" class="text-sm font-black text-gray-900 uppercase tracking-wider">Sender</p>
@@ -218,7 +229,6 @@
             </div>
             <p id="notif-text" class="text-base font-bold text-gray-700 leading-snug line-clamp-2">Message content</p>
         </div>
-
         <button class="close-notification-btn text-gray-400 hover:text-gray-900" onclick="event.stopPropagation(); hideNotification();">
             <span class="material-symbols-rounded">close</span>
         </button>
@@ -257,7 +267,7 @@
     </div>
 
     <div id="app-container">
-        <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 z-20">
+        <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 z-20 pt-safe">
             <div class="flex justify-between items-center px-4 py-3 h-16 relative">
                 
                 <div class="flex gap-2">
@@ -270,11 +280,12 @@
                 </div>
 
                 <h1 id="header-title" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                                        text-xl md:text-2xl font-black text-gray-900 tracking-tight whitespace-nowrap transition-opacity duration-300">
+                                        text-lg md:text-2xl font-black text-gray-900 tracking-tight whitespace-nowrap transition-opacity duration-300 text-center">
                     配信画面コントローラー
                 </h1>
 
-                <div class="flex items-center justify-end min-w-[88px]"> <div id="header-trouble-status" class="hidden">
+                <div class="flex items-center justify-end min-w-[88px]"> 
+                    <div id="header-trouble-status" class="hidden">
                         <span class="material-symbols-rounded mr-1 !text-xl">error</span>
                         <span id="trouble-message">トラブル対応中</span>
                     </div>
@@ -292,23 +303,23 @@
 
         <nav class="flex-shrink-0 bg-white border-t-2 border-gray-900 z-20 pb-safe">
             <div class="flex h-20"> 
-                <button class="nav-btn flex-1" data-target="chat" onclick="switchTab('chat')">
+                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')">
                     <span class="material-symbols-rounded">chat</span>
                     <span class="nav-label">CHAT</span>
                 </button>
-                <button class="nav-btn active flex-1" data-target="controller" onclick="switchTab('controller')">
+                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')">
                     <span class="material-symbols-rounded">gamepad</span>
                     <span class="nav-label">CONTROL</span>
                 </button>
-                <button class="nav-btn flex-1" data-target="match" onclick="switchTab('match')">
+                <button class="nav-btn" data-target="match" onclick="switchTab('match')">
                     <span class="material-symbols-rounded">tune</span>
                     <span class="nav-label" id="match-nav-text">MATCH SET</span>
                 </button>
-                <button class="nav-btn flex-1" data-target="team" onclick="switchTab('team')">
+                <button class="nav-btn" data-target="team" onclick="switchTab('team')">
                     <span class="material-symbols-rounded">groups</span>
                     <span class="nav-label">TEAMS</span>
                 </button>
-                <button class="nav-btn flex-1" data-target="script" onclick="switchTab('script')">
+                <button class="nav-btn" data-target="script" onclick="switchTab('script')">
                     <span class="material-symbols-rounded">description</span>
                     <span class="nav-label">SCRIPT</span>
                 </button>
@@ -420,7 +431,6 @@
         let currentTab = 'controller';
         let lastMessageTimestamp = Date.now();
 
-        // 日本語メッセージに変更
         const troubleMessages = { 'lag': 'ラグ対応中', 'stream': '配信トラブル', 'admin': '運営トラブル' };
 
         onSnapshot(broadcastRef, (docSnap) => {
@@ -473,7 +483,7 @@
         }
 
         window.hideNotification = function () {
-            chatNotification.classList.add('hidden');
+       chatNotification.classList.add('hidden');
             chatNotification.classList.remove('notification-animate');
             if (notificationTimeout) clearTimeout(notificationTimeout);
         };
