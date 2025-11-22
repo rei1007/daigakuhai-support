@@ -554,6 +554,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const matchRef = doc(db, "state", "match");
+        const settingsRef = doc(db, "state", "settings");
 
         // DOM要素
         const roundNameInput = document.getElementById('round-name');
@@ -573,6 +574,7 @@
 
         let teamsData = [];
         let stagesData = [];
+        let allowedStages = null; // null means "all allowed" or "settings not loaded yet"
 
         let currentState = {
             roundName: "本戦第一試合",
@@ -673,7 +675,13 @@
 
         function initModal() {
             modalStageGrid.innerHTML = '';
-            stagesData.forEach(stageName => {
+            
+            // 許可されたステージのみをフィルタリング
+            const stagesToShow = (allowedStages && allowedStages.length > 0) 
+                ? stagesData.filter(s => allowedStages.includes(s))
+                : stagesData;
+
+            stagesToShow.forEach(stageName => {
                 const div = document.createElement('div');
                 div.className = 'modal-stage-item bg-gray-100 relative';
                 div.style.paddingTop = '77.5%'; // 40:31 ratio
@@ -801,6 +809,8 @@
             catch (e) { console.error("Save error:", e); }
         }
 
+        // --- Listeners ---
+
         onSnapshot(matchRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -813,6 +823,14 @@
                 renderUI();
             } else {
                 saveState(currentState);
+            }
+        });
+
+        onSnapshot(settingsRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                allowedStages = data.allowedStages; // array or undefined
+                if (stagesData.length > 0) initModal();
             }
         });
 
