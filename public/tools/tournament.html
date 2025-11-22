@@ -265,13 +265,13 @@
             width: 44px; height: 32px; font-weight: 900; text-align: center;
             border: 1px solid #D1D5DB; border-radius: 0.25rem; background: #FFFFFF; cursor: pointer;
         }
-        .win-btn {
+        .win-badge {
             width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--color-main); border-radius: 50%; cursor: pointer;
-            color: #D1D5DB; background: #FFF; transition: all 0.1s;
+            border: 2px solid #E5E7EB; border-radius: 50%;
+            color: #D1D5DB; background: #FFF; 
+            cursor: default; pointer-events: none;
         }
-        .win-btn:hover { background: #F3F4F6; color: var(--color-main); }
-        .win-btn.active { background: var(--color-main); color: #FFF; border-color: var(--color-main); }
+        .win-badge.active { background: var(--color-main); color: #FFF; border-color: var(--color-main); }
         
         /* Connector */
         .match-card::after {
@@ -287,8 +287,7 @@
             pointer-events: none; background-color: transparent; border: none; appearance: none;
             color: var(--color-main); padding-left: 0;
         }
-        body.read-only-mode .win-btn { pointer-events: none; cursor: default; }
-        body.read-only-mode .win-btn:not(.active) { opacity: 0.2; border-color: transparent; background: transparent; }
+        body.read-only-mode .win-badge:not(.active) { opacity: 0.2; border-color: transparent; background: transparent; }
         body.read-only-mode .round-name-input { pointer-events: none; border-color: transparent; }
         body.read-only-mode .live-btn { pointer-events: none; }
 
@@ -572,6 +571,16 @@
                 }
             });
 
+            // 対戦設定の監視 (スコア等の自動同期)
+            onSnapshot(matchRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.tournamentMatchId && tournamentData.matches[data.tournamentMatchId]) {
+                        handleMatchUpdate(data.tournamentMatchId, data);
+                    }
+                }
+            });
+
             // 大会設定の監視
             onSnapshot(settingsRef, (docSnap) => {
                 if (docSnap.exists()) {
@@ -579,6 +588,42 @@
                     renderBracket(); // 設定反映のために再描画
                 }
             });
+        }
+
+        function handleMatchUpdate(matchId, matchData) {
+            const match = tournamentData.matches[matchId];
+            if (!match) return;
+
+            let alphaWins = 0;
+            let bravoWins = 0;
+            if (matchData.games && Array.isArray(matchData.games)) {
+                matchData.games.forEach(g => {
+                    if (g.winner === 'alpha') alphaWins++;
+                    if (g.winner === 'bravo') bravoWins++;
+                });
+            }
+
+            let needsUpdate = false;
+            
+            if (match.scoreA !== alphaWins) { match.scoreA = alphaWins; needsUpdate = true; }
+            if (match.scoreB !== bravoWins) { match.scoreB = bravoWins; needsUpdate = true; }
+
+            const boType = matchData.boType || 'BO3';
+            const winThreshold = boType === 'BO5' ? 3 : 2;
+            
+            let newWinner = null;
+            if (alphaWins >= winThreshold) newWinner = 'alpha';
+            else if (bravoWins >= winThreshold) newWinner = 'bravo';
+            
+            if (match.winner !== newWinner) {
+                match.winner = newWinner;
+                needsUpdate = true;
+            }
+
+            if (needsUpdate) {
+                renderBracket();
+                saveTournamentData(); 
+            }
         }
 
         async function saveTournamentData() {
@@ -612,7 +657,6 @@
             let hasChanges = false;
             const totalRounds = Math.log2(currentFormat);
 
-            // Round 2 ~ Final
             for (let r = 2; r <= totalRounds; r++) {
                 const matchCount = currentFormat / Math.pow(2, r);
                 for (let m = 1; m <= matchCount; m++) {
@@ -682,7 +726,6 @@
                 else rName = `ラウンド ${roundNum}`;
             }
 
-            // Determine BO Type based on round
             const boType = getRoundFormat(roundNum, totalRounds);
             const gameCount = boType === 'BO5' ? 5 : 3;
             const games = Array(gameCount).fill({ stage: "未決定", winner: "none" });
@@ -692,7 +735,8 @@
                 bravoTeamId: match.bravo,
                 roundName: rName,
                 games: games,
-                boType: boType 
+                boType: boType,
+                tournamentMatchId: matchId
             };
             setDoc(matchRef, syncData, { merge: true }).catch(e => console.error("Sync error:", e));
         }
@@ -752,20 +796,27 @@
 
         window.updateScore = (matchId, side, score) => {
             if(isReadOnly) return;
-            const updates = {};
-            if (side === 'alpha') updates.scoreA = parseInt(score);
-            if (side === 'bravo') updates.scoreB = parseInt(score);
-            updateMatchData(matchId, updates);
-        };
+            
+            const match = tournamentData.matches[matchId] || { scoreA: 0, scoreB: 0 };
+            const newScoreA = side === 'alpha' ? parseInt(score) : (match.scoreA || 0);
+            const newScoreB = side === 'bravo' ? parseInt(score) : (match.scoreB || 0);
 
-        window.toggleWinner = (matchId, side) => {
-            if(isReadOnly) return;
-            const currentWinner = tournamentData.matches[matchId]?.winner;
-            let newWinner = side;
-            if (currentWinner === side) {
-                newWinner = null;
-            }
-            updateMatchData(matchId, { winner: newWinner });
+            const roundNum = parseInt(matchId.split('_')[0].replace('r', ''));
+            const totalRounds = Math.log2(currentFormat);
+            const boType = getRoundFormat(roundNum, totalRounds);
+            const threshold = boType === 'BO5' ? 3 : 2;
+
+            let newWinner = null;
+            if (newScoreA >= threshold) newWinner = 'alpha';
+            else if (newScoreB >= threshold) newWinner = 'bravo';
+
+            const updates = {
+                scoreA: newScoreA,
+                scoreB: newScoreB,
+                winner: newWinner
+            };
+            
+            updateMatchData(matchId, updates);
         };
 
         function updateMatchData(matchId, updates) {
@@ -777,7 +828,6 @@
             }
 
             propagateBracketData();
-            
             renderBracket();
             saveTournamentData();
         }
@@ -895,10 +945,9 @@
                 <select class="score-select" onchange="updateScore('${matchId}', '${side}', this.value)" ${disabledAttr}>
                     ${getScoreOptions(score, boType)}
                 </select>
-                <button class="win-btn ${isWinner ? 'active' : ''}" 
-                        onclick="toggleWinner('${matchId}', '${side}')" title="勝利" ${disabledAttr}>
+                <div class="win-badge ${isWinner ? 'active' : ''}" title="${isWinner ? 'WINNER' : ''}">
                     <span class="material-symbols-rounded text-base">emoji_events</span>
-                </button>
+                </div>
             `;
             contentHTML += `</div>`;
             row.innerHTML = contentHTML;
