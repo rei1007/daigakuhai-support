@@ -26,7 +26,7 @@
         rel="stylesheet" />
 
     <style>
-        /* --- テーマ定義 (Friendly Brutalism) --- */
+        /* --- テーマ定義 --- */
         :root {
             --color-main: #1F2937;
             --color-bg: #F3F4F6;
@@ -34,53 +34,27 @@
             --color-shadow: #D1D5DB;
             --color-warning-bg: #FEF08A;
             --color-warning-text: #854D0E;
-            --color-warning-border: #EAB308;
+            --color-edit-mode: #2563EB; /* 編集モード用のアクセントカラー */
         }
 
-        /* --- PWA対応のコアレイアウト --- */
-        html {
-            height: 100%;
-            overflow: hidden;
-            /* バウンス防止 */
-        }
-
+        /* --- レイアウト基盤 --- */
+        html { height: 100%; overflow: hidden; }
         body {
             font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
             background-color: var(--color-bg);
             color: var(--color-main);
-
-            /* 画面を完全に固定する設定 */
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            overscroll-behavior: none;
-            /* 引っ張り更新などを無効化 */
-
-            display: flex;
-            justify-content: center;
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            overflow: hidden; overscroll-behavior: none;
+            display: flex; justify-content: center;
         }
 
-        /* セーフエリア対応ユーティリティ */
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom, 20px);
-        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 
-        .pt-safe {
-            padding-top: env(safe-area-inset-top, 0px);
-        }
-
-        /* アプリ本体のコンテナ */
         #app-container {
-            width: 100%;
-            max-width: 1080px;
-            background-color: #FFFFFF;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            position: relative;
+            width: 100%; max-width: 1080px; background-color: #FFFFFF;
+            display: flex; flex-direction: column; height: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); position: relative;
         }
 
         .material-symbols-rounded {
@@ -88,191 +62,310 @@
             font-size: 24px;
         }
 
-        /* --- ナビゲーションボタン --- */
-        .nav-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #6B7280;
-            transition: all 0.2s ease;
-            background-color: #FFFFFF;
-            border-right: 2px solid var(--color-main);
-            height: 100%;
-            position: relative;
-            flex: 1;
-        }
-
-        .nav-btn:last-child {
-            border-right: none;
-        }
-
-        .nav-btn:hover {
-            background-color: #F3F4F6;
-            color: var(--color-main);
-        }
-
-        /* アクティブ状態 */
-        .nav-btn.active {
-            background-color: var(--color-main);
-            color: #FFFFFF;
-        }
-
-        .nav-btn.active .material-symbols-rounded {
-            color: #FFFFFF;
-        }
-
-        .nav-btn.active .nav-label {
-            color: #FFFFFF;
-        }
-
-        .nav-label {
-            font-size: 0.65rem;
-            font-weight: 900;
-            letter-spacing: 0.05em;
-            margin-top: 0.25rem;
-            text-transform: uppercase;
-        }
-
-        /* --- メインコンテンツエリア --- */
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            background-color: #F9FAFB;
-        }
-
-        /* --- ヘッダー要素 --- */
+        /* --- ヘッダー --- */
+        header { z-index: 50; position: relative; }
         .header-icon-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--color-main);
-            background: #fff;
-            color: var(--color-main);
-            transition: all 0.2s;
-            border-radius: 0.5rem;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--color-main); background: #fff; color: var(--color-main);
+            transition: all 0.2s; border-radius: 0.5rem; cursor: pointer;
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
-
-        .header-icon-btn:hover {
-            background: var(--color-main);
-            color: #fff;
+        .header-icon-btn:hover { 
+            background: var(--color-main); color: #fff; 
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 0 var(--color-shadow);
+        }
+        .header-icon-btn:active {
+            transform: translate(0, 0);
+            box-shadow: none;
         }
 
         #header-trouble-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 700;
-            background-color: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            border: 2px solid var(--color-main);
-            border-radius: 0.5rem;
-            white-space: nowrap;
-            /* 折り返し防止 */
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;
+            font-size: 0.875rem; font-weight: 700;
+            background-color: var(--color-warning-bg); color: var(--color-warning-text);
+            border: 2px solid var(--color-main); border-radius: 0.5rem; white-space: nowrap;
+        }
+        #header-trouble-status.hidden { display: none !important; }
+
+        /* --- ナビゲーション --- */
+        nav { z-index: 50; position: relative; }
+        .nav-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #6B7280; transition: all 0.2s ease; background-color: #FFFFFF;
+            border-right: 2px solid var(--color-main); height: 100%; position: relative; flex: 1;
+            cursor: pointer;
+        }
+        .nav-btn:last-child { border-right: none; }
+        .nav-btn:hover { background-color: #F3F4F6; color: var(--color-main); }
+        
+        .nav-btn.active {
+            background-color: #E5E7EB; color: var(--color-main);
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .nav-btn.active .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
+
+        .menu-btn-container {
+            background-color: var(--color-main); color: white; border-right: 2px solid var(--color-main);
+        }
+        .menu-btn-container:hover { background-color: #374151; color: white; }
+        .menu-btn-container.open { background-color: #111827; }
+
+        .nav-label {
+            font-size: 0.65rem; font-weight: 900; letter-spacing: 0.05em;
+            margin-top: 0.25rem; text-transform: uppercase;
         }
 
-        #header-trouble-status.hidden {
-            display: none !important;
+        /* --- メニューオーバーレイ (Brutalist Card Style) --- */
+        .menu-overlay {
+            position: absolute;
+            /* ナビバーの上に浮かせる */
+            bottom: 1rem; 
+            left: 1rem; 
+            right: 1rem;
+            
+            background-color: #FFFFFF;
+            /* 太い枠線とハードシャドウ */
+            border: 3px solid var(--color-main);
+            border-radius: 1.5rem; /* 全角丸 */
+            box-shadow: 8px 8px 0 0 rgba(31, 41, 55, 0.2);
+            
+            padding: 1.5rem;
+            display: flex; flex-direction: column; gap: 1rem;
+            max-height: calc(100% - 2rem); /* はみ出し防止 */
+            overflow-y: auto;
+            
+            /* アニメーション */
+            transform: translateY(150%); /* 完全に下に隠す */
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 60;
         }
+        .menu-overlay.show { transform: translateY(0); }
+
+        /* メニュー内ヘッダー */
+        .menu-section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 0.5rem; height: 32px;
+        }
+        .menu-section-title {
+            font-size: 1rem; font-weight: 900; color: #111827;
+            letter-spacing: 0.05em;
+        }
+
+        /* 編集ボタン */
+        .edit-toggle-btn {
+            font-size: 0.85rem; font-weight: 900;
+            padding: 0.25rem 1rem;
+            border: 2px solid var(--color-main);
+            border-radius: 9999px;
+            background-color: #FFFFFF;
+            color: var(--color-main);
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
+            transition: all 0.1s;
+        }
+        .edit-toggle-btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: none;
+        }
+        /* 編集モード中のスタイル */
+        .edit-toggle-btn.editing {
+            background-color: var(--color-edit-mode);
+            color: white;
+            border-color: var(--color-edit-mode);
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 仕切り線 */
+        .menu-divider {
+            border-top: 3px dashed #E5E7EB;
+            margin: 0.5rem 0;
+        }
+
+        /* アイコングリッド */
+        .tool-grid-nav, .tool-grid-pool {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem 0.5rem;
+            justify-items: center;
+            width: 100%;
+        }
+
+        /* ツールアイコンボタン */
+        .tool-btn {
+            width: 100%; max-width: 72px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            cursor: pointer; transition: transform 0.1s;
+            background: transparent; border: none;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* アイコンボックス (Brutalist) */
+        .tool-icon-box {
+            width: 56px; height: 56px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 14px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            
+            background-color: #FFFFFF;
+            border: 2px solid var(--color-main);
+            box-shadow: 3px 3px 0 0 var(--color-shadow); /* ハードシャドウ */
+            color: var(--color-main);
+            position: relative;
+        }
+        
+        .tool-btn:active .tool-icon-box {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 0 var(--color-shadow);
+        }
+
+        /* ナビバー枠のアイコンスタイル (強調) */
+        .tool-grid-nav .tool-btn .tool-icon-box {
+            background-color: #F3F4F6;
+            border-width: 2px;
+        }
+
+        .tool-btn span.icon { font-size: 32px; pointer-events: none; }
+        .tool-btn span.label {
+            font-size: 0.7rem; font-weight: 800; color: #4B5563;
+            line-height: 1.2; text-align: center; width: 100%;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            pointer-events: none;
+        }
+
+        /* --- 編集モード時のスタイル --- */
+        
+        /* 編集モードでなければドラッグ不可・クリックのみ */
+        .tool-btn.disabled-edit { cursor: pointer; }
+
+        /* 編集モード時: 揺れるアニメーション & 色変化 */
+        .editing-mode .tool-btn .tool-icon-box {
+            animation: jiggle 0.3s infinite alternate;
+            border-color: var(--color-edit-mode);
+            color: var(--color-edit-mode);
+            cursor: grab;
+        }
+        
+        /* 編集バッジ */
+        .editing-mode .tool-btn .tool-icon-box::after {
+            content: 'swap_horiz'; /* Google Font Icon */
+            font-family: 'Material Symbols Rounded';
+            font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            position: absolute; top: -6px; right: -6px;
+            width: 20px; height: 20px;
+            background-color: var(--color-edit-mode);
+            color: white;
+            border-radius: 50%;
+            border: 2px solid white;
+            z-index: 5;
+        }
+        
+        .editing-mode .tool-btn:active .tool-icon-box {
+            cursor: grabbing;
+            animation: none;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        @keyframes jiggle {
+            0% { transform: rotate(-3deg); }
+            100% { transform: rotate(3deg); }
+        }
+
+        /* ドラッグ中 */
+        .tool-btn.dragging { opacity: 0.2; }
+
+        /* タップ選択中 (入れ替え待ち) */
+        .tool-btn.selected-swap .tool-icon-box {
+            background-color: var(--color-edit-mode); color: white;
+            border-color: var(--color-edit-mode);
+            box-shadow: 3px 3px 0 0 rgba(0,0,0,0.3);
+            animation: none; /* 揺れを止めて強調 */
+            transform: scale(1.1) !important;
+            z-index: 20;
+        }
+        .tool-btn.selected-swap .tool-icon-box::after {
+            content: 'check'; /* 選択中はチェックマーク */
+            background-color: white; color: var(--color-edit-mode); border-color: var(--color-edit-mode);
+        }
+
+        /* バックドロップ */
+        .menu-backdrop {
+            position: absolute; inset: 0; z-index: 55;
+            background-color: rgba(0,0,0,0.3);
+            backdrop-filter: blur(2px);
+            transition: opacity 0.3s; opacity: 0; pointer-events: none;
+        }
+        .menu-backdrop.show { opacity: 1; pointer-events: auto; }
+
+        /* --- メインエリア --- */
+        main { flex: 1; position: relative; overflow: hidden; background-color: white; z-index: 10; }
+        iframe { border: none; width: 100%; height: 100%; background-color: #F9FAFB; }
 
         /* --- モーダル --- */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
+        .modal-overlay-full {
+            position: fixed; inset: 0; background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100;
         }
-
         .modal-content {
-            background: #FFFFFF;
-            width: 90%;
-            max-width: 480px;
-            border: 2px solid var(--color-main);
-            box-shadow: 8px 8px 0 var(--color-main);
-            padding: 0;
-            border-radius: 1rem;
+            background: #FFFFFF; width: 90%; max-width: 480px;
+            border: 2px solid var(--color-main); box-shadow: 8px 8px 0 var(--color-main);
+            padding: 0; border-radius: 1rem;
         }
-
         .input-brutal {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #D1D5DB;
-            background-color: #F9FAFB;
-            font-weight: 700;
-            color: var(--color-main);
-            transition: border-color 0.2s;
-            border-radius: 0.5rem;
+            width: 100%; padding: 0.75rem; border: 2px solid #D1D5DB; background-color: #F9FAFB;
+            font-weight: 700; color: var(--color-main); border-radius: 0.5rem;
         }
-
-        .input-brutal:focus {
-            outline: none;
-            border-color: var(--color-main);
-            background-color: #FFF;
-            box-shadow: 2px 2px 0 var(--color-shadow);
-        }
-
         .btn-brutal {
-            background-color: var(--color-main);
-            color: white;
-            font-weight: 900;
-            padding: 0.75rem 1.5rem;
-            border: 2px solid var(--color-main);
-            transition: all 0.2s;
-            border-radius: 0.5rem;
-            box-shadow: 2px 2px 0 var(--color-shadow);
+            background-color: var(--color-main); color: white; font-weight: 900;
+            padding: 0.75rem 1.5rem; border: 2px solid var(--color-main); border-radius: 0.5rem;
+            box-shadow: 2px 2px 0 var(--color-shadow); cursor: pointer;
         }
 
-        .btn-brutal:hover {
-            background-color: white;
-            color: var(--color-main);
-            transform: translate(-1px, -1px);
-            box-shadow: 4px 4px 0 var(--color-shadow);
-        }
-
-        /* --- 通知バナー --- */
+        /* 通知 */
         #chat-notification {
-            border: 2px solid var(--color-main);
-            background: #FFFFFF;
-            box-shadow: 4px 4px 0 var(--color-shadow);
-            border-radius: 0.75rem;
+            border: 2px solid var(--color-main); background: #FFFFFF;
+            box-shadow: 4px 4px 0 var(--color-shadow); border-radius: 0.75rem; z-index: 90;
         }
-
         @keyframes slideInDown {
-            from {
-                transform: translate(-50%, -120%);
-                opacity: 0;
-            }
+            from { transform: translate(-50%, -120%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .notification-animate { animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
+        /* オンボーディング */
+        .onboarding-bubble {
+            position: absolute; bottom: calc(5rem + env(safe-area-inset-bottom, 20px) + 10px);
+            left: 50%; transform: translateX(-50%);
+            background-color: var(--color-main); color: white;
+            padding: 0.75rem 1rem; border-radius: 0.75rem;
+            font-weight: 700; font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 80;
+            animation: bounce 1s infinite; pointer-events: none; display: none;
+        }
+        .onboarding-bubble::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+            border-left: 8px solid transparent; border-right: 8px solid transparent;
+            border-top: 8px solid var(--color-main);
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
         }
 
-        .notification-animate {
-            animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 
 <body>
 
-    <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-[480px] 
+    <div id="chat-notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 w-[95%] max-w-[480px] 
                 p-4 cursor-pointer flex items-start gap-4 transition-transform">
-
         <div class="flex-shrink-0 text-blue-600 mt-1">
             <span class="material-symbols-rounded">chat</span>
         </div>
-
         <div class="flex-1 min-w-0">
             <div class="flex justify-between items-baseline mb-1">
                 <p id="notif-sender" class="text-sm font-black text-gray-900 uppercase tracking-wider">Sender</p>
@@ -280,64 +373,63 @@
             </div>
             <p id="notif-text" class="text-base font-bold text-gray-700 leading-snug line-clamp-2">Message content</p>
         </div>
-
         <button class="close-notification-btn text-gray-400 hover:text-gray-900"
-            onclick="event.stopPropagation(); hideNotification();">
+            onclick="window.UI_TOOLS.hideNotification(event)">
             <span class="material-symbols-rounded">close</span>
         </button>
     </div>
 
-    <div id="settings-modal" class="modal-overlay hidden">
+    <div id="onboarding-bubble" class="onboarding-bubble">
+        他のツールはここから！
+    </div>
+
+    <div id="settings-modal" class="modal-overlay-full hidden">
         <div class="modal-content">
             <div class="p-6 border-b-2 border-gray-100">
                 <h2 class="text-2xl font-black tracking-tight">USER SETTINGS</h2>
-                <p class="text-xs font-bold text-gray-400 mt-1">表示名とロールの設定</p>
+                <p class="text-xs font-bold text-gray-400 mt-1">ロールと表示名の設定</p>
             </div>
             <div class="p-6 space-y-6">
                 <div>
-                    <label for="username-input"
-                        class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">DISPLAY
-                        NAME</label>
-                    <input type="text" id="username-input" placeholder="名前を入力" class="input-brutal">
-                </div>
-                <div>
                     <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">ROLE</label>
                     <div class="relative">
-                        <select id="role-select" class="input-brutal appearance-none cursor-pointer">
+                        <select id="role-select" class="input-brutal appearance-none cursor-pointer" onchange="window.UI_TOOLS.handleRoleChange()">
+                            <option value="" disabled selected>選択してください</option>
                             <option value="運営">運営</option>
                             <option value="配信担当">配信担当</option>
                             <option value="実況">実況</option>
                             <option value="解説">解説</option>
                         </select>
-                        <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
                             <span class="material-symbols-rounded">expand_more</span>
                         </div>
                     </div>
                 </div>
+                <div>
+                    <label class="block text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">DISPLAY NAME</label>
+                    <input type="text" id="username-input" placeholder="名前を入力" class="input-brutal">
+                </div>
             </div>
             <div class="p-4 bg-gray-50 border-t-2 border-gray-100 flex justify-end rounded-b-2xl">
-                <button id="save-settings-btn" class="btn-brutal w-full md:w-auto">SAVE CHANGES</button>
+                <button id="save-settings-btn" class="btn-brutal w-full md:w-auto" onclick="window.UI_TOOLS.saveSettings()">SAVE CHANGES</button>
             </div>
         </div>
     </div>
 
     <div id="app-container">
-        <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 z-20 pt-safe">
+        <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 pt-safe">
             <div class="flex justify-between items-center px-4 py-3 h-16 relative">
-
                 <div class="flex gap-2">
                     <a href="../index.html" class="header-icon-btn" title="ホームに戻る">
                         <span class="material-symbols-rounded">home</span>
                     </a>
-                    <button id="global-settings-btn" class="header-icon-btn" title="ユーザー設定">
+                    <button id="global-settings-btn" class="header-icon-btn" title="ユーザー設定" onclick="window.UI_TOOLS.openSettings()">
                         <span class="material-symbols-rounded">settings</span>
                     </button>
                 </div>
 
-                <h1 id="header-title"
-                    class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                                        text-lg md:text-2xl font-black text-gray-900 tracking-tight whitespace-nowrap transition-opacity duration-300 text-center">
+                <h1 id="header-title" class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                            text-lg md:text-2xl font-black text-gray-900 tracking-tight whitespace-nowrap transition-opacity duration-300 text-center">
                     画面リモコン
                 </h1>
 
@@ -350,253 +442,476 @@
             </div>
         </header>
 
-        <main class="flex-1 relative overflow-hidden bg-white">
-            <iframe id="frame-chat" src="chat.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
-            <iframe id="frame-controller" src="controller.html" class="absolute top-0 left-0 w-full h-full"></iframe>
-            <iframe id="frame-match" src="match-setting.html"
-                class="absolute top-0 left-0 w-full h-full hidden"></iframe>
-            <iframe id="frame-team" src="team-viewer.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
-            <iframe id="frame-script" src="script.html" class="absolute top-0 left-0 w-full h-full hidden"></iframe>
+        <main>
+            <iframe id="frame-chat" src="chat.html" class="absolute top-0 left-0 hidden"></iframe>
+            <iframe id="frame-controller" src="controller.html" class="absolute top-0 left-0"></iframe>
+            <iframe id="frame-match" src="match-setting.html" class="absolute top-0 left-0 hidden"></iframe>
+            <iframe id="frame-team" src="team-viewer.html" class="absolute top-0 left-0 hidden"></iframe>
+            <iframe id="frame-script" src="script.html" class="absolute top-0 left-0 hidden"></iframe>
+            <iframe id="frame-tournament" src="tournament.html" class="absolute top-0 left-0 hidden"></iframe>
+            <iframe id="frame-settings" src="tournament-setting.html" class="absolute top-0 left-0 hidden"></iframe>
+
+            <div id="menu-overlay" class="menu-overlay">
+                <div>
+                    <div class="menu-section-header">
+                        <span class="menu-section-title">マイメニュー</span>
+                        <button id="menu-edit-btn" class="edit-toggle-btn" onclick="window.UI_TOOLS.toggleEditMode()">編集</button>
+                    </div>
+                    <div class="tool-grid-nav" id="grid-nav"></div>
+                </div>
+                
+                <div class="menu-divider"></div>
+
+                <div>
+                    <div class="menu-section-header">
+                        <span class="menu-section-title">ほかのツール</span>
+                    </div>
+                    <div class="tool-grid-pool" id="grid-pool"></div>
+                </div>
+                
+                <p id="menu-instruction" class="text-[10px] text-gray-400 text-center mt-auto font-bold pb-2 hidden">
+                    ドラッグ または タップ2回で入れ替え
+                </p>
+            </div>
+            
+            <div id="menu-backdrop" class="menu-backdrop" onclick="window.UI_TOOLS.toggleMenu()"></div>
         </main>
 
-        <nav class="flex-shrink-0 bg-white border-t-2 border-gray-900 z-20 pb-safe">
-            <div class="flex h-20">
-                <button class="nav-btn" data-target="chat" onclick="switchTab('chat')">
-                    <span class="material-symbols-rounded">forum</span>
-                    <span class="nav-label">CHAT</span>
+        <nav class="flex-shrink-0 bg-white border-t-2 border-gray-900 pb-safe">
+            <div class="flex h-20" id="nav-bar-container">
+                <button class="nav-btn" id="nav-slot-0" onclick="window.UI_TOOLS.handleNavClick(0)"></button>
+                <button class="nav-btn" id="nav-slot-1" onclick="window.UI_TOOLS.handleNavClick(1)"></button>
+                
+                <button class="nav-btn menu-btn-container" id="menu-toggle-btn" onclick="window.UI_TOOLS.toggleMenu()">
+                    <span class="material-symbols-rounded">grid_view</span>
+                    <span class="nav-label">MENU</span>
                 </button>
-                <button class="nav-btn active" data-target="controller" onclick="switchTab('controller')">
-                    <span class="material-symbols-rounded">settings_remote</span>
-                    <span class="nav-label">CONTROL</span>
-                </button>
-                <button class="nav-btn" data-target="match" onclick="switchTab('match')">
-                    <span class="material-symbols-rounded">tune</span>
-                    <span class="nav-label" id="match-nav-text">MATCH SET</span>
-                </button>
-                <button class="nav-btn" data-target="team" onclick="switchTab('team')">
-                    <span class="material-symbols-rounded">group_search</span>
-                    <span class="nav-label">TEAMS</span>
-                </button>
-                <button class="nav-btn" data-target="script" onclick="switchTab('script')">
-                    <span class="material-symbols-rounded">description</span>
-                    <span class="nav-label">SCRIPT</span>
-                </button>
+
+                <button class="nav-btn" id="nav-slot-2" onclick="window.UI_TOOLS.handleNavClick(2)"></button>
+                <button class="nav-btn" id="nav-slot-3" onclick="window.UI_TOOLS.handleNavClick(3)"></button>
             </div>
         </nav>
     </div>
+
+    <script>
+        (function() {
+            // --- Definitions ---
+            const TOOLS = {
+                chat:       { id: 'chat',       label: 'チャット',      icon: 'forum',           title: 'チャット' },
+                controller: { id: 'controller', label: 'リモコン',      icon: 'settings_remote', title: '画面リモコン' },
+                match:      { id: 'match',      label: '対戦設定',      icon: 'tune',            title: '対戦設定' },
+                team:       { id: 'team',       label: 'チーム情報',    icon: 'group_search',    title: 'チーム情報' },
+                script:     { id: 'script',     label: '配信台本',      icon: 'description',     title: '配信台本' },
+                tournament: { id: 'tournament', label: 'トーナメント',  icon: 'emoji_events',    title: 'トーナメント' },
+                settings:   { id: 'settings',   label: '大会設定',      icon: 'settings_applications', title: '大会設定' }
+            };
+            const ALL_IDS = Object.keys(TOOLS);
+            const DEFAULT_SLOTS = ['controller', 'match', 'team', 'script'];
+
+            // --- State ---
+            let navSlots = []; 
+            let poolSlots = []; 
+            let currentTab = 'controller';
+            let swapSelectedId = null; 
+            let isEditMode = false; 
+            let tournamentSettingsData = {}; // 大会設定のキャッシュ
+
+            // Global User
+            window.currentUser = {
+                name: localStorage.getItem('app_user_name') || '',
+                // 初期ロールを空にして、「選択してください」を強制する
+                role: localStorage.getItem('app_user_role') || '', 
+                uid: localStorage.getItem('app_user_uid') || crypto.randomUUID()
+            };
+            if (!localStorage.getItem('app_user_uid')) localStorage.setItem('app_user_uid', window.currentUser.uid);
+
+            // DOM Elements
+            const els = {
+                headerTitle: document.getElementById('header-title'),
+                settingsModal: document.getElementById('settings-modal'),
+                username: document.getElementById('username-input'),
+                role: document.getElementById('role-select'),
+                menuOverlay: document.getElementById('menu-overlay'),
+                menuBackdrop: document.getElementById('menu-backdrop'),
+                menuBtn: document.getElementById('menu-toggle-btn'),
+                onboarding: document.getElementById('onboarding-bubble'),
+                chatNotif: document.getElementById('chat-notification'),
+                gridNav: document.getElementById('grid-nav'),
+                gridPool: document.getElementById('grid-pool'),
+                menuEditBtn: document.getElementById('menu-edit-btn'),
+                menuInstruction: document.getElementById('menu-instruction')
+            };
+
+            // --- Logic ---
+
+            function getToolData(id) {
+                const t = TOOLS[id];
+                if (!t) return { label: '???', icon: 'help', title: '不明' };
+                
+                const isRO = (window.currentUser.role === '実況' || window.currentUser.role === '解説');
+
+                if (id === 'match') {
+                    return { ...t, label: isRO ? '対戦情報' : '対戦設定', title: isRO ? '対戦情報' : '対戦設定' };
+                }
+                
+                if (id === 'settings') {
+                    return { ...t, label: isRO ? '大会情報' : '大会設定', title: isRO ? '大会情報' : '大会設定' };
+                }
+
+                return t;
+            }
+
+            function loadState() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('tools_navSlots'));
+                    if (saved && Array.isArray(saved) && saved.length === 4) {
+                        navSlots = saved;
+                    } else {
+                        navSlots = [...DEFAULT_SLOTS];
+                    }
+                } catch { navSlots = [...DEFAULT_SLOTS]; }
+
+                // 追加されたツールがプールに含まれるように調整
+                const used = new Set(navSlots);
+                poolSlots = ALL_IDS.filter(id => !used.has(id));
+            }
+
+            function saveState() {
+                localStorage.setItem('tools_navSlots', JSON.stringify(navSlots));
+            }
+
+            // --- Render ---
+            function renderNav() {
+                for(let i=0; i<4; i++) {
+                    const btn = document.getElementById(`nav-slot-${i}`);
+                    const tool = getToolData(navSlots[i]);
+                    
+                    const navLabels = {
+                        'chat': 'CHAT', 'controller': 'CONTROL', 'match': 'MATCH',
+                        'team': 'TEAMS', 'script': 'SCRIPT', 'tournament': 'BRACKET', 'settings': 'SETTINGS'
+                    };
+                    let displayLabel = navLabels[navSlots[i]] || tool.label;
+                    
+                    const isRO = (window.currentUser.role === '実況' || window.currentUser.role === '解説');
+                    if(navSlots[i] === 'match') displayLabel = isRO ? 'MATCH INFO' : 'MATCH SET';
+                    if(navSlots[i] === 'settings') displayLabel = isRO ? 'INFO' : 'CUP SET';
+
+                    btn.innerHTML = `<span class="material-symbols-rounded">${tool.icon}</span><span class="nav-label">${displayLabel}</span>`;
+                    btn.classList.toggle('active', currentTab === navSlots[i]);
+                }
+            }
+
+            function createToolBtn(id) {
+                const t = getToolData(id);
+                const div = document.createElement('button');
+                div.className = `tool-btn ${isEditMode ? '' : 'disabled-edit'}`;
+                div.draggable = isEditMode; 
+                
+                if(swapSelectedId === id) div.classList.add('selected-swap');
+                
+                div.innerHTML = `
+                    <div class="tool-icon-box">
+                        <span class="material-symbols-rounded icon">${t.icon}</span>
+                    </div>
+                    <span class="label">${t.label}</span>
+                `;
+                
+                div.onclick = (e) => {
+                    e.stopPropagation();
+
+                    if (!isEditMode) {
+                        API.toggleMenu(); 
+                        API.switchTab(id);
+                        return;
+                    }
+
+                    if (swapSelectedId === null) {
+                        swapSelectedId = id;
+                        renderMenu(); 
+                    } else if (swapSelectedId === id) {
+                        swapSelectedId = null;
+                        renderMenu();
+                    } else {
+                        performSwap(swapSelectedId, id);
+                        swapSelectedId = null;
+                    }
+                };
+
+                if (isEditMode) {
+                    div.ondragstart = (e) => {
+                        e.dataTransfer.setData('text/plain', id);
+                        div.classList.add('dragging');
+                        swapSelectedId = null; 
+                    };
+                    div.ondragend = () => {
+                        div.classList.remove('dragging');
+                    };
+                    div.ondragover = (e) => e.preventDefault();
+                    div.ondrop = (e) => {
+                        e.preventDefault();
+                        const sourceId = e.dataTransfer.getData('text/plain');
+                        if(sourceId && sourceId !== id) {
+                            performSwap(sourceId, id);
+                            swapSelectedId = null;
+                        }
+                    };
+                }
+
+                return div;
+            }
+
+            function renderMenu() {
+                els.gridNav.innerHTML = '';
+                navSlots.forEach((id) => els.gridNav.appendChild(createToolBtn(id)));
+
+                els.gridPool.innerHTML = '';
+                poolSlots.forEach((id) => els.gridPool.appendChild(createToolBtn(id)));
+
+                const container = document.getElementById('menu-overlay');
+                if (isEditMode) {
+                    container.classList.add('editing-mode');
+                    els.menuEditBtn.classList.add('editing');
+                    els.menuEditBtn.textContent = '完了';
+                    els.menuInstruction.classList.remove('hidden');
+                } else {
+                    container.classList.remove('editing-mode');
+                    els.menuEditBtn.classList.remove('editing');
+                    els.menuEditBtn.textContent = '編集';
+                    els.menuInstruction.classList.add('hidden');
+                }
+            }
+
+            function performSwap(id1, id2) {
+                let list1 = navSlots.includes(id1) ? navSlots : poolSlots;
+                let list2 = navSlots.includes(id2) ? navSlots : poolSlots;
+                const idx1 = list1.indexOf(id1);
+                const idx2 = list2.indexOf(id2);
+
+                if (list1 === list2) {
+                    [list1[idx1], list1[idx2]] = [list1[idx2], list1[idx1]];
+                } else {
+                    list1[idx1] = id2;
+                    list2[idx2] = id1;
+                }
+                saveState();
+                renderNav();
+                renderMenu();
+            }
+
+            function notifyIframes() {
+                document.querySelectorAll('iframe').forEach(f => {
+                    f.contentWindow.postMessage({ type: 'settings-update', user: window.currentUser }, '*');
+                });
+            }
+
+            // --- Public API ---
+            const API = {
+                openSettings: () => {
+                    els.username.value = window.currentUser.name;
+                    els.role.value = window.currentUser.role;
+                    els.settingsModal.classList.remove('hidden');
+                },
+                handleRoleChange: () => {
+                    const selectedRole = els.role.value;
+                    let autoName = null;
+                    
+                    if (selectedRole === '実況' && tournamentSettingsData.caster) {
+                        autoName = tournamentSettingsData.caster;
+                    } else if (selectedRole === '解説' && tournamentSettingsData.commentator) {
+                        autoName = tournamentSettingsData.commentator;
+                    }
+
+                    if (autoName) {
+                        els.username.value = autoName;
+                        // フラッシュエフェクトで自動入力されたことを視覚的に伝える
+                        els.username.style.transition = 'background-color 0.2s';
+                        els.username.style.backgroundColor = '#FEF9C3'; // yellow-100
+                        setTimeout(() => els.username.style.backgroundColor = '#F9FAFB', 500);
+                    }
+                },
+                updateSettingsCache: (data) => {
+                    tournamentSettingsData = data;
+                },
+                saveSettings: () => {
+                    const name = els.username.value.trim();
+                    const role = els.role.value;
+
+                    // バリデーション: ロール未選択ならアラート
+                    if (!role) {
+                        return alert('ロール（役割）を選択してください。');
+                    }
+                    if (!name) {
+                        return alert('表示名を入力してください');
+                    }
+                    
+                    const isFirst = !window.currentUser.name;
+                    
+                    window.currentUser.name = name;
+                    window.currentUser.role = role;
+                    localStorage.setItem('app_user_name', name);
+                    localStorage.setItem('app_user_role', role);
+                    
+                    els.settingsModal.classList.add('hidden');
+                    notifyIframes();
+                    renderNav(); 
+                    if(isFirst) setTimeout(() => els.onboarding.style.display = 'block', 500);
+                },
+                toggleMenu: () => {
+                    const isShow = els.menuOverlay.classList.contains('show');
+                    if(isShow) {
+                        els.menuOverlay.classList.remove('show');
+                        els.menuBackdrop.classList.remove('show');
+                        setTimeout(() => els.menuBackdrop.classList.add('hidden'), 250);
+                        els.menuBtn.classList.remove('open');
+                        
+                        swapSelectedId = null;
+                        isEditMode = false; 
+                    } else {
+                        isEditMode = false;
+                        renderMenu();
+                        els.menuBackdrop.classList.remove('hidden');
+                        requestAnimationFrame(() => {
+                            els.menuBackdrop.classList.add('show');
+                            els.menuOverlay.classList.add('show');
+                        });
+                        els.menuBtn.classList.add('open');
+                        els.onboarding.style.display = 'none';
+                    }
+                },
+                toggleEditMode: () => {
+                    isEditMode = !isEditMode;
+                    swapSelectedId = null;
+                    renderMenu();
+                },
+                switchTab: (id) => {
+                    currentTab = id;
+                    localStorage.setItem('tools_activeTab', id);
+                    
+                    // IDのマッピング: settings -> frame-settings (tournament-setting.html)
+                    const frameId = (id === 'settings') ? 'settings' : id;
+
+                    document.querySelectorAll('iframe').forEach(el => el.classList.add('hidden'));
+                    const frame = document.getElementById(`frame-${frameId}`);
+                    if(frame) {
+                        frame.classList.remove('hidden');
+                        if(id === 'script') try { frame.contentWindow.postMessage('scroll-to-current', '*'); } catch(e){}
+                    }
+
+                    const tool = getToolData(id);
+                    els.headerTitle.style.opacity = 0;
+                    setTimeout(() => { els.headerTitle.textContent = tool.title; els.headerTitle.style.opacity = 1; }, 150);
+
+                    renderNav();
+                    API.hideNotification();
+                },
+                handleNavClick: (idx) => API.switchTab(navSlots[idx]),
+                hideNotification: (e) => {
+                    if(e) e.stopPropagation();
+                    els.chatNotif.classList.add('hidden');
+                    els.chatNotif.classList.remove('notification-animate');
+                }
+            };
+
+            // Init
+            loadState();
+            const savedTab = localStorage.getItem('tools_activeTab');
+            API.switchTab(savedTab || 'controller');
+            
+            document.querySelectorAll('iframe').forEach(f => {
+                f.onload = () => f.contentWindow.postMessage({ type: 'settings-update', user: window.currentUser }, '*');
+            });
+
+            if(!window.currentUser.name) API.openSettings();
+            window.UI_TOOLS = API;
+        })();
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, onSnapshot, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
-            authDomain: "daigakuhai-support-fb.firebaseapp.com",
-            projectId: "daigakuhai-support-fb",
-            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
-            messagingSenderId: "939931798179",
-            appId: "1:939931798179:web:8320fba89104e81f47cd16"
-        };
+        try {
+            const firebaseConfig = {
+                apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+                authDomain: "daigakuhai-support-fb.firebaseapp.com",
+                projectId: "daigakuhai-support-fb",
+                storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+                messagingSenderId: "939931798179",
+                appId: "1:939931798179:web:8320fba89104e81f47cd16"
+            };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const broadcastRef = doc(db, "state", "broadcast");
-        const messagesRef = collection(db, "messages");
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            
+            // --- トラブル状況監視 ---
+            const troubleEl = document.getElementById('header-trouble-status');
+            const troubleMsg = document.getElementById('trouble-message');
+            const troubleMap = { 'lag': 'ラグ対応', 'stream': '配信トラブル', 'admin': '運営トラブル' };
 
-        // --- ユーザー設定管理 ---
-        const settingsModal = document.getElementById('settings-modal');
-        const usernameInput = document.getElementById('username-input');
-        const roleSelect = document.getElementById('role-select');
-        const saveSettingsBtn = document.getElementById('save-settings-btn');
-        const globalSettingsBtn = document.getElementById('global-settings-btn');
-        const matchNavText = document.getElementById('match-nav-text');
-
-        let currentUser = {
-            name: localStorage.getItem('app_user_name') || '',
-            role: localStorage.getItem('app_user_role') || '実況',
-            uid: localStorage.getItem('app_user_uid') || crypto.randomUUID()
-        };
-        if (!localStorage.getItem('app_user_uid')) localStorage.setItem('app_user_uid', currentUser.uid);
-
-        // 初期ロード
-        updateMatchNavText();
-
-        function openSettings() {
-            usernameInput.value = currentUser.name;
-            roleSelect.value = currentUser.role;
-            settingsModal.classList.remove('hidden');
-        }
-        function closeSettings() { settingsModal.classList.add('hidden'); }
-
-        settingsModal.addEventListener('click', (e) => {
-            if (e.target === settingsModal) closeSettings();
-        });
-
-        saveSettingsBtn.addEventListener('click', () => {
-            const newName = usernameInput.value.trim();
-            if (newName) {
-                currentUser.name = newName;
-                currentUser.role = roleSelect.value;
-                localStorage.setItem('app_user_name', currentUser.name);
-                localStorage.setItem('app_user_role', currentUser.role);
-                updateMatchNavText();
-                notifyIframesOfSettings();
-                closeSettings();
-            } else {
-                alert("名前を入力してください");
-            }
-        });
-        globalSettingsBtn.addEventListener('click', openSettings);
-
-        if (!currentUser.name) openSettings();
-
-        function updateMatchNavText() {
-            let newText;
-            if (currentUser.role === '実況' || currentUser.role === '解説') {
-                newText = 'MATCH INFO';
-            } else {
-                newText = 'MATCH SET';
-            }
-            matchNavText.textContent = newText;
-            return newText;
-        }
-
-        function notifyIframesOfSettings() {
-            const frames = ['frame-chat', 'frame-controller', 'frame-match', 'frame-team', 'frame-script'];
-            frames.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && el.contentWindow) {
-                    el.contentWindow.postMessage({ type: 'settings-update', user: currentUser }, '*');
+            onSnapshot(doc(db, "state", "broadcast"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const s = docSnap.data().trouble || 'none';
+                    if(s === 'none') troubleEl.classList.add('hidden');
+                    else {
+                        troubleMsg.textContent = troubleMap[s] || 'トラブル対応中';
+                        troubleEl.classList.remove('hidden');
+                    }
                 }
             });
-        }
 
-        document.querySelectorAll('iframe').forEach(frame => {
-            frame.addEventListener('load', () => {
-                frame.contentWindow.postMessage({ type: 'settings-update', user: currentUser }, '*');
+            // --- 大会設定 (実況・解説名取得用) 監視 ---
+            onSnapshot(doc(db, "state", "settings"), (docSnap) => {
+                if (docSnap.exists()) {
+                    window.UI_TOOLS.updateSettingsCache(docSnap.data());
+                }
             });
-        });
 
+            // --- チャット通知監視 ---
+            const notifEl = document.getElementById('chat-notification');
+            const notifSender = document.getElementById('notif-sender');
+            const notifText = document.getElementById('notif-text');
+            let lastTs = Date.now();
+            let timer;
 
-        // --- 既存ロジック ---
-        const headerTroubleStatus = document.getElementById('header-trouble-status');
-        const troubleMessage = document.getElementById('trouble-message');
-        const chatNotification = document.getElementById('chat-notification');
-        const notifSender = document.getElementById('notif-sender');
-        const notifText = document.getElementById('notif-text');
-        let notificationTimeout;
+            onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "desc"), limit(1)), (snap) => {
+                snap.docChanges().forEach((ch) => {
+                    if (ch.type === "added") {
+                        const d = ch.doc.data();
+                        const currentTab = localStorage.getItem('tools_activeTab');
+                        
+                        if (d.timestamp > lastTs && d.uid !== window.currentUser.uid && currentTab !== 'chat') {
+                            const isStaff = (window.currentUser.role === '運営' || window.currentUser.role === '配信担当');
+                            if (!d.isStaffOnly || (d.isStaffOnly && isStaff)) {
+                                if(timer) clearTimeout(timer);
+                                notifSender.textContent = d.name;
+                                notifText.textContent = d.text;
+                                
+                                if(d.isStaffOnly) {
+                                    notifEl.style.borderColor = '#2563EB';
+                                    notifEl.style.backgroundColor = '#EFF6FF';
+                                } else {
+                                    notifEl.style.borderColor = '#111827';
+                                    notifEl.style.backgroundColor = '#FFFFFF';
+                                }
 
-        let currentTab = 'controller';
-        let lastMessageTimestamp = Date.now();
-
-        const troubleMessages = { 'lag': 'ラグ対応', 'stream': '配信トラブル', 'admin': '運営トラブル' };
-
-        onSnapshot(broadcastRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const troubleState = data.trouble || 'none';
-                if (troubleState === 'none') { headerTroubleStatus.classList.add('hidden'); }
-                else { troubleMessage.textContent = troubleMessages[troubleState] || 'トラブル対応中'; headerTroubleStatus.classList.remove('hidden'); }
-            }
-        });
-
-        const messagesQuery = query(messagesRef, orderBy("timestamp", "desc"), limit(1));
-        onSnapshot(messagesQuery, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === "added") {
-                    const data = change.doc.data();
-
-                    if (data.timestamp > lastMessageTimestamp && data.uid !== currentUser.uid && currentTab !== 'chat') {
-                        const isStaffMsg = data.isStaffOnly;
-                        const amIStaff = (currentUser.role === '運営' || currentUser.role === '配信担当');
-
-                        if (!isStaffMsg || (isStaffMsg && amIStaff)) {
-                            showNotification(data.name, data.text, isStaffMsg);
+                                notifEl.classList.remove('hidden');
+                                notifEl.classList.add('notification-animate');
+                                notifEl.onclick = (e) => {
+                                    if(!e.target.closest('.close-notification-btn')) {
+                                        window.UI_TOOLS.switchTab('chat');
+                                    }
+                                };
+                                timer = setTimeout(() => window.UI_TOOLS.hideNotification(), 5000);
+                            }
                         }
+                        if (d.timestamp > lastTs) lastTs = d.timestamp;
                     }
-                    if (data.timestamp > lastMessageTimestamp) { lastMessageTimestamp = data.timestamp; }
-                }
+                });
             });
-        });
 
-        function showNotification(sender, text, isStaffOnly) {
-            if (notificationTimeout) clearTimeout(notificationTimeout);
-            notifSender.textContent = sender;
-            notifText.textContent = text;
-
-            if (isStaffOnly) {
-                chatNotification.style.borderColor = '#2563EB';
-                chatNotification.style.backgroundColor = '#EFF6FF';
-            } else {
-                chatNotification.style.borderColor = '#111827';
-                chatNotification.style.backgroundColor = '#FFFFFF';
-            }
-
-            chatNotification.classList.remove('hidden');
-            chatNotification.classList.add('notification-animate');
-            chatNotification.onclick = (e) => {
-                if (!e.target.closest('.close-notification-btn')) { switchTab('chat'); hideNotification(); }
-            };
-            notificationTimeout = setTimeout(() => { hideNotification(); }, 5000);
+        } catch (e) {
+            console.error("Firebase Init Error:", e);
         }
-
-        window.hideNotification = function () {
-            chatNotification.classList.add('hidden');
-            chatNotification.classList.remove('notification-animate');
-            if (notificationTimeout) clearTimeout(notificationTimeout);
-        };
-
-        window.switchTab = function (targetName) {
-            currentTab = targetName;
-            localStorage.setItem('tools_activeTab', targetName);
-            if (targetName === 'chat') { hideNotification(); }
-
-            const matchTitle = updateMatchNavText();
-
-            const titles = {
-                chat: "チャット",
-                controller: "画面リモコン",
-                match: matchTitle === 'MATCH INFO' ? "対戦情報" : "対戦設定",
-                team: "チーム情報",
-                script: "配信台本"
-            };
-
-            document.querySelectorAll('iframe').forEach(el => { el.classList.add('hidden'); });
-            const targetFrame = document.getElementById(`frame-${targetName}`);
-            if (targetFrame) {
-                targetFrame.classList.remove('hidden');
-                if (targetName === 'script') {
-                    if (targetFrame.contentWindow.document.readyState === 'complete') {
-                        targetFrame.contentWindow.postMessage('scroll-to-current', '*');
-                    } else {
-                        targetFrame.onload = () => { targetFrame.contentWindow.postMessage('scroll-to-current', '*'); };
-                    }
-                }
-            }
-
-            const titleEl = document.getElementById('header-title');
-            titleEl.style.opacity = 0;
-            setTimeout(() => {
-                titleEl.textContent = titles[targetName];
-                titleEl.style.opacity = 1;
-            }, 150);
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            const activeBtn = document.querySelector(`.nav-btn[data-target="${targetName}"]`);
-            if (activeBtn) {
-                activeBtn.classList.add('active');
-            }
-        };
-
-        const savedTab = localStorage.getItem('tools_activeTab');
-        window.switchTab(savedTab || 'controller');
-
-        notifyIframesOfSettings();
-
     </script>
 </body>
-
 </html>

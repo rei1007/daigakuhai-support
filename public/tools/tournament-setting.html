@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大会全体設定</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+
+    <style>
+        /* --- テーマ定義 --- */
+        :root {
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #9CA3AF;
+            --color-accent: #2563EB;
+            --color-danger: #EF4444;
+        }
+
+        body {
+            font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-main);
+            padding-bottom: 6rem;
+        }
+
+        /* --- コンポーネント --- */
+        .section-header {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            border-left: 4px solid var(--color-main);
+            padding-left: 0.75rem;
+            margin-top: 2.5rem;
+        }
+
+        .section-title { font-size: 1.1rem; font-weight: 900; color: var(--color-main); }
+        .section-subtitle { font-size: 0.65rem; font-weight: 700; color: #6B7280; letter-spacing: 0.05em; }
+
+        .setting-panel {
+            background-color: var(--color-panel);
+            padding: 1.5rem;
+            border: 2px solid var(--color-main);
+            border-radius: 0.5rem;
+            box-shadow: 3px 3px 0 0 #D1D5DB;
+            transition: all 0.2s;
+        }
+
+        /* --- 入力フォーム --- */
+        .input-label {
+            display: block; font-size: 0.7rem; font-weight: 800; color: #6B7280;
+            margin-bottom: 0.25rem; letter-spacing: 0.05em;
+        }
+
+        .custom-input, .custom-select {
+            width: 100%; padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem; border: 2px solid #D1D5DB;
+            background-color: #F9FAFB; font-weight: 700; color: var(--color-main);
+            transition: all 0.2s; font-size: 0.9rem;
+        }
+        .custom-input:focus, .custom-select:focus {
+            outline: none; background-color: #FFFFFF;
+            border-color: var(--color-main); box-shadow: 2px 2px 0 0 var(--color-shadow);
+        }
+        .custom-input:disabled { 
+            background-color: #F3F4F6; color: #9CA3AF; cursor: not-allowed; border-color: #E5E7EB;
+        }
+
+        /* --- トグルボタン --- */
+        .toggle-btn {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.5rem; border: 2px solid #D1D5DB; border-radius: 0.5rem;
+            font-weight: 900; color: #9CA3AF; cursor: pointer; transition: all 0.2s;
+            background: white;
+        }
+        .toggle-btn:hover { background-color: #F3F4F6; }
+        .toggle-btn.active {
+            background-color: var(--color-main); color: white; border-color: var(--color-main);
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
+        }
+
+        /* --- ステージ設定ボタン --- */
+        .stage-setting-btn {
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed #D1D5DB;
+            border-radius: 0.5rem;
+            color: #6B7280;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background-color: #F9FAFB;
+        }
+        .stage-setting-btn:hover {
+            border-color: var(--color-main);
+            color: var(--color-main);
+            background-color: white;
+        }
+        .stage-count-badge {
+            background-color: var(--color-main);
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+        }
+
+        /* --- モーダル --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
+            z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: white; width: 95%; max-width: 800px; max-height: 85vh;
+            border: 2px solid var(--color-main); border-radius: 1rem;
+            box-shadow: 8px 8px 0 0 var(--color-main);
+            display: flex; flex-direction: column;
+        }
+
+        /* --- ステージ選択グリッド (Modal) --- */
+        .modal-stage-item {
+            cursor: pointer;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.2s;
+            position: relative;
+            background-color: #E5E7EB;
+            border: 2px solid transparent;
+        }
+        /* アスペクト比固定ハック (40:31 -> padding-top: 77.5%) */
+        .modal-stage-item::before {
+            content: "";
+            display: block;
+            padding-top: 77.5%; 
+        }
+
+        .stage-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            transition: filter 0.2s;
+        }
+
+        /* 非選択状態 */
+        .modal-stage-item:not(.selected) .stage-img {
+            filter: grayscale(100%) opacity(0.7);
+        }
+        .modal-stage-item:not(.selected):hover {
+            border-color: #D1D5DB;
+        }
+        .modal-stage-item:not(.selected):hover .stage-img {
+            filter: grayscale(0%) opacity(0.9);
+        }
+
+        /* 選択状態 (枠線とチェックマークを削除) */
+        .modal-stage-item.selected {
+            border-color: transparent;
+        }
+        .modal-stage-item.selected .stage-img {
+            filter: grayscale(0%) opacity(1);
+        }
+
+        /* --- 全選択・全解除ボタン (Updated) --- */
+        .reset-btn {
+            display: flex; align-items: center; gap: 0.25rem;
+            padding: 0.4rem 0.8rem; border-radius: 0.5rem;
+            font-size: 0.8rem; font-weight: 800;
+            border: 2px solid #D1D5DB;
+            background-color: white; color: #6B7280;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover {
+            background-color: #F3F4F6;
+            color: var(--color-main);
+            border-color: var(--color-main);
+        }
+        .reset-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* --- Read Only Mode (Updated) --- */
+        /* 下矢印を消すための設定 */
+        body.read-only-mode .custom-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: none !important; /* 重要 */
+            padding-right: 0.75rem;
+        }
+
+        body.read-only-mode .custom-input,
+        body.read-only-mode .custom-select {
+            border: 2px solid #E5E7EB; /* 枠線を復活させて独立感を出す */
+            background: #FFFFFF;
+            color: var(--color-main); 
+            opacity: 1;
+            box-shadow: none; 
+            pointer-events: none;
+            font-weight: 900;
+        }
+        
+        body.read-only-mode input[type="date"],
+        body.read-only-mode input[type="time"] { pointer-events: none; border: 2px solid #E5E7EB; background: #fff; }
+        
+        body.read-only-mode .toggle-btn { pointer-events: none; }
+        body.read-only-mode .toggle-btn:not(.active) { opacity: 0.3; background: transparent; border-color: transparent; }
+        body.read-only-mode .toggle-btn.active { 
+            border: 2px solid var(--color-main); 
+            box-shadow: none; 
+            justify-content: center; 
+            background: var(--color-main); 
+            color: white; 
+        }
+        
+        /* チェックボックスとラベルの非表示 */
+        body.read-only-mode input[type="checkbox"] { display: none !important; }
+        body.read-only-mode .limit-label-text { display: none !important; }
+
+        /* パネルのスタイル維持 */
+        body.read-only-mode .setting-panel {
+            box-shadow: none;
+            border: 2px solid #E5E7EB;
+            background-color: #F9FAFB; 
+        }
+
+        body.read-only-mode .stage-setting-btn {
+            pointer-events: auto;
+            border: 2px solid #E5E7EB;
+            background: #FFFFFF;
+            color: var(--color-main);
+        }
+        
+        /* 閲覧専用時のモーダル内スタイル */
+        body.read-only-mode .modal-stage-item {
+            cursor: default;
+            pointer-events: none;
+        }
+        body.read-only-mode .modal-stage-item:not(.selected) {
+            order: 999; 
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        
+        body.read-only-mode .reset-actions { display: none; }
+    </style>
+</head>
+
+<body>
+    <div class="max-w-[800px] mx-auto p-4 md:p-6">
+        
+        <section>
+            <div class="section-header" style="margin-top: 0;">
+                <h2 class="section-title">大会基本情報</h2>
+                <span class="section-subtitle">BASIC INFO</span>
+            </div>
+            <div class="setting-panel grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="input-label">大会名</label>
+                    <input type="text" id="t-name" class="custom-input text-lg" placeholder="例：第8回 大学杯">
+                </div>
+                
+                <div>
+                    <label class="input-label">開始日時</label>
+                    <div class="flex gap-2">
+                        <input type="date" id="t-date" class="custom-input">
+                        <input type="time" id="t-time" class="custom-input">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="input-label">クロス大学制度</label>
+                    <div class="flex h-[42px]">
+                        <button id="cross-uni-btn" class="toggle-btn w-full h-full" onclick="toggleBool('crossUniAllowed')">
+                            <span class="material-symbols-rounded">diversity_3</span>
+                            <span id="cross-uni-text">不許可</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="input-label">実況</label>
+                    <input type="text" id="caster-name" class="custom-input" placeholder="名前を入力">
+                </div>
+                <div>
+                    <label class="input-label">解説</label>
+                    <input type="text" id="commentator-name" class="custom-input" placeholder="名前を入力">
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <h2 class="section-title">採用ルール</h2>
+                <span class="section-subtitle">RULES</span>
+            </div>
+            <div class="setting-panel">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <button class="toggle-btn rule-btn" data-rule="Area">エリア</button>
+                    <button class="toggle-btn rule-btn" data-rule="Yagura">ヤグラ</button>
+                    <button class="toggle-btn rule-btn" data-rule="Hoko">ホコ</button>
+                    <button class="toggle-btn rule-btn" data-rule="Asari">アサリ</button>
+                    <button class="toggle-btn rule-btn" data-rule="Nawabari">ナワバリ</button>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <h2 class="section-title">マッププール</h2>
+                <span class="section-subtitle">STAGE POOL</span>
+            </div>
+            
+            <div class="setting-panel">
+                <button id="stage-trigger" onclick="openStageModal()" class="stage-setting-btn">
+                    <span class="material-symbols-rounded">distance</span>
+                    <span id="stage-btn-label">使用ステージを設定する</span>
+                    <span id="stage-count" class="stage-count-badge">0</span>
+                </button>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <h2 class="section-title">チームXP制限</h2>
+                <span class="section-subtitle">RESTRICTIONS</span>
+            </div>
+            <div class="setting-panel grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="input-label">チーム平均XP上限</label>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="avg-xp-limit-check" class="w-4 h-4 accent-gray-800" onchange="toggleInput('avg-xp-input', this.checked)">
+                            <label for="avg-xp-limit-check" class="limit-label-text text-xs font-bold text-gray-500 cursor-pointer">制限あり</label>
+                        </div>
+                    </div>
+                    <input type="number" id="avg-xp-input" class="custom-input" disabled placeholder="制限なし">
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="input-label">チーム最高XP上限</label>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="max-xp-limit-check" class="w-4 h-4 accent-gray-800" onchange="toggleInput('max-xp-input', this.checked)">
+                            <label for="max-xp-limit-check" class="limit-label-text text-xs font-bold text-gray-500 cursor-pointer">制限あり</label>
+                        </div>
+                    </div>
+                    <input type="number" id="max-xp-input" class="custom-input" disabled placeholder="制限なし">
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-header">
+                <h2 class="section-title">対戦形式 (BO数)</h2>
+                <span class="section-subtitle">MATCH FORMAT</span>
+            </div>
+            <div class="setting-panel grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <label class="input-label justify-center">その他の試合</label>
+                    <select id="format-other" class="custom-select text-center" onchange="saveFormat()">
+                        <option value="BO1">BO1 (1先)</option>
+                        <option value="BO3" selected>BO3 (2先)</option>
+                        <option value="BO5">BO5 (3先)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="input-label justify-center">準決勝</label>
+                    <select id="format-semis" class="custom-select text-center" onchange="saveFormat()">
+                        <option value="BO1">BO1 (1先)</option>
+                        <option value="BO3">BO3 (2先)</option>
+                        <option value="BO5" selected>BO5 (3先)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="input-label justify-center">決勝戦</label>
+                    <select id="format-finals" class="custom-select text-center" onchange="saveFormat()">
+                        <option value="BO3">BO3 (2先)</option>
+                        <option value="BO5" selected>BO5 (3先)</option>
+                        <option value="BO7">BO7 (4先)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="stage-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="p-4 border-b-2 border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+                <div>
+                    <h3 class="font-black text-lg text-gray-800">MAP POOL SELECTION</h3>
+                    <p class="text-xs font-bold text-gray-400">使用するステージを選択してください</p>
+                </div>
+                <div class="flex gap-2 reset-actions">
+                    <button onclick="resetStages(true)" class="reset-btn">
+                        <span class="material-symbols-rounded text-lg">check_box</span>
+                        全選択
+                    </button>
+                    <button onclick="resetStages(false)" class="reset-btn">
+                        <span class="material-symbols-rounded text-lg">check_box_outline_blank</span>
+                        全解除
+                    </button>
+                </div>
+                <button onclick="closeStageModal()" class="p-1 hover:bg-gray-200 rounded-full transition-colors ml-2">
+                    <span class="material-symbols-rounded text-gray-500">close</span>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 bg-white rounded-b-2xl">
+                <div id="modal-stage-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
+            authDomain: "daigakuhai-support-fb.firebaseapp.com",
+            projectId: "daigakuhai-support-fb",
+            storageBucket: "daigakuhai-support-fb.firebasestorage.app",
+            messagingSenderId: "939931798179",
+            appId: "1:939931798179:web:8320fba89104e81f47cd16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const settingsRef = doc(db, "state", "settings");
+
+        // --- State ---
+        let currentSettings = {
+            tournamentName: "",
+            startDate: "",
+            startTime: "",
+            crossUniAllowed: false,
+            caster: "",
+            commentator: "",
+            rules: [], 
+            xpLimit: { avgEnabled: false, avgValue: null, maxEnabled: false, maxValue: null },
+            matchFormat: { other: 'BO3', semis: 'BO5', finals: 'BO5' },
+            allowedStages: []
+        };
+        
+        let allStages = [];
+        let isReadOnly = false;
+        let currentUser = { name: '', role: '' };
+
+        // --- DOM Elements ---
+        const els = {
+            tName: document.getElementById('t-name'),
+            tDate: document.getElementById('t-date'),
+            tTime: document.getElementById('t-time'),
+            crossUniBtn: document.getElementById('cross-uni-btn'),
+            crossUniText: document.getElementById('cross-uni-text'),
+            caster: document.getElementById('caster-name'),
+            commentator: document.getElementById('commentator-name'),
+            ruleBtns: document.querySelectorAll('.rule-btn'),
+            
+            avgCheck: document.getElementById('avg-xp-limit-check'),
+            avgInput: document.getElementById('avg-xp-input'),
+            maxCheck: document.getElementById('max-xp-limit-check'),
+            maxInput: document.getElementById('max-xp-input'),
+
+            formatOther: document.getElementById('format-other'),
+            formatSemis: document.getElementById('format-semis'),
+            formatFinals: document.getElementById('format-finals'),
+
+            stageTrigger: document.getElementById('stage-trigger'),
+            stageBtnLabel: document.getElementById('stage-btn-label'),
+            stageCount: document.getElementById('stage-count'),
+
+            stageModal: document.getElementById('stage-modal'),
+            modalStageGrid: document.getElementById('modal-stage-grid')
+        };
+
+        // --- 親フレームからの設定受け取り ---
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'settings-update') {
+                currentUser = event.data.user;
+                updateRoleRestriction();
+            }
+        });
+
+        function updateRoleRestriction() {
+            const role = currentUser.role;
+            // 実況・解説は読み取り専用
+            if (role === '実況' || role === '解説') {
+                isReadOnly = true;
+                document.body.classList.add('read-only-mode');
+                
+                // ステージボタンの文言変更
+                els.stageBtnLabel.textContent = "使用ステージを確認する";
+                // 閲覧のみでもクリックしてモーダルを開けるようにする（onclickはHTMLで設定済みなので上書きしない）
+            } else {
+                isReadOnly = false;
+                document.body.classList.remove('read-only-mode');
+
+                els.stageBtnLabel.textContent = "使用ステージを設定する";
+            }
+            // 入力要素の一括制御
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(el => el.disabled = isReadOnly);
+        }
+
+        // --- Init ---
+        async function init() {
+            try {
+                const res = await fetch('../json/stages.json');
+                allStages = await res.json();
+            } catch (e) {
+                console.error("Stages load error", e);
+                allStages = ["ユノハナ大渓谷", "ゴンズイ地区", "ヤガラ市場", "マテガイ放水路", "ナメロウ金属", "マサバ海峡大橋", "キンメダイ美術館", "マヒマヒリゾート＆スパ", "海女美術大学", "チョウザメ造船", "ザトウマーケット", "スメーシーワールド", "クサヤ温泉", "ヒラメが丘団地", "マンタマリア号", "タラポートショッピングパーク", "コンブトラック", "タカアシ経済特区", "オヒョウ海運", "バイガイ亭", "ネギトロ炭鉱"];
+            }
+
+            onSnapshot(settingsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentSettings = { ...currentSettings, ...data };
+                    if (!data.allowedStages && allStages.length > 0) {
+                        currentSettings.allowedStages = [...allStages];
+                    }
+                    renderUI();
+                } else {
+                    if(!isReadOnly) {
+                        currentSettings.allowedStages = [...allStages];
+                        saveSettings();
+                    }
+                }
+            });
+
+            setupInputs();
+        }
+
+        // --- Rendering ---
+        function renderUI() {
+            els.tName.value = currentSettings.tournamentName || "";
+            els.tDate.value = currentSettings.startDate || "";
+            els.tTime.value = currentSettings.startTime || "";
+            els.caster.value = currentSettings.caster || "";
+            els.commentator.value = currentSettings.commentator || "";
+
+            // クロス大学
+            if (currentSettings.crossUniAllowed) {
+                els.crossUniBtn.classList.add('active');
+                els.crossUniText.textContent = "許可";
+                els.crossUniBtn.innerHTML = `<span class="material-symbols-rounded">check_circle</span> 許可`;
+            } else {
+                els.crossUniBtn.classList.remove('active');
+                els.crossUniText.textContent = "不許可";
+                els.crossUniBtn.innerHTML = `<span class="material-symbols-rounded">block</span> 不許可`;
+            }
+
+            // ルール
+            els.ruleBtns.forEach(btn => {
+                const rule = btn.dataset.rule;
+                if (currentSettings.rules.includes(rule)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // XP
+            els.avgCheck.checked = currentSettings.xpLimit.avgEnabled;
+            els.avgInput.disabled = isReadOnly ? true : !currentSettings.xpLimit.avgEnabled;
+            els.avgInput.value = currentSettings.xpLimit.avgValue || "";
+            if(!currentSettings.xpLimit.avgEnabled && isReadOnly) els.avgInput.placeholder = "制限なし";
+
+            els.maxCheck.checked = currentSettings.xpLimit.maxEnabled;
+            els.maxInput.disabled = isReadOnly ? true : !currentSettings.xpLimit.maxEnabled;
+            els.maxInput.value = currentSettings.xpLimit.maxValue || "";
+            if(!currentSettings.xpLimit.maxEnabled && isReadOnly) els.maxInput.placeholder = "制限なし";
+
+            // Format
+            els.formatOther.value = currentSettings.matchFormat.other;
+            els.formatSemis.value = currentSettings.matchFormat.semis;
+            els.formatFinals.value = currentSettings.matchFormat.finals;
+
+            // Stage Count
+            const count = currentSettings.allowedStages ? currentSettings.allowedStages.length : 0;
+            els.stageCount.textContent = count;
+        }
+
+        // --- Stage Modal ---
+        window.openStageModal = () => {
+            renderModalGrid();
+            els.stageModal.classList.add('show');
+        };
+        window.closeStageModal = () => els.stageModal.classList.remove('show');
+
+        function renderModalGrid() {
+            els.modalStageGrid.innerHTML = '';
+            const allowedSet = new Set(currentSettings.allowedStages || []);
+            
+            // ソート用配列を作成
+            let stagesToRender = [...allStages];
+
+            // 閲覧専用モードなら、許可されたものを前に、ブロックされたものを後ろにソート
+            if (isReadOnly) {
+                stagesToRender.sort((a, b) => {
+                    const aAllowed = allowedSet.has(a);
+                    const bAllowed = allowedSet.has(b);
+                    return (bAllowed - aAllowed); // true(=1)が先に来る
+                });
+            }
+
+            stagesToRender.forEach(stage => {
+                const isSelected = allowedSet.has(stage);
+                const div = document.createElement('div');
+                div.className = `modal-stage-item ${isSelected ? 'selected' : ''}`;
+                
+                // ReadOnlyならクリックしてもトグルさせない（CSSでもpointer-events:noneにしているが念のため）
+                if (!isReadOnly) {
+                    div.onclick = () => toggleStage(stage);
+                }
+                
+                // チェックマークのオーバーレイ要素を削除
+                div.innerHTML = `
+                    <img src="../stage-image/${stage}.png" class="stage-img" loading="lazy" onerror="this.src='../stage-image/未決定.png'">
+                `;
+                els.modalStageGrid.appendChild(div);
+            });
+        }
+
+        window.toggleStage = (stageName) => {
+            if(isReadOnly) return;
+            const allowed = currentSettings.allowedStages || [];
+            let newAllowed;
+            if (allowed.includes(stageName)) {
+                newAllowed = allowed.filter(s => s !== stageName);
+            } else {
+                newAllowed = [...allowed, stageName];
+            }
+            currentSettings.allowedStages = newAllowed;
+            
+            renderModalGrid();
+            renderUI();
+            saveSettings();
+        };
+
+        window.resetStages = (selectAll) => {
+            if(isReadOnly) return;
+            if (selectAll) currentSettings.allowedStages = [...allStages];
+            else currentSettings.allowedStages = [];
+            renderModalGrid();
+            renderUI();
+            saveSettings();
+        };
+
+        // --- Actions ---
+        function setupInputs() {
+            const save = () => { if(!isReadOnly) saveSettings(); };
+
+            [els.tName, els.tDate, els.tTime, els.caster, els.commentator, els.avgInput, els.maxInput].forEach(el => {
+                el.addEventListener('change', () => {
+                    if(!isReadOnly) { updateLocalFromUI(); save(); }
+                });
+            });
+
+            els.ruleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if(isReadOnly) return;
+                    const rule = btn.dataset.rule;
+                    if (currentSettings.rules.includes(rule)) {
+                        currentSettings.rules = currentSettings.rules.filter(r => r !== rule);
+                    } else {
+                        currentSettings.rules.push(rule);
+                    }
+                    renderUI(); 
+                    save();
+                });
+            });
+        }
+
+        window.toggleBool = (key) => {
+            if(isReadOnly) return;
+            currentSettings[key] = !currentSettings[key];
+            renderUI();
+            saveSettings();
+        };
+
+        window.toggleInput = (inputId, isChecked) => {
+            if(isReadOnly) return;
+            const input = document.getElementById(inputId);
+            input.disabled = !isChecked;
+            updateLocalFromUI();
+            saveSettings();
+        };
+
+        window.saveFormat = () => {
+            if(isReadOnly) return;
+            updateLocalFromUI();
+            saveSettings();
+        };
+
+        function updateLocalFromUI() {
+            currentSettings.tournamentName = els.tName.value;
+            currentSettings.startDate = els.tDate.value;
+            currentSettings.startTime = els.tTime.value;
+            currentSettings.caster = els.caster.value;
+            currentSettings.commentator = els.commentator.value;
+
+            currentSettings.xpLimit.avgEnabled = els.avgCheck.checked;
+            currentSettings.xpLimit.avgValue = els.avgInput.value;
+            currentSettings.xpLimit.maxEnabled = els.maxCheck.checked;
+            currentSettings.xpLimit.maxValue = els.maxInput.value;
+
+            currentSettings.matchFormat.other = els.formatOther.value;
+            currentSettings.matchFormat.semis = els.formatSemis.value;
+            currentSettings.matchFormat.finals = els.formatFinals.value;
+        }
+
+        async function saveSettings() {
+            if(isReadOnly) return;
+            try { await setDoc(settingsRef, currentSettings, { merge: true }); }
+            catch (e) { console.error("Save Error:", e); }
+        }
+
+        init();
+    </script>
+</body>
+</html>
