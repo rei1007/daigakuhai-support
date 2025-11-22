@@ -189,10 +189,20 @@
         .match-card:hover .match-header,
         .match-card.is-live .match-header { opacity: 1; }
 
+        .header-left-group {
+            display: flex; gap: 4px; pointer-events: auto;
+        }
+
         .match-id {
             background: var(--color-main); color: white; font-size: 0.6rem;
             padding: 2px 6px; border-radius: 4px; font-weight: bold;
-            z-index: 5; pointer-events: auto;
+            z-index: 5;
+        }
+
+        .bo-badge {
+            background: #E5E7EB; color: #4B5563; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold;
+            z-index: 5; border: 1px solid #D1D5DB;
         }
 
         .live-control { pointer-events: auto; z-index: 5; }
@@ -387,6 +397,7 @@
         const db = getFirestore(app);
         const tournamentRef = doc(db, "state", "tournament");
         const matchRef = doc(db, "state", "match");
+        const settingsRef = doc(db, "state", "settings");
 
         let teamsData = [];
         let currentFormat = 8;
@@ -395,6 +406,10 @@
             matches: {},
             roundNames: {}
         };
+        let tournamentSettings = {
+            matchFormat: { other: 'BO3', semis: 'BO5', finals: 'BO5' }
+        };
+
         let isUpdating = false;
         let currentUser = { name: '', role: '' };
         let isReadOnly = false;
@@ -546,7 +561,6 @@
                             formatSelect.value = currentFormat;
                         }
                         
-                        // データ計算 (Propagate) - 変更があれば即保存
                         if (propagateBracketData()) {
                             saveTournamentData();
                         } else {
@@ -555,6 +569,14 @@
                     }
                 } else {
                     saveTournamentData();
+                }
+            });
+
+            // 大会設定の監視
+            onSnapshot(settingsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    tournamentSettings = docSnap.data();
+                    renderBracket(); // 設定反映のために再描画
                 }
             });
         }
@@ -610,13 +632,13 @@
                     if (match.alpha !== (winnerA || null)) {
                         match.alpha = (winnerA || null);
                         hasChanges = true;
-                        if(match.isLive) syncToMatchSettings(matchId);
+                        if(match.isLive) syncToMatchSettings(matchId, r);
                     }
 
                     if (match.bravo !== (winnerB || null)) {
                         match.bravo = (winnerB || null);
                         hasChanges = true;
-                        if(match.isLive) syncToMatchSettings(matchId);
+                        if(match.isLive) syncToMatchSettings(matchId, r);
                     }
                     
                     if (checkAutoWin(matchId, match)) {
@@ -645,33 +667,41 @@
             return changed;
         }
 
-        function syncToMatchSettings(matchId) {
+        function syncToMatchSettings(matchId, roundNum) {
             const match = tournamentData.matches[matchId];
             if (!match || !match.alpha || !match.bravo) return;
             if (match.alpha === SEED_ID || match.bravo === SEED_ID) return;
 
-            const roundNum = parseInt(matchId.split('_')[0].replace('r', ''));
             let rName = tournamentData.roundNames && tournamentData.roundNames[roundNum] ? tournamentData.roundNames[roundNum] : null;
+            const totalRounds = Math.log2(currentFormat);
+            
             if (!rName) {
-                const totalRounds = Math.log2(currentFormat);
                 if (roundNum === totalRounds) rName = "決勝";
                 else if (roundNum === totalRounds - 1) rName = "準決勝";
                 else if (roundNum === totalRounds - 2 && totalRounds > 2) rName = "準々決勝";
                 else rName = `ラウンド ${roundNum}`;
             }
 
+            // Determine BO Type based on round
+            const boType = getRoundFormat(roundNum, totalRounds);
+            const gameCount = boType === 'BO5' ? 5 : 3;
+            const games = Array(gameCount).fill({ stage: "未決定", winner: "none" });
+
             const syncData = {
                 alphaTeamId: match.alpha,
                 bravoTeamId: match.bravo,
                 roundName: rName,
-                games: [
-                    { stage: "未決定", winner: "none" },
-                    { stage: "未決定", winner: "none" },
-                    { stage: "未決定", winner: "none" }
-                ],
-                boType: "BO3" 
+                games: games,
+                boType: boType 
             };
             setDoc(matchRef, syncData, { merge: true }).catch(e => console.error("Sync error:", e));
+        }
+
+        function getRoundFormat(roundNum, totalRounds) {
+            const settings = tournamentSettings.matchFormat || { other: 'BO3', semis: 'BO5', finals: 'BO5' };
+            if (roundNum === totalRounds) return settings.finals;
+            if (roundNum === totalRounds - 1) return settings.semis;
+            return settings.other;
         }
 
         function getWinnerTeamId(match) {
@@ -705,11 +735,10 @@
             targetMatch.isLive = newState;
             
             if (newState) {
-                // 状態判定 (Activeかどうか)
                 const hasTeams = !!targetMatch.alpha && !!targetMatch.bravo;
                 const isFinished = !!targetMatch.winner;
                 if(hasTeams && !isFinished) {
-                    syncToMatchSettings(targetMatchId);
+                    syncToMatchSettings(targetMatchId, roundNum);
                 }
             }
             
@@ -779,39 +808,49 @@
                 roundCol.appendChild(header);
 
                 const matchCount = currentFormat / Math.pow(2, r);
+                const boType = getRoundFormat(r, totalRounds);
 
                 for (let m = 1; m <= matchCount; m++) {
                     const matchId = `r${r}_m${m}`;
-                    // Ensure data exists
                     if(!tournamentData.matches[matchId]) tournamentData.matches[matchId] = { alpha: null, bravo: null, scoreA: 0, scoreB: 0, winner: null, isLive: false };
                     
                     const matchData = tournamentData.matches[matchId];
                     const alphaName = getTeamName(matchData.alpha);
                     const bravoName = getTeamName(matchData.bravo);
                     
-                    // New Logic for Status Color
                     const hasTeams = !!matchData.alpha && !!matchData.bravo;
                     const isFinished = !!matchData.winner;
                     const isActiveContext = hasTeams && !isFinished;
 
-                    const card = createMatchCard(matchId, r, matchData, r === 1, alphaName, bravoName, isActiveContext);
+                    const card = createMatchCard(matchId, r, matchData, r === 1, alphaName, bravoName, isActiveContext, boType);
                     roundCol.appendChild(card);
                 }
                 bracketWrapper.appendChild(roundCol);
             }
         }
 
-        function createMatchCard(matchId, roundNum, data, isFirstRound, alphaName, bravoName, isActiveContext) {
+        function createMatchCard(matchId, roundNum, data, isFirstRound, alphaName, bravoName, isActiveContext, boType) {
             const div = document.createElement('div');
             const statusClass = isActiveContext ? 'status-active' : 'status-inactive';
             div.className = `match-card ${data.isLive ? `is-live ${statusClass}` : ''}`;
             
             const header = document.createElement('div');
             header.className = 'match-header';
+            
+            const headerLeft = document.createElement('div');
+            headerLeft.className = 'header-left-group';
+
             const idBadge = document.createElement('span');
             idBadge.className = 'match-id';
             idBadge.textContent = matchId.toUpperCase().replace('_', '-');
             
+            const boBadge = document.createElement('span');
+            boBadge.className = 'bo-badge';
+            boBadge.textContent = boType;
+
+            headerLeft.appendChild(idBadge);
+            headerLeft.appendChild(boBadge);
+
             const liveControl = document.createElement('div');
             liveControl.className = 'live-control';
             const liveBtn = document.createElement('button');
@@ -820,17 +859,17 @@
             liveBtn.innerHTML = `<span class="material-symbols-rounded" style="font-size: 14px;">sensors</span>${data.isLive ? 'ON AIR' : '配信'}`;
             
             liveControl.appendChild(liveBtn);
-            header.appendChild(idBadge);
+            header.appendChild(headerLeft);
             header.appendChild(liveControl);
             div.appendChild(header);
 
-            div.appendChild(createTeamRow(matchId, 'alpha', data, isFirstRound, alphaName));
-            div.appendChild(createTeamRow(matchId, 'bravo', data, isFirstRound, bravoName));
+            div.appendChild(createTeamRow(matchId, 'alpha', data, isFirstRound, alphaName, boType));
+            div.appendChild(createTeamRow(matchId, 'bravo', data, isFirstRound, bravoName, boType));
 
             return div;
         }
 
-        function createTeamRow(matchId, side, data, isFirstRound, nameDisplay) {
+        function createTeamRow(matchId, side, data, isFirstRound, nameDisplay, boType) {
             const row = document.createElement('div');
             const isWinner = data.winner === side;
             const isLoser = data.winner && data.winner !== side;
@@ -854,7 +893,7 @@
             contentHTML += `<div class="action-area">`;
             contentHTML += `
                 <select class="score-select" onchange="updateScore('${matchId}', '${side}', this.value)" ${disabledAttr}>
-                    ${getScoreOptions(score)}
+                    ${getScoreOptions(score, boType)}
                 </select>
                 <button class="win-btn ${isWinner ? 'active' : ''}" 
                         onclick="toggleWinner('${matchId}', '${side}')" title="勝利" ${disabledAttr}>
@@ -877,9 +916,10 @@
             return html;
         }
 
-        function getScoreOptions(currentScore) {
+        function getScoreOptions(currentScore, boType) {
             let html = '';
-            for(let i=0; i<=3; i++) {
+            const maxScore = boType === 'BO5' ? 3 : 2;
+            for(let i=0; i<=maxScore; i++) {
                 html += `<option value="${i}" ${parseInt(currentScore) === i ? 'selected' : ''}>${i}</option>`;
             }
             return html;

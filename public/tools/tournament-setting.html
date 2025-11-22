@@ -324,7 +324,7 @@
             
             <div class="setting-panel">
                 <button id="stage-trigger" onclick="openStageModal()" class="stage-setting-btn">
-                    <span class="material-symbols-rounded">distance</span>
+                    <span class="material-symbols-rounded">map</span>
                     <span id="stage-btn-label">使用ステージを設定する</span>
                     <span id="stage-count" class="stage-count-badge">0</span>
                 </button>
@@ -370,7 +370,6 @@
                 <div>
                     <label class="input-label justify-center">その他の試合</label>
                     <select id="format-other" class="custom-select text-center" onchange="saveFormat()">
-                        <option value="BO1">BO1 (1先)</option>
                         <option value="BO3" selected>BO3 (2先)</option>
                         <option value="BO5">BO5 (3先)</option>
                     </select>
@@ -378,7 +377,6 @@
                 <div>
                     <label class="input-label justify-center">準決勝</label>
                     <select id="format-semis" class="custom-select text-center" onchange="saveFormat()">
-                        <option value="BO1">BO1 (1先)</option>
                         <option value="BO3">BO3 (2先)</option>
                         <option value="BO5" selected>BO5 (3先)</option>
                     </select>
@@ -388,7 +386,6 @@
                     <select id="format-finals" class="custom-select text-center" onchange="saveFormat()">
                         <option value="BO3">BO3 (2先)</option>
                         <option value="BO5" selected>BO5 (3先)</option>
-                        <option value="BO7">BO7 (4先)</option>
                     </select>
                 </div>
             </div>

@@ -454,7 +454,7 @@
             <div id="menu-overlay" class="menu-overlay">
                 <div>
                     <div class="menu-section-header">
-                        <span class="menu-section-title">ナビゲーションバー</span>
+                        <span class="menu-section-title">マイメニュー</span>
                         <button id="menu-edit-btn" class="edit-toggle-btn" onclick="window.UI_TOOLS.toggleEditMode()">編集</button>
                     </div>
                     <div class="tool-grid-nav" id="grid-nav"></div>
@@ -754,6 +754,11 @@
                     els.settingsModal.classList.add('hidden');
                     notifyIframes();
                     renderNav(); 
+                    
+                    // ヘッダータイトルも即時更新
+                    const currentTool = getToolData(currentTab);
+                    els.headerTitle.textContent = currentTool.title;
+
                     if(isFirst) setTimeout(() => els.onboarding.style.display = 'block', 500);
                 },
                 toggleMenu: () => {
