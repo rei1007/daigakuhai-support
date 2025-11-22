@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配信メンバーチャット</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+        rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
 
     <style>
         /* --- テーマ定義 (共通) --- */
@@ -20,7 +25,7 @@
             --color-bg: #F3F4F6;
             --color-panel: #FFFFFF;
             --color-shadow: #D1D5DB;
-            
+
             --color-staff-bg-other: #EFF6FF;
             --color-staff-border-other: #2563EB;
             --color-staff-bg-me: #1E40AF;
@@ -37,12 +42,24 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
             font-size: 24px;
         }
-        
+
         /* カスタムスクロールバー */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
 
         /* --- メッセージバブル --- */
         .msg-bubble {
@@ -52,7 +69,8 @@
             padding: 1.25rem;
             max-width: 90%;
             position: relative;
-            box-shadow: 4px 4px 0 0 var(--color-shadow); /* ハードシャドウ */
+            box-shadow: 4px 4px 0 0 var(--color-shadow);
+            /* ハードシャドウ */
             transition: transform 0.2s;
         }
 
@@ -64,14 +82,21 @@
             border-color: var(--color-main);
             /* 自分のメッセージは影なし、または濃い影にするなどの調整も可能ですが、統一感を優先 */
         }
-        .msg-me .msg-text { color: #FFFFFF; }
-        .msg-me .msg-name { color: #D1D5DB; }
-        .msg-me .role-badge { 
-            background-color: #FFFFFF; 
-            color: var(--color-main); 
+
+        .msg-me .msg-text {
+            color: #FFFFFF;
+        }
+
+        .msg-me .msg-name {
+            color: #D1D5DB;
+        }
+
+        .msg-me .role-badge {
+            background-color: #FFFFFF;
+            color: var(--color-main);
             border-color: #FFFFFF;
         }
-        
+
         /* 相手のメッセージ */
         .msg-other {
             background-color: #FFFFFF;
@@ -81,10 +106,11 @@
 
         /* スタッフ限定メッセージ（相手） */
         .msg-staff-other {
-            background-color: var(--color-staff-bg-other); 
-            border-color: var(--color-staff-border-other);     
+            background-color: var(--color-staff-bg-other);
+            border-color: var(--color-staff-border-other);
             color: #1E3A8A;
         }
+
         .msg-staff-other .role-badge {
             background-color: var(--color-staff-border-other);
             color: white;
@@ -93,29 +119,38 @@
 
         /* スタッフ限定メッセージ（自分） */
         .msg-staff-me {
-            background-color: var(--color-staff-bg-me); 
+            background-color: var(--color-staff-bg-me);
             border-color: var(--color-staff-bg-me);
             color: #FFFFFF;
         }
-        .msg-staff-me .msg-text { color: #FFFFFF !important; }
-        .msg-staff-me .msg-name { color: #BFDBFE !important; }
+
+        .msg-staff-me .msg-text {
+            color: #FFFFFF !important;
+        }
+
+        .msg-staff-me .msg-name {
+            color: #BFDBFE !important;
+        }
+
         .msg-staff-me .role-badge {
             background-color: #FFFFFF;
             color: var(--color-staff-bg-me);
             border-color: #FFFFFF;
         }
-        
+
         /* ロールバッジ */
         .role-badge {
             font-size: 0.7rem;
             font-weight: 900;
             padding: 0.15rem 0.6rem;
-            border: 2px solid var(--color-main); /* 枠線を少し太く */
+            border: 2px solid var(--color-main);
+            /* 枠線を少し太く */
             border-radius: 0.25rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             display: inline-block;
         }
+
         .msg-other .role-badge {
             background-color: var(--color-main);
             color: #FFFFFF;
@@ -148,6 +183,7 @@
             font-size: 1rem;
             transition: all 0.2s;
         }
+
         textarea:focus {
             outline: none;
             background-color: #FFFFFF;
@@ -164,16 +200,19 @@
             transition: all 0.2s;
             box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
+
         #send-button:hover {
             background-color: #FFFFFF;
             color: var(--color-main);
             transform: translate(-2px, -2px);
             box-shadow: 4px 4px 0 0 var(--color-shadow);
         }
+
         #send-button:active {
             transform: translate(0, 0);
             box-shadow: none;
         }
+
         #send-button:disabled {
             background-color: #E5E7EB;
             border-color: #D1D5DB;
@@ -191,17 +230,22 @@
             color: white;
             border: 2px solid var(--color-main);
             border-radius: 0.5rem;
-            width: 32px; height: 32px;
-            display: flex; align-items: center; justify-content: center;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             opacity: 0;
             transition: all 0.2s;
             z-index: 10;
-            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.1);
+            box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 0.1);
         }
+
         .msg-bubble:hover .delete-btn {
             opacity: 1;
         }
+
         .delete-btn:hover {
             background-color: #DC2626;
             transform: scale(1.1);
@@ -209,62 +253,121 @@
 
         /* --- モーダル (Friendly Brutalism) --- */
         .modal-overlay {
-            position: fixed; inset: 0; background-color: rgba(255,255,255,0.8);
+            position: fixed;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
         }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .modal-box {
-            background: #FFFFFF; 
-            width: 90%; max-width: 400px;
+            background: #FFFFFF;
+            width: 90%;
+            max-width: 400px;
             border: 2px solid var(--color-main);
             border-radius: 1rem;
             box-shadow: 8px 8px 0 0 var(--color-main);
             padding: 2rem;
-            display: flex; flex-direction: column; gap: 1.5rem;
-            transform: scale(0.95); transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transform: scale(0.95);
+            transition: transform 0.2s;
         }
-        .modal-overlay.show .modal-box { transform: scale(1); }
 
-        .modal-title { font-size: 1.25rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; color: var(--color-main); }
-        .modal-msg { font-size: 1rem; font-weight: 500; line-height: 1.6; color: #374151; }
-        
-        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; }
-        
+        .modal-overlay.show .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-main);
+        }
+
+        .modal-msg {
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
         .btn-modal {
-            padding: 0.5rem 1.5rem; font-weight: 700; 
-            border: 2px solid var(--color-main); 
+            padding: 0.5rem 1.5rem;
+            font-weight: 700;
+            border: 2px solid var(--color-main);
             border-radius: 0.5rem;
             transition: all 0.1s;
             box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
-        .btn-modal:active { transform: translate(2px, 2px); box-shadow: none; }
 
-        .btn-cancel { background: white; color: var(--color-main); }
-        .btn-cancel:hover { background: #F3F4F6; }
-        
-        .btn-ok { background: var(--color-main); color: white; }
-        .btn-ok:hover { background: #374151; }
-        
-        .btn-danger { background: #EF4444; color: white; border-color: var(--color-main); }
-        .btn-danger:hover { background: #DC2626; }
+        .btn-modal:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
 
+        .btn-cancel {
+            background: white;
+            color: var(--color-main);
+        }
+
+        .btn-cancel:hover {
+            background: #F3F4F6;
+        }
+
+        .btn-ok {
+            background: var(--color-main);
+            color: white;
+        }
+
+        .btn-ok:hover {
+            background: #374151;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+            border-color: var(--color-main);
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
     </style>
 </head>
+
 <body class="bg-gray-50 text-gray-900">
 
     <div class="max-w-[1080px] mx-auto flex flex-col h-screen border-x-0 md:border-x-2 md:border-gray-200">
-        
+
         <main id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col-reverse gap-6">
-            </main>
+        </main>
 
         <footer class="input-area">
             <div class="flex items-end gap-3">
-                <textarea id="chat-input" rows="1" placeholder="メッセージを入力 (Shift+Enterで改行)" 
-                          class="flex-1 p-4 resize-none min-h-[60px] max-h-[150px] leading-relaxed placeholder-gray-400"></textarea>
-                
+                <textarea id="chat-input" rows="1" placeholder="メッセージを入力 (Shift+Enterで改行)"
+                    class="flex-1 p-4 resize-none min-h-[60px] max-h-[150px] leading-relaxed placeholder-gray-400"></textarea>
+
                 <button id="send-button" class="flex items-center justify-center w-[60px] h-[60px] flex-shrink-0">
                     <span class="material-symbols-rounded !text-3xl" style="margin-left: 2px;">send</span>
                 </button>
@@ -298,7 +401,7 @@
             </div>
         </div>
     </div>
-    
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, writeBatch, doc, query, orderBy, onSnapshot, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -388,18 +491,18 @@
 
         function deleteMessage(messageId) {
             showConfirm("DELETE MESSAGE", "このメッセージを削除しますか？\n(取り消せません)", async () => {
-                try { await deleteDoc(doc(db, "messages", messageId)); } 
+                try { await deleteDoc(doc(db, "messages", messageId)); }
                 catch (error) { console.error("削除エラー:", error); }
             });
         }
 
         async function sendMessage() {
             let messageText = chatInput.value.trim();
-            
+
             if (!messageText) return;
-            if (!currentUser.name) { 
-                showAlert("USER SETTING ERROR", "ユーザー設定が読み込まれていません。親画面をリロードしてください。"); 
-                return; 
+            if (!currentUser.name) {
+                showAlert("USER SETTING ERROR", "ユーザー設定が読み込まれていません。親画面をリロードしてください。");
+                return;
             }
 
             const isStaff = (currentUser.role === "運営" || currentUser.role === "配信担当");
@@ -443,7 +546,7 @@
                 });
 
                 chatInput.value = '';
-                chatInput.style.height = 'auto'; 
+                chatInput.style.height = 'auto';
                 chatMessages.scrollTop = 0;
 
             } catch (error) {
@@ -467,10 +570,10 @@
                 const data = docSnap.data();
                 const messageId = docSnap.id;
                 const isMe = data.uid === currentUser.uid;
-                
+
                 const isStaffMsg = data.isStaffOnly;
                 const amIStaff = (currentUser.role === "運営" || currentUser.role === "配信担当");
-                
+
                 if (!isStaffMsg || (isStaffMsg && amIStaff)) {
                     const messageElement = createMessageHTML(messageId, data.name, data.role, data.text, isMe, isStaffMsg);
                     chatMessages.appendChild(messageElement);
@@ -481,30 +584,30 @@
         function createMessageHTML(id, name, role, text, isMe, isStaffMsg) {
             const wrapper = document.createElement('div');
             wrapper.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
-            
+
             const bubble = document.createElement('div');
             let bubbleClass = 'msg-bubble';
-            
+
             if (isMe) {
                 bubbleClass += isStaffMsg ? ' msg-staff-me' : ' msg-me';
             } else {
                 bubbleClass += isStaffMsg ? ' msg-staff-other' : ' msg-other';
             }
-            
+
             bubble.className = bubbleClass;
 
             // ヘッダー (名前 + ロール)
             const header = document.createElement('div');
             header.className = 'flex items-baseline gap-2 mb-2';
-            
+
             const nameSpan = document.createElement('span');
             nameSpan.className = 'font-bold text-sm msg-name uppercase tracking-wider';
             nameSpan.textContent = name;
-            
+
             const roleSpan = document.createElement('span');
             roleSpan.className = 'role-badge';
             roleSpan.textContent = role;
-            
+
             header.appendChild(nameSpan);
             header.appendChild(roleSpan);
 
@@ -531,4 +634,5 @@
         }
     </script>
 </body>
+
 </html>

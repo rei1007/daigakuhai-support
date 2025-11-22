@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>チーム情報閲覧</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
 
     <style>
         /* --- テーマ定義 (共通) --- */
@@ -18,25 +23,39 @@
             --color-bg: #F3F4F6;
             --color-panel: #FFFFFF;
             --color-shadow: #D1D5DB;
-            
+
             --color-alpha: #d0be08;
             --color-bravo: #3a0ccd;
-            
-            --color-alpha-bg: #FEFCE8; /* yellow-50 */
-            --color-bravo-bg: #EFF6FF; /* blue-50 */
+
+            --color-alpha-bg: #FEFCE8;
+            /* yellow-50 */
+            --color-bravo-bg: #EFF6FF;
+            /* blue-50 */
         }
 
-        body { 
+        body {
             font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
-            background-color: var(--color-bg); 
-            color: var(--color-main); 
-            overflow: hidden; 
+            background-color: var(--color-bg);
+            color: var(--color-main);
+            overflow: hidden;
         }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
 
         .material-symbols-rounded {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
@@ -44,78 +63,146 @@
         }
 
         /* --- チームカード --- */
-        .team-card { 
-            background-color: var(--color-panel); 
-            border-radius: 1rem; 
-            padding: 1.5rem; 
-            border: 2px solid var(--color-main); 
+        .team-card {
+            background-color: var(--color-panel);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 2px solid var(--color-main);
             box-shadow: 6px 6px 0 0 var(--color-shadow);
-            height: 100%; 
-            display: flex; flex-direction: column; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
-        
-        .border-alpha { border-top: 8px solid var(--color-alpha); }
-        .border-bravo { border-top: 8px solid var(--color-bravo); }
-        
-        .text-alpha { color: var(--color-alpha); }
-        .text-bravo { color: var(--color-bravo); }
 
-        .team-header { padding-bottom: 1.5rem; margin-bottom: 1.5rem; text-align: center; border-bottom: 2px dashed #E5E7EB; }
-        .team-title { font-size: 2.5rem; font-weight: 900; line-height: 1.2; margin-bottom: 0.5rem; }
-        .team-subtitle { font-size: 1.2rem; font-weight: 700; color: #4B5563; margin-top: 0.5rem; }
-        
-        .team-circle { 
-            font-size: 1.25rem; font-weight: 700; color: #6B7280; 
-            transition: all 0.2s; display: inline-block;
+        .border-alpha {
+            border-top: 8px solid var(--color-alpha);
         }
-        .team-circle.clickable:hover { 
-            color: #2563EB; text-decoration: underline; cursor: pointer; 
+
+        .border-bravo {
+            border-top: 8px solid var(--color-bravo);
         }
-        
-        .kana-text { font-size: 1rem; font-weight: 500; color: #9CA3AF; }
-        
+
+        .text-alpha {
+            color: var(--color-alpha);
+        }
+
+        .text-bravo {
+            color: var(--color-bravo);
+        }
+
+        .team-header {
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            border-bottom: 2px dashed #E5E7EB;
+        }
+
+        .team-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-subtitle {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #4B5563;
+            margin-top: 0.5rem;
+        }
+
+        .team-circle {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #6B7280;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .team-circle.clickable:hover {
+            color: #2563EB;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .kana-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #9CA3AF;
+        }
+
         /* 平均XPバッジ */
-        .avg-xp-pill { 
-            display: inline-block; 
-            padding: 0.3rem 1.2rem; 
-            border-radius: 9999px; 
-            font-weight: 900; 
-            font-size: 1.1rem; 
-            margin-top: 0.75rem; 
-            border-width: 2px; 
-            border-style: solid; 
-            letter-spacing: 0.05em; 
+        .avg-xp-pill {
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin-top: 0.75rem;
+            border-width: 2px;
+            border-style: solid;
+            letter-spacing: 0.05em;
             box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
         }
-        .xp-pill-alpha { 
-            background-color: var(--color-alpha); 
-            color: white; 
-            border-color: var(--color-alpha); 
-            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
-        }
-        .xp-pill-bravo { 
-            background-color: var(--color-bravo); 
-            color: white; 
-            border-color: var(--color-bravo); 
-            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+
+        .xp-pill-alpha {
+            background-color: var(--color-alpha);
+            color: white;
+            border-color: var(--color-alpha);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
         }
 
-        
+        .xp-pill-bravo {
+            background-color: var(--color-bravo);
+            color: white;
+            border-color: var(--color-bravo);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+
         /* 詳細情報エリア */
         .detail-box {
-            margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
             border: 1px solid transparent;
         }
-        .bg-alpha-light { background-color: var(--color-alpha-bg); border-color: #FEF08A; } 
-        .bg-bravo-light { background-color: var(--color-bravo-bg); border-color: #BFDBFE; } 
-        
-        .detail-text strong { display: block; font-size: 0.9rem; margin-bottom: 0.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
-        .detail-content { font-size: 1.15rem; line-height: 1.6; color: #374151; font-weight: 500; min-height: 1.5em; }
+
+        .bg-alpha-light {
+            background-color: var(--color-alpha-bg);
+            border-color: #FEF08A;
+        }
+
+        .bg-bravo-light {
+            background-color: var(--color-bravo-bg);
+            border-color: #BFDBFE;
+        }
+
+        .detail-text strong {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-content {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #374151;
+            font-weight: 500;
+            min-height: 1.5em;
+        }
 
         /* プレイヤーリスト */
-        .member-list { list-style: none; padding: 0; }
+        .member-list {
+            list-style: none;
+            padding: 0;
+        }
+
         .player-item {
-            padding: 1rem; 
+            padding: 1rem;
             background-color: #F9FAFB;
             border: 1px solid #E5E7EB;
             border-left-width: 5px;
@@ -123,132 +210,253 @@
             margin-bottom: 0.75rem;
             transition: transform 0.1s;
         }
-        .player-item:hover { transform: translateX(2px); }
-        
-        .player-name-main { font-size: 1.4rem; font-weight: 700; color: #1F2937; }
-        .player-weapon-main { font-size: 1.1rem; font-weight: 500; color: #6B7280; margin-top: 0.25rem; }
-        
-        .player-xp-badge {
-            font-size: 0.9rem; font-weight: 900; color: white;
-            padding: 0.25rem 0.75rem; border-radius: 9999px;
-            box-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+
+        .player-item:hover {
+            transform: translateX(2px);
         }
-        .bg-alpha-dark { background-color: #A16207; }
-        .bg-bravo-dark { background-color: #1D4ED8; }
+
+        .player-name-main {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1F2937;
+        }
+
+        .player-weapon-main {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+
+        .player-xp-badge {
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .bg-alpha-dark {
+            background-color: #A16207;
+        }
+
+        .bg-bravo-dark {
+            background-color: #1D4ED8;
+        }
 
         /* チーム選択フッター (レイアウト修正: flex-shrink-0) */
         .footer-select-area {
-            flex-shrink: 0; /* 固定サイズ */
+            flex-shrink: 0;
+            /* 固定サイズ */
             background-color: var(--color-panel);
             border-top: 2px solid var(--color-main);
-            padding: 1.5rem; 
+            padding: 1.5rem;
             z-index: 30;
-            width: 100%; 
+            width: 100%;
             /* absolute, bottom:0 を削除し、flexフローに参加させる */
         }
-        .team-select { 
-            width: 100%; padding: 1rem; border-radius: 0.5rem; 
-            border: 2px solid var(--color-main); 
-            background-color: #F9FAFB; 
-            font-weight: 700; color: var(--color-main); font-size: 1rem;
-            cursor: pointer; appearance: none; 
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231F2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); 
-            background-position: right 1rem center; background-repeat: no-repeat; background-size: 1.25em 1.25em;
+
+        .team-select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--color-main);
+            background-color: #F9FAFB;
+            font-weight: 700;
+            color: var(--color-main);
+            font-size: 1rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%231F2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25em 1.25em;
         }
-        .team-select:focus { outline: none; background-color: white; box-shadow: 2px 2px 0 0 var(--color-shadow); }
+
+        .team-select:focus {
+            outline: none;
+            background-color: white;
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
+        }
 
         /* 同期ボタン (絶対配置でフロートさせる) */
         #sync-match-btn {
-            position: absolute; /* container内での絶対配置 */
-            bottom: 7rem; /* フッターの高さ分 + マージン */
-            left: 50%; transform: translateX(-50%); z-index: 40;
-            background-color: var(--color-main); color: white;
-            font-weight: 900; padding: 1rem 2rem;
+            position: absolute;
+            /* container内での絶対配置 */
+            bottom: 7rem;
+            /* フッターの高さ分 + マージン */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 40;
+            background-color: var(--color-main);
+            color: white;
+            font-weight: 900;
+            padding: 1rem 2rem;
             border-radius: 9999px;
             border: 2px solid var(--color-main);
-            box-shadow: 4px 4px 0 0 rgba(0,0,0,0.2);
-            display: flex; items-center; gap: 0.75rem;
+            box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.2);
+            display: flex;
+            items-center;
+            gap: 0.75rem;
             transition: all 0.2s;
-            opacity: 0; pointer-events: none;
+            opacity: 0;
+            pointer-events: none;
         }
+
         #sync-match-btn.show {
-            opacity: 1; pointer-events: auto;
+            opacity: 1;
+            pointer-events: auto;
             animation: fadeInUp 0.3s ease-out forwards;
         }
-        #sync-match-btn:hover {
-            background-color: white; color: var(--color-main);
-            transform: translateX(-50%) translateY(-2px);
-            box-shadow: 6px 6px 0 0 rgba(0,0,0,0.2);
-        }
-        #sync-match-btn span { font-size: 1.25rem; }
 
-        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        #sync-match-btn:hover {
+            background-color: white;
+            color: var(--color-main);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.2);
+        }
+
+        #sync-match-btn span {
+            font-size: 1.25rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
 
         /* モーダル */
-        .modal-overlay { 
-            position: fixed; inset: 0; background-color: rgba(255,255,255,0.8); 
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center; 
-            z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.2s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
         }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        
-        .modal-content { 
-            background: white; width: 90%; max-width: 600px; max-height: 85vh; 
-            border-radius: 1rem; 
+
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 1rem;
             border: 2px solid var(--color-main);
             box-shadow: 8px 8px 0 0 var(--color-main);
-            overflow: hidden; display: flex; flex-direction: column; 
-            transform: scale(0.95); transition: transform 0.2s; 
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.2s;
         }
-        .modal-overlay.show .modal-content { transform: scale(1); }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
 
         /* モバイルタブ */
-        .mobile-tab-btn { flex: 1; padding: 0.75rem; font-weight: 900; text-align: center; border-radius: 0.5rem; transition: all 0.2s; border: 2px solid transparent; }
-        .tab-active-alpha { background-color: var(--color-alpha); color: white; border-color: var(--color-main); }
-        .tab-inactive-alpha { background-color: white; color: var(--color-alpha); border-color: var(--color-alpha); }
-        .tab-active-bravo { background-color: var(--color-bravo); color: white; border-color: var(--color-main); }
-        .tab-inactive-bravo { background-color: white; color: var(--color-bravo); border-color: var(--color-bravo); }
+        .mobile-tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            font-weight: 900;
+            text-align: center;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .tab-active-alpha {
+            background-color: var(--color-alpha);
+            color: white;
+            border-color: var(--color-main);
+        }
+
+        .tab-inactive-alpha {
+            background-color: white;
+            color: var(--color-alpha);
+            border-color: var(--color-alpha);
+        }
+
+        .tab-active-bravo {
+            background-color: var(--color-bravo);
+            color: white;
+            border-color: var(--color-main);
+        }
+
+        .tab-inactive-bravo {
+            background-color: white;
+            color: var(--color-bravo);
+            border-color: var(--color-bravo);
+        }
     </style>
 </head>
+
 <body>
 
     <div class="max-w-[1080px] mx-auto flex flex-col h-screen border-x-0 md:border-x-2 border-gray-200 relative">
-        
+
         <div class="md:hidden px-4 pt-4 pb-2 flex-shrink-0 z-10">
             <div class="flex gap-3">
-                <button id="tab-btn-alpha" class="mobile-tab-btn tab-active-alpha" onclick="switchMobileTab('alpha')">ALPHA TEAM</button>
-                <button id="tab-btn-bravo" class="mobile-tab-btn tab-inactive-bravo" onclick="switchMobileTab('bravo')">BRAVO TEAM</button>
+                <button id="tab-btn-alpha" class="mobile-tab-btn tab-active-alpha"
+                    onclick="switchMobileTab('alpha')">ALPHA TEAM</button>
+                <button id="tab-btn-bravo" class="mobile-tab-btn tab-inactive-bravo"
+                    onclick="switchMobileTab('bravo')">BRAVO TEAM</button>
             </div>
         </div>
 
-        <main class="flex-1 overflow-y-auto p-4 md:p-6"> 
+        <main class="flex-1 overflow-y-auto p-4 md:p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-                
+
                 <div id="alpha-card" class="team-card border-alpha md:block">
                     <div class="team-header">
                         <span class="block text-xs font-black mb-1 tracking-widest text-alpha">ALPHA TEAM</span>
                         <h2 id="alpha-name" class="team-title text-gray-900">未選択</h2>
                         <p id="alpha-name-kana" class="kana-text text-center"></p>
-                        
+
                         <div class="flex flex-col items-center mt-4 gap-1">
                             <p id="alpha-univ" class="team-subtitle">-</p>
                             <p id="alpha-circle" class="team-circle">-</p>
                             <p id="alpha-circle-kana" class="kana-text"></p>
                         </div>
-                        
+
                         <div class="mt-4">
                             <p id="alpha-avg-xp" class="avg-xp-pill xp-pill-alpha hidden">平均XP: -</p>
                         </div>
                     </div>
-                    
+
                     <div class="detail-box bg-alpha-light">
-                        <div id="alpha-comment" class="mb-4"><strong class="text-alpha">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
-                        <div id="alpha-records" class="mb-4"><strong class="text-alpha">実績</strong><p class="detail-content">-</p></div>
-                        <div id="alpha-tactics"><strong class="text-alpha">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
+                        <div id="alpha-comment" class="mb-4"><strong class="text-alpha">意気込み</strong>
+                            <p class="detail-content whitespace-pre-wrap">-</p>
+                        </div>
+                        <div id="alpha-records" class="mb-4"><strong class="text-alpha">実績</strong>
+                            <p class="detail-content">-</p>
+                        </div>
+                        <div id="alpha-tactics"><strong class="text-alpha">作戦 (配信紹介禁止)</strong>
+                            <p class="detail-content">-</p>
+                        </div>
                     </div>
-                    
-                    <ul id="alpha-members" class="member-list"><li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li></ul>
+
+                    <ul id="alpha-members" class="member-list">
+                        <li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li>
+                    </ul>
                 </div>
 
                 <div id="bravo-card" class="team-card border-bravo hidden md:block">
@@ -256,7 +464,7 @@
                         <span class="block text-xs font-black mb-1 tracking-widest text-bravo">BRAVO TEAM</span>
                         <h2 id="bravo-name" class="team-title text-gray-900">未選択</h2>
                         <p id="bravo-name-kana" class="kana-text text-center"></p>
-                        
+
                         <div class="flex flex-col items-center mt-4 gap-1">
                             <p id="bravo-univ" class="team-subtitle">-</p>
                             <p id="bravo-circle" class="team-circle">-</p>
@@ -267,14 +475,22 @@
                             <p id="bravo-avg-xp" class="avg-xp-pill xp-pill-bravo hidden">平均XP: -</p>
                         </div>
                     </div>
-                    
+
                     <div class="detail-box bg-bravo-light">
-                        <div id="bravo-comment" class="mb-4"><strong class="text-bravo">意気込み</strong><p class="detail-content whitespace-pre-wrap">-</p></div>
-                        <div id="bravo-records" class="mb-4"><strong class="text-bravo">実績</strong><p class="detail-content">-</p></div>
-                        <div id="bravo-tactics"><strong class="text-bravo">作戦 (配信紹介禁止)</strong><p class="detail-content">-</p></div>
+                        <div id="bravo-comment" class="mb-4"><strong class="text-bravo">意気込み</strong>
+                            <p class="detail-content whitespace-pre-wrap">-</p>
+                        </div>
+                        <div id="bravo-records" class="mb-4"><strong class="text-bravo">実績</strong>
+                            <p class="detail-content">-</p>
+                        </div>
+                        <div id="bravo-tactics"><strong class="text-bravo">作戦 (配信紹介禁止)</strong>
+                            <p class="detail-content">-</p>
+                        </div>
                     </div>
-                    
-                    <ul id="bravo-members" class="member-list"><li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li></ul>
+
+                    <ul id="bravo-members" class="member-list">
+                        <li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">チームを選択してください</li>
+                    </ul>
                 </div>
 
             </div>
@@ -289,11 +505,15 @@
             <div class="grid grid-cols-2 gap-4 w-full">
                 <div class="flex flex-col gap-1">
                     <label for="alpha-select" class="text-xs font-black text-gray-500 ml-1">ALPHA</label>
-                    <select id="alpha-select" class="team-select"><option value="">選択してください</option></select>
+                    <select id="alpha-select" class="team-select">
+                        <option value="">選択してください</option>
+                    </select>
                 </div>
                 <div class="flex flex-col gap-1">
                     <label for="bravo-select" class="text-xs font-black text-gray-500 ml-1">BRAVO</label>
-                    <select id="bravo-select" class="team-select"><option value="">選択してください</option></select>
+                    <select id="bravo-select" class="team-select">
+                        <option value="">選択してください</option>
+                    </select>
                 </div>
             </div>
         </footer>
@@ -306,22 +526,28 @@
                 <h3 class="font-black text-xl text-gray-800 flex items-center gap-2">
                     <span class="material-symbols-rounded text-blue-600">diversity_3</span> CIRCLE INFO
                 </h3>
-                <button onclick="closeCircleModal()" class="p-2 hover:bg-gray-200 rounded-full transition-colors"><span class="material-symbols-rounded">close</span></button>
+                <button onclick="closeCircleModal()" class="p-2 hover:bg-gray-200 rounded-full transition-colors"><span
+                        class="material-symbols-rounded">close</span></button>
             </div>
             <div class="p-8 overflow-y-auto bg-white">
                 <div class="flex flex-col items-center text-center mb-8">
                     <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-900 shadow-md mb-4">
-                        <img id="modal-circle-img" src="" alt="サークルアイコン" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23e5e7eb\' viewBox=\'0 0 24 24\'%3e%3cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/%3e%3c/svg%3e'">
+                        <img id="modal-circle-img" src="" alt="サークルアイコン" class="w-full h-full object-cover"
+                            onerror="this.src='data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23e5e7eb\' viewBox=\'0 0 24 24\'%3e%3cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/%3e%3c/svg%3e'">
                     </div>
-                    <p id="modal-circle-univ" class="text-sm font-bold text-gray-500 mb-1 uppercase tracking-widest">UNIVERSITY</p>
+                    <p id="modal-circle-univ" class="text-sm font-bold text-gray-500 mb-1 uppercase tracking-widest">
+                        UNIVERSITY</p>
                     <h2 id="modal-circle-name" class="text-3xl font-black text-gray-900 mb-4">サークル名</h2>
                     <div class="flex flex-wrap justify-center gap-3 mb-4">
-                        <span id="modal-circle-id" class="inline-flex items-center px-4 py-1.5 rounded-md bg-blue-50 text-blue-700 text-base font-bold border border-blue-200"></span>
-                        <span id="modal-circle-win" class="inline-flex items-center px-4 py-1.5 rounded-md bg-orange-50 text-orange-700 text-base font-bold border border-orange-200"></span>
+                        <span id="modal-circle-id"
+                            class="inline-flex items-center px-4 py-1.5 rounded-md bg-blue-50 text-blue-700 text-base font-bold border border-blue-200"></span>
+                        <span id="modal-circle-win"
+                            class="inline-flex items-center px-4 py-1.5 rounded-md bg-orange-50 text-orange-700 text-base font-bold border border-orange-200"></span>
                     </div>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                    <p id="modal-circle-comment" class="text-gray-700 leading-relaxed whitespace-pre-wrap font-medium text-lg"></p>
+                    <p id="modal-circle-comment"
+                        class="text-gray-700 leading-relaxed whitespace-pre-wrap font-medium text-lg"></p>
                 </div>
             </div>
         </div>
@@ -330,7 +556,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // モバイルタブ切り替え
-            window.switchMobileTab = function(side) {
+            window.switchMobileTab = function (side) {
                 const alphaCard = document.getElementById('alpha-card');
                 const bravoCard = document.getElementById('bravo-card');
                 const btnAlpha = document.getElementById('tab-btn-alpha');
@@ -374,22 +600,22 @@
             const alphaSelect = document.getElementById('alpha-select');
             const bravoSelect = document.getElementById('bravo-select');
             const syncMatchBtn = document.getElementById('sync-match-btn');
-            
+
             const els = {
                 alpha: {
                     name: document.getElementById('alpha-name'), kana: document.getElementById('alpha-name-kana'), avgXp: document.getElementById('alpha-avg-xp'),
                     univ: document.getElementById('alpha-univ'), circle: document.getElementById('alpha-circle'), circleKana: document.getElementById('alpha-circle-kana'),
-                    records: document.getElementById('alpha-records').querySelector('.detail-content'), 
+                    records: document.getElementById('alpha-records').querySelector('.detail-content'),
                     tactics: document.getElementById('alpha-tactics').querySelector('.detail-content'),
-                    comment: document.getElementById('alpha-comment').querySelector('.detail-content'), 
+                    comment: document.getElementById('alpha-comment').querySelector('.detail-content'),
                     members: document.getElementById('alpha-members')
                 },
                 bravo: {
                     name: document.getElementById('bravo-name'), kana: document.getElementById('bravo-name-kana'), avgXp: document.getElementById('bravo-avg-xp'),
                     univ: document.getElementById('bravo-univ'), circle: document.getElementById('bravo-circle'), circleKana: document.getElementById('bravo-circle-kana'),
-                    records: document.getElementById('bravo-records').querySelector('.detail-content'), 
+                    records: document.getElementById('bravo-records').querySelector('.detail-content'),
                     tactics: document.getElementById('bravo-tactics').querySelector('.detail-content'),
-                    comment: document.getElementById('bravo-comment').querySelector('.detail-content'), 
+                    comment: document.getElementById('bravo-comment').querySelector('.detail-content'),
                     members: document.getElementById('bravo-members')
                 }
             };
@@ -397,7 +623,7 @@
             let teamsData = [];
             let circleData = [];
             let activeMatchState = { alphaId: "", bravoId: "" };
-            let isSynced = true; 
+            let isSynced = true;
 
             async function loadData() {
                 try {
@@ -410,7 +636,7 @@
                     if (circleRes.ok) circleData = await circleRes.json();
 
                     initSelects();
-                    restoreLocalState(); 
+                    restoreLocalState();
                 } catch (error) {
                     console.error('Failed to load data:', error);
                 }
@@ -440,7 +666,7 @@
                 const el = els[side];
                 const isAlpha = side === 'alpha';
                 const xpBgColor = isAlpha ? 'bg-alpha-dark' : 'bg-bravo-dark';
-                const borderColor = isAlpha ? '#d0be08' : '#3a0ccd'; 
+                const borderColor = isAlpha ? '#d0be08' : '#3a0ccd';
 
                 if (team) {
                     el.name.textContent = team.teamName || 'チーム名なし';
@@ -448,7 +674,7 @@
                     const avgXp = team.team_average_xp && team.team_average_xp !== '----' ? team.team_average_xp : 'N/A';
                     el.avgXp.textContent = `平均XP: ${avgXp}`; el.avgXp.classList.remove('hidden');
                     el.univ.textContent = team.university || '-';
-                    
+
                     const cName = team.circle || '-';
                     el.circle.textContent = cName;
                     if (cName !== '-' && cName !== '----' && circleData.some(c => c['circle-name'] === cName)) {
@@ -462,10 +688,10 @@
                     }
 
                     el.circleKana.innerHTML = formatKana(team.circle_kana);
-                    
-                    el.comment.textContent = team.comment || 'なし'; 
-                    el.records.textContent = team.records || 'なし'; 
-                    el.tactics.textContent = team.tactics || 'なし'; 
+
+                    el.comment.textContent = team.comment || 'なし';
+                    el.records.textContent = team.records || 'なし';
+                    el.tactics.textContent = team.tactics || 'なし';
 
                     let maxXP = -1;
                     const players = [];
@@ -475,9 +701,9 @@
                         let xp = -1;
                         if (xpStr && xpStr.trim() !== '----') {
                             xp = parseInt(xpStr);
-                            if (isNaN(xp)) xp = -1; 
+                            if (isNaN(xp)) xp = -1;
                         }
-                        
+
                         const player = {
                             name: team[`p${i}_name`],
                             nameKana: team[`p${i}_name_kana`],
@@ -496,24 +722,24 @@
 
                     el.members.innerHTML = '';
                     let memberCount = 0;
-                    
+
                     players.forEach(player => {
-                        const isMaxXP = (maxXP > 0 && player.xp === maxXP); 
-                        
+                        const isMaxXP = (maxXP > 0 && player.xp === maxXP);
+
                         if (player.name && player.name.trim() !== '----') {
                             memberCount++;
                             const playerKana = formatPlayerKana(player.nameKana);
                             const playerXp = player.xpStr;
                             const playerWeapon = player.weapon;
-                            
-                            const marker = isMaxXP 
+
+                            const marker = isMaxXP
                                 ? `<span class="material-symbols-rounded text-yellow-500 mr-1 !text-xl" style="font-variation-settings: 'FILL' 1;">star</span>`
                                 : '';
-                                
+
                             const nameClass = isMaxXP ? 'font-black text-gray-900' : 'text-gray-700 font-bold';
-                            
+
                             const li = document.createElement('li');
-                            li.className = `player-item`; 
+                            li.className = `player-item`;
                             li.style.borderLeftColor = borderColor;
                             li.innerHTML = `
                                 <div class="flex justify-between w-full items-center">
@@ -529,7 +755,7 @@
                             el.members.appendChild(li);
                         }
                     });
-                    
+
                     if (memberCount === 0) el.members.innerHTML = '<li class="text-gray-400 justify-center text-center p-4 font-bold text-lg">メンバー情報なし</li>';
                 } else {
                     el.name.textContent = '未選択'; el.kana.innerHTML = ''; el.avgXp.textContent = '平均XP: -'; el.avgXp.classList.add('hidden');
@@ -556,7 +782,7 @@
                     bravoSelect.value = savedBravo;
                     updateTeamDisplay('alpha', savedAlpha);
                     updateTeamDisplay('bravo', savedBravo);
-                    checkSyncStatus(); 
+                    checkSyncStatus();
                 } else {
                     // 同期モードならFirestoreからのデータを待つ
                 }
@@ -574,7 +800,7 @@
 
             function handleManualChange(side, value) {
                 updateTeamDisplay(side, value);
-                isSynced = false; 
+                isSynced = false;
                 checkSyncStatus();
                 saveLocalState();
             }
@@ -603,18 +829,18 @@
             syncMatchBtn.addEventListener('click', () => syncToActiveMatch());
 
             loadData();
-            
+
             window.teamViewerApp = {
                 updateTeamDisplay: updateTeamDisplay,
                 alphaSelect: alphaSelect,
                 bravoSelect: bravoSelect,
-                setSyncState: (state) => { 
-                    isSynced = state; 
-                    checkSyncStatus(); 
-                    saveLocalState(); 
+                setSyncState: (state) => {
+                    isSynced = state;
+                    checkSyncStatus();
+                    saveLocalState();
                 },
-                setActiveMatch: (state) => { 
-                    activeMatchState = state; 
+                setActiveMatch: (state) => {
+                    activeMatchState = state;
                     if (isSynced) {
                         syncToActiveMatch();
                     } else {
@@ -648,7 +874,7 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 const newState = { alphaId: data.alphaTeamId, bravoId: data.bravoTeamId };
-                
+
                 if (window.teamViewerApp) {
                     window.teamViewerApp.setActiveMatch(newState);
                 } else {
@@ -664,4 +890,5 @@
     </script>
 
 </body>
+
 </html>
